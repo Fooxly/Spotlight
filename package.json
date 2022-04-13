@@ -1,5 +1,5 @@
 {
-    "name": "devkit",
+    "name": "@fooxly/devkit",
     "version": "1.0.0",
     "private": true,
     "main": "./lib/cjs/index.js",
