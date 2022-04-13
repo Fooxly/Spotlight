@@ -1,0 +1,17 @@
+{
+    "extends": [
+        "@fooxly/eslint-config",
+        "@fooxly/eslint-config-react"
+    ],
+    "overrides": [
+        {
+            "files": ["./scripts/*.ts"],
+            "parserOptions": {
+                "project": "./scripts/tsconfig.json"
+            },
+            "rules": {
+                "unicorn/import-style": "off"
+            }
+        }
+    ]
+}
