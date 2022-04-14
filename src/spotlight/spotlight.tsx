@@ -68,7 +68,10 @@ export function SpotlightComponent (): JSX.Element | null {
         setSubMenuItem(null);
     }, [visible]);
 
-    useEffect(() => setSelectedIndex(0), [search, subMenuItem]);
+    useEffect(() => {
+        setError('');
+        setSelectedIndex(0);
+    }, [search, subMenuItem]);
 
     const toggleVisible = () => setVisible((last) => !last);
     const hideSpotlight = () => setVisible(false);
@@ -92,6 +95,7 @@ export function SpotlightComponent (): JSX.Element | null {
     };
 
     const selectResult = (result: Result) => {
+        setError('');
         if (result.item.type === 'command') {
             const cmd = (result.item as Command);
             if (cmd.parentCommand) return executeCommand(cmd.parentCommand, cmd.title);
@@ -109,6 +113,7 @@ export function SpotlightComponent (): JSX.Element | null {
     };
 
     const removeHistory = () => {
+        setError('');
         clearHistory();
         setReloadVersion(Date.now());
     };
