@@ -1,9 +1,7 @@
 import { Command, JumpTo } from '@/types';
-import { uuid } from '@/utils/uuid';
 
 export const BASE_COMMANDS: Command[] = [
     {
-        id: uuid(),
         action: () => { window.location.reload() },
         title: 'Reload window',
         type: 'command',
@@ -16,7 +14,6 @@ export const BASE_COMMANDS: Command[] = [
 
 export const BASE_PAGES: JumpTo[] = [
     {
-        id: uuid(),
         title: 'Homepage',
         page: '/',
         type: 'jump-to',

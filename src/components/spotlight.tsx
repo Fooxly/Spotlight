@@ -1,13 +1,14 @@
-import React, { ChangeEvent, createRef, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { ChangeEvent, createRef, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { useHotkeys, Options } from 'react-hotkeys-hook';
 import { SearchIcon, TimesIcon } from '@/icons/line';
 import { Result } from './result';
-import { Item } from '@/types';
+import { Command, Item } from '@/types';
 
 import { COMMANDS, PAGES, getCommandIcon, filterResults } from '@/utils';
 import { executeItem } from '@/utils/execute-item';
+import { Loading } from './loading';
 
 // create the spotlight wrapper if this is not already created
 let wrapper = document.querySelector<HTMLDivElement>('#spotlight');
@@ -19,7 +20,9 @@ if (!wrapper) {
 
 export function SpotlightComponent (): JSX.Element | null {
     const [visible, setVisible] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
+    const [subMenuItem, setSubMenuItem] = useState<Command>();
     const [search, setSearch] = useState('');
     const inputRef = createRef<HTMLInputElement>();
 
@@ -29,9 +32,30 @@ export function SpotlightComponent (): JSX.Element | null {
     }), [visible]);
 
     const indexedResults: Item[] = useMemo(() => {
+        if (subMenuItem) {
+            return filterResults(search,
+                        subMenuItem.options?.options?.map((item) => ({
+                            title: item,
+                            type: 'command',
+                            parentCommand: subMenuItem,
+                        })) as Command[]
+                    );
+        }
         const all = [...PAGES, ...COMMANDS];
         return filterResults(search, all);
-    }, [search, COMMANDS, PAGES]);
+    }, [search, COMMANDS, PAGES, subMenuItem]);
+
+    useEffect(() => {
+        setSearch('');
+        setSelectedIndex(-1);
+    }, [subMenuItem]);
+
+    useEffect(() => {
+        if (visible) return;
+        setSearch('');
+        setSelectedIndex(-1);
+        setSubMenuItem(undefined);
+    }, [visible]);
 
     const hasIcons = useMemo(() => indexedResults.filter((item) => !!getCommandIcon(item.options?.icon)).length > 0, [indexedResults]);
     const pages = useMemo(() => indexedResults.filter((item) => item.type === 'jump-to'), [indexedResults]);
@@ -42,11 +66,7 @@ export function SpotlightComponent (): JSX.Element | null {
         else inputRef.current.focus();
     }, [selectedIndex, inputRef]);
 
-    const toggleVisible = () => {
-        setSearch('');
-        setVisible((last) => !last);
-    }
-
+    const toggleVisible = () => setVisible((last) => !last);
     const hideSpotlight = () => setVisible(false);
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -55,9 +75,32 @@ export function SpotlightComponent (): JSX.Element | null {
             setSearch(e.target.value);
         }
     }
+    const handleClearSearch = () => setSearch('');
+    const executeCommand = (command: Command, result?: string) => {
+        const res = executeItem(command, result);
+        if (res instanceof Promise) {
+            setLoading(true);
+            res.finally(() => {
+                setLoading(false);
+                hideSpotlight();
+            });
+        } else {
+            hideSpotlight();
+        }
+    }
+    const handleItemSelect = (item: Item) => {
+        if (item.type === 'command') {
+            const cmd = (item as Command);
+            if (cmd.parentCommand) return executeCommand(cmd.parentCommand, cmd.title);
+            if (cmd.options?.options?.length) return setSubMenuItem(cmd);
+            executeCommand(cmd);
+        } else {
+            executeItem(item);
+        }
+    }
 
     // All the hotkeys
-    useHotkeys('cmd+shift+k, ctrl+shift_k', (e) => {
+    useHotkeys('cmd+shift+k, ctrl+shift+k', (e) => {
         e.preventDefault();
         e.stopPropagation();
         toggleVisible();
@@ -75,7 +118,7 @@ export function SpotlightComponent (): JSX.Element | null {
         setSelectedIndex((last) => {
             const newIndex = Math.max(-1, last - 1);
             if (newIndex < 0) return -1;
-            document.getElementById(`command-${indexedResults[newIndex].id}`)?.scrollIntoView({
+            document.getElementById(`command-${newIndex}`)?.scrollIntoView({
                 behavior: 'smooth',
                 block: newIndex <= 0 ? 'center' : 'nearest',
             });
@@ -88,7 +131,7 @@ export function SpotlightComponent (): JSX.Element | null {
         setSelectedIndex((last) => {
             const newIndex = Math.min(indexedResults.length - 1, last + 1);
             if (newIndex < 0) return -1;
-            document.getElementById(`command-${indexedResults[newIndex].id}`)?.scrollIntoView({
+            document.getElementById(`command-${newIndex}`)?.scrollIntoView({
                 behavior: 'smooth',
                 block: newIndex === (indexedResults.length - 1) ? 'center' : 'nearest',
             });
@@ -99,21 +142,33 @@ export function SpotlightComponent (): JSX.Element | null {
         e.preventDefault();
         e.stopPropagation();
         if (selectedIndex < 0) return;
-        executeItem(indexedResults[selectedIndex]);
-        hideSpotlight();
+        handleItemSelect(indexedResults[selectedIndex]);
     }, HOTKEY_OPTIONS, [indexedResults, selectedIndex]);
-
-    const handleClearSearch = () => setSearch('');
-
-    // TODO: add section with "Top result" which shows the most likely result
+    useHotkeys('backspace', (e) => {
+        if (search.length !== 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+        setSelectedIndex(-1);
+        setSubMenuItem(undefined);
+        setSearch('');
+    }, {
+        ...HOTKEY_OPTIONS,
+        enabled: visible && !!subMenuItem,
+    }, [search, indexedResults, selectedIndex]);
 
     return ReactDOM.createPortal(!visible ? null : (
         <Container>
             <Background onClick={hideSpotlight} />
             <Content>
                 <SearchBar $hasResults={!!indexedResults?.length}>
-                    <SearchInput autoFocus ref={inputRef} placeholder='Search or jump to...' value={search} onChange={handleInputChange} />
-                    <SearchIcon size={24} color='gray4' />
+                    <SearchInput autoFocus ref={inputRef} placeholder={subMenuItem ? subMenuItem.title : 'Search or jump to...'} value={search} onChange={handleInputChange} />
+                    <SearchIconWrapper>
+                        {loading ? (
+                            <Loading size={22} color='blue' thickness={3} />
+                        ) : (
+                            <SearchIcon size={24} color='gray4' />
+                        )}
+                        </SearchIconWrapper>
                     {search?.length > 0 && (
                         <CloseButton onClick={handleClearSearch}>
                             <TimesIcon size={8} color='gray10' />
@@ -128,16 +183,16 @@ export function SpotlightComponent (): JSX.Element | null {
                                     <ResultSectionTitle>Pages</ResultSectionTitle>
                                 </ResultSection>
                                 {pages.map((item) => {
-                                    const index = indexedResults.findIndex(i => i.id === item.id);
+                                    const index = indexedResults.findIndex(i => i.title === item.title);
                                     return (
                                         <Result
-                                            key={item.id}
+                                            key={item.title}
                                             index={index}
                                             item={item}
                                             hasIcons={hasIcons}
                                             selected={selectedIndex === index}
                                             onSoftSelect={setSelectedIndex}
-                                            onComplete={hideSpotlight}
+                                            onSelect={handleItemSelect}
                                         />
                                     )
                                 })}
@@ -145,20 +200,22 @@ export function SpotlightComponent (): JSX.Element | null {
                         )}
                         {!!commands.length && (
                             <>
-                                <ResultSection>
-                                    <ResultSectionTitle>Commands</ResultSectionTitle>
-                                </ResultSection>
+                                {!subMenuItem && (
+                                    <ResultSection>
+                                        <ResultSectionTitle>Commands</ResultSectionTitle>
+                                    </ResultSection>
+                                )}
                                 {commands.map((item) => {
-                                    const index = indexedResults.findIndex(i => i.id === item.id);
+                                    const index = indexedResults.findIndex(i => i.title === item.title);
                                     return (
                                         <Result
-                                            key={item.id}
+                                            key={item.title}
                                             index={index}
                                             item={item}
                                             hasIcons={hasIcons}
                                             selected={selectedIndex === index}
                                             onSoftSelect={setSelectedIndex}
-                                            onComplete={hideSpotlight}
+                                            onSelect={handleItemSelect}
                                         />
                                     )
                                 })}
@@ -200,7 +257,7 @@ const Content = styled.div`
     border-radius: 10px;
     border: 2px solid ${(p) => p.theme.light ? p.theme.color.gray4 : p.theme.color.gray8};
     overflow: hidden;
-    animation: ${(p) => p.theme.animation.fadeInWithPulse} 0.4s ease-in-out;
+    animation: ${(p) => p.theme.animation.fadeInWithPulse} 0.25s ease-in-out;
     z-index: 99999;
 
     @media(max-width: 900px) {
@@ -219,12 +276,6 @@ const SearchBar = styled.div<{ $hasResults: boolean }>`
     ${(p) => p.$hasResults && `
         border-bottom: 1px solid ${p.theme.color.gray8};
     `}
-
-    > svg {
-        position: absolute;
-        left: 15px;
-        margin-bottom: 2px;
-    }
 `;
 
 const SearchInput = styled.input`
@@ -238,6 +289,13 @@ const SearchInput = styled.input`
     }
 `;
 
+const SearchIconWrapper = styled.div`
+    ${(p) => p.theme.flex.col({ justify: 'center', align: 'center' })}
+    position: absolute;
+    left: 15px;
+    margin-bottom: 2px;
+`;
+
 const Results = styled.div`
     ${(p) => p.theme.flex.col()};
     height: auto;
@@ -248,7 +306,7 @@ const Results = styled.div`
     @media(max-height: 600px) {
         max-height: 100%;
     }
-`
+`;
 
 const CloseButton = styled.button`
     ${(p) => p.theme.flex.col({ justify: 'center', align: 'center' })}

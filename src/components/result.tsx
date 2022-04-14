@@ -9,24 +9,19 @@ interface Props {
     index: number;
     selected: boolean;
     onSoftSelect: (index: number) => void;
-    onComplete: () => void;
+    onSelect: (item: Item) => any | Promise<any>;
 }
 
-export function Result ({ hasIcons, item, index, selected, onSoftSelect, onComplete }: Props): JSX.Element | null {
+export function Result ({ hasIcons, item, index, selected, onSoftSelect, onSelect }: Props): JSX.Element | null {
     const enableFocus = () => onSoftSelect(index);
     const Icon = getCommandIcon(item.options?.icon);
 
     const handleAction = () => {
-        if (item.type === 'command') {
-            (item as Command).action();
-        } else {
-            window.location.href = (item as JumpTo).page;
-        }
-        onComplete();
+        onSelect(item);
     }
 
     return (
-        <Container id={`command-${item.id}`} $selected={selected} onClick={handleAction} onMouseMove={enableFocus} onFocus={enableFocus}>
+        <Container id={`command-${index}`} $selected={selected} onClick={handleAction} onMouseMove={enableFocus} onFocus={enableFocus}>
             <Left>
                 {hasIcons && (
                     <IconWrapper>
