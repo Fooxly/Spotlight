@@ -83,7 +83,6 @@ export function SpotlightComponent (): JSX.Element | null {
                 hideSpotlight();
             }).catch((error) => {
                 setLoading(false);
-                console.log(error);
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 setError(ERRORS[error.message] || ERRORS.UNKNOWN);
             });
