@@ -4,10 +4,10 @@ import styled from 'styled-components';
 import { useHotkeys, Options } from 'react-hotkeys-hook';
 import { SearchIcon, TimesIcon } from '@/icons/line';
 import { Result } from './result';
-import { Command } from '@/types';
-import { BASE_COMMANDS } from '../utils/constants/base-commands';
-import { getCommandIcon } from '@/utils/get-command-icon';
-import { COMMANDS } from '@/utils';
+import { Command, Item } from '@/types';
+
+import { COMMANDS, PAGES, getCommandIcon, filterResults } from '@/utils';
+import { executeItem } from '@/utils/execute-item';
 
 // create the spotlight wrapper if this is not already created
 let wrapper = document.querySelector<HTMLDivElement>('#spotlight');
@@ -23,24 +23,19 @@ export function SpotlightComponent (): JSX.Element | null {
     const [search, setSearch] = useState('');
     const inputRef = createRef<HTMLInputElement>();
 
-    const HOTKEY_OPTIONS: Options = {
+    const HOTKEY_OPTIONS: Options = useMemo(() => ({
         enabled: visible,
         enableOnTags: ['INPUT', 'TEXTAREA'],
-    };
+    }), [visible]);
 
-    // TODO: update the search algorithm to be more efficient and sort based on most likely match
-    const indexedResults: Command[] = useMemo(() => search.trim().length === 0 ? COMMANDS.slice(0, 8) : COMMANDS.filter((cmd) => {
-        const fullSearch = search.trim().toLowerCase();
-        const words = fullSearch.split(' ').filter((word) => word.length > 1);
-        // check the title for keywords
-        const title = cmd.title.toLowerCase();
-        if (title.includes(fullSearch)) return true;
-        // check the keywords
-        const keywords = cmd.options?.keywords?.map((kw) => kw.toLowerCase());
-        if (keywords?.filter((kw) => words.filter((word) => kw.includes(word)).length > 0).length) return true;
-    }), [search]);
+    const indexedResults: Item[] = useMemo(() => {
+        const all = [...PAGES, ...COMMANDS];
+        return filterResults(search, all);
+    }, [search, COMMANDS, PAGES]);
 
-    const hasIcons = useMemo(() => indexedResults.filter((cmd) => !!getCommandIcon(cmd.options?.icon)).length > 0, [indexedResults]);
+    const hasIcons = useMemo(() => indexedResults.filter((item) => !!getCommandIcon(item.options?.icon)).length > 0, [indexedResults]);
+    const pages = useMemo(() => indexedResults.filter((item) => item.type === 'jump-to'), [indexedResults]);
+    const commands = useMemo(() => indexedResults.filter((item) => item.type === 'command'), [indexedResults]);
 
     useEffect(() => {
         if (!inputRef.current) return;
@@ -52,11 +47,14 @@ export function SpotlightComponent (): JSX.Element | null {
         setVisible((last) => !last);
     }
 
+    const hideSpotlight = () => setVisible(false);
+
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
         setSelectedIndex(-1);
     }
 
+    // All the hotkeys
     useHotkeys('cmd+shift+k, ctrl+shift_k', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -67,7 +65,7 @@ export function SpotlightComponent (): JSX.Element | null {
     useHotkeys('esc', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        setVisible(false);
+        hideSpotlight();
     }, HOTKEY_OPTIONS);
     useHotkeys('up', (e) => {
         e.preventDefault();
@@ -99,15 +97,17 @@ export function SpotlightComponent (): JSX.Element | null {
         e.preventDefault();
         e.stopPropagation();
         if (selectedIndex < 0) return;
-        indexedResults[selectedIndex].action();
-        toggleVisible();
+        executeItem(indexedResults[selectedIndex]);
+        hideSpotlight();
     }, HOTKEY_OPTIONS);
 
     const handleClearSearch = () => setSearch('');
 
+    // TODO: add section with "Top result" which shows the most likely result
+
     return ReactDOM.createPortal(!visible ? null : (
         <Container>
-            <Background onClick={toggleVisible} />
+            <Background onClick={hideSpotlight} />
             <Content>
                 <SearchBar $hasResults={!!indexedResults?.length}>
                     <SearchInput onFocus={() => setSelectedIndex(-1)} autoFocus ref={inputRef} placeholder='Search or jump to...' value={search} onChange={handleInputChange} />
@@ -120,9 +120,48 @@ export function SpotlightComponent (): JSX.Element | null {
                 </SearchBar>
                 {!!indexedResults.length && (
                     <Results>
-                        {indexedResults.map((command, index) => (
-                            <Result hasIcons={hasIcons} command={command} index={index} selected={selectedIndex === index} key={command.id} onSoftSelect={setSelectedIndex} onComplete={toggleVisible} />
-                        ))}
+                        {!!pages.length && (
+                            <>
+                                <ResultSection>
+                                    <ResultSectionTitle>Pages</ResultSectionTitle>
+                                </ResultSection>
+                                {pages.map((item) => {
+                                    const index = indexedResults.findIndex(i => i.id === item.id);
+                                    return (
+                                        <Result
+                                            key={item.id}
+                                            index={index}
+                                            item={item}
+                                            hasIcons={hasIcons}
+                                            selected={selectedIndex === index}
+                                            onSoftSelect={setSelectedIndex}
+                                            onComplete={hideSpotlight}
+                                        />
+                                    )
+                                })}
+                            </>
+                        )}
+                        {!!commands.length && (
+                            <>
+                                <ResultSection>
+                                    <ResultSectionTitle>Commands</ResultSectionTitle>
+                                </ResultSection>
+                                {commands.map((item) => {
+                                    const index = indexedResults.findIndex(i => i.id === item.id);
+                                    return (
+                                        <Result
+                                            key={item.id}
+                                            index={index}
+                                            item={item}
+                                            hasIcons={hasIcons}
+                                            selected={selectedIndex === index}
+                                            onSoftSelect={setSelectedIndex}
+                                            onComplete={hideSpotlight}
+                                        />
+                                    )
+                                })}
+                            </>
+                        )}
                     </Results>
                 )}
             </Content>
@@ -218,4 +257,12 @@ const CloseButton = styled.button`
     width: 22px;
     height: 22px;
     cursor: pointer;
+`;
+
+const ResultSection = styled.div`
+    padding: 7px 5px;
+`;
+
+const ResultSectionTitle = styled.p`
+    ${(p) => p.theme.text.System.semibold(14, 'gray4')}
 `;

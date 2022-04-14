@@ -1,10 +1,9 @@
 import React, { useMemo } from 'react';
 import { ThemeProvider } from 'styled-components';
-
 import { SpotlightComponent } from './components';
 import { getColorFunction, themes } from './theme';
-import { CommandOptions, Theme } from './types';
-import { COMMANDS, uuid } from './utils';
+import { ItemOptions, Theme } from './types';
+import { COMMANDS, PAGES, uuid } from './utils';
 
 interface Props {
     isDarkMode?: boolean;
@@ -12,7 +11,7 @@ interface Props {
 
 export function Spotlight ({ isDarkMode }: Props): JSX.Element {
     const calculatedTheme = useMemo(() => {
-        const selectedTheme: Theme = themes[isDarkMode ? 'dark' : 'light'];
+    const selectedTheme: Theme = themes[isDarkMode ? 'dark' : 'light'];
         return {
             ...selectedTheme,
             color: getColorFunction({ ...selectedTheme.color.colors }),
@@ -20,28 +19,18 @@ export function Spotlight ({ isDarkMode }: Props): JSX.Element {
     }, [isDarkMode]);
 
     return (
-        <div id='dev-toolkit'>
-            <ThemeProvider theme={calculatedTheme}>
-                <SpotlightComponent />
-            </ThemeProvider>
-        </div>
+        <ThemeProvider theme={calculatedTheme}>
+            <SpotlightComponent />
+        </ThemeProvider>
     );
 }
 
-
-export function RegisterJumpTo (title: string, page: string, options?: CommandOptions): string {
+export function RegisterJumpTo (title: string, page: string, options?: ItemOptions): string {
     const id = uuid();
-    COMMANDS.push({
+    PAGES.push({
         id,
         title,
-        action: () => {
-            // TODO: check if this link is external
-            if (page.startsWith('/')) {
-                window.location.href = `${window.location.origin}${page}`;
-            } else {
-                window.location.href = page;
-            }
-        },
+        page,
         type: 'jump-to',
         options: {
             icon: 'redirect',
@@ -51,7 +40,7 @@ export function RegisterJumpTo (title: string, page: string, options?: CommandOp
     return id;
 }
 
-export function RegisterCommand (title: string, action: () => void, options?: CommandOptions): string {
+export function RegisterCommand (title: string, action: () => void, options?: ItemOptions): string {
     const id = uuid();
     COMMANDS.push({
         id,
@@ -65,6 +54,7 @@ export function RegisterCommand (title: string, action: () => void, options?: Co
 
 export function Unregister (id: string): void {
     COMMANDS.splice(COMMANDS.findIndex(command => command.id === id), 1);
+    PAGES.splice(PAGES.findIndex(page => page.id === id), 1);
 }
 
 export default {

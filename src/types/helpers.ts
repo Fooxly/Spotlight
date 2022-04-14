@@ -1,14 +1,23 @@
-export interface Command {
+export interface Item {
     id: string;
     title: string;
-    action: () => void;
+    options?: ItemOptions;
     type: 'command' | 'jump-to';
-    options?: CommandOptions;
 }
 
-export interface CommandOptions {
+export interface Command extends Item {
+    action: () => void;
+    type: 'command';
+}
+
+export interface JumpTo extends Item {
+    page: string;
+    type: 'jump-to';
+}
+
+export interface ItemOptions {
     keywords?: string[];
-    icon?: CommandIcon;
+    icon?: ItemIcon;
 }
 
-export type CommandIcon = 'redirect' | 'redo' | 'house' | 'undo';
+export type ItemIcon = 'redirect' | 'redo' | 'house' | 'undo';

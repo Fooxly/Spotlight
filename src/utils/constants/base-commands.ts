@@ -1,17 +1,7 @@
-import { Command } from '@/types';
-import { uuid } from '@/utils';
+import { Command, JumpTo } from '@/types';
+import { uuid } from '@/utils/uuid';
 
 export const BASE_COMMANDS: Command[] = [
-    {
-        id: uuid(),
-        action: () => { window.location.href = '/' },
-        title: 'Homepage',
-        type: 'jump-to',
-        options: {
-            icon: 'house',
-            keywords: ['home', 'homepage'],
-        }
-    },
     {
         id: uuid(),
         action: () => { window.location.reload() },
@@ -23,3 +13,17 @@ export const BASE_COMMANDS: Command[] = [
         }
     },
 ];
+
+export const BASE_PAGES: JumpTo[] = [
+    {
+        id: uuid(),
+        title: 'Homepage',
+        page: '/',
+        type: 'jump-to',
+        options: {
+            icon: 'house',
+            keywords: ['home', 'homepage'],
+        }
+    },
+];
+

@@ -1,38 +1,42 @@
 import React from 'react';
-import styled, { keyframes } from 'styled-components';
-import { Command } from '@/types';
+import styled from 'styled-components';
+import { Command, Item, JumpTo } from '@/types';
 import { getCommandIcon } from '@/utils/get-command-icon';
 
 interface Props {
     hasIcons: boolean;
-    command: Command;
+    item: Item;
     index: number;
     selected: boolean;
     onSoftSelect: (index: number) => void;
     onComplete: () => void;
 }
 
-export function Result ({ hasIcons, command, index, selected, onSoftSelect, onComplete }: Props): JSX.Element | null {
+export function Result ({ hasIcons, item, index, selected, onSoftSelect, onComplete }: Props): JSX.Element | null {
     const enableFocus = () => onSoftSelect(index);
-    const Icon = getCommandIcon(command.options?.icon);
+    const Icon = getCommandIcon(item.options?.icon);
 
     const handleAction = () => {
-        command.action();
+        if (item.type === 'command') {
+            (item as Command).action();
+        } else {
+            window.location.href = (item as JumpTo).page;
+        }
         onComplete();
     }
 
     return (
-        <Container id={`command-${command.id}`} $selected={selected} onClick={handleAction} onMouseMove={enableFocus} onFocus={enableFocus}>
+        <Container id={`command-${item.id}`} $selected={selected} onClick={handleAction} onMouseMove={enableFocus} onFocus={enableFocus}>
             <Left>
                 {hasIcons && (
                     <IconWrapper>
                         {!!Icon && <Icon size={24} color='gray4' />}
                     </IconWrapper>
                 )}
-                <Title>{command.title}</Title>
+                <Title>{item.title}</Title>
             </Left>
             {selected && (
-                <Type>{command.type === 'command' ? 'Run command' : 'Jump to'}</Type>
+                <Type>{item.type === 'command' ? 'Run command' : 'Jump to'}</Type>
             )}
         </Container>
     );
@@ -73,7 +77,7 @@ const IconWrapper = styled.div`
 `
 
 const Title = styled.p`
-    ${(p) => p.theme.text.System.regular(15, 'gray3')}
+    ${(p) => p.theme.text.System.regular(15, 'gray1')}
 `;
 
 const Type = styled.p`
