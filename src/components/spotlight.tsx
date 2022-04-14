@@ -50,8 +50,10 @@ export function SpotlightComponent (): JSX.Element | null {
     const hideSpotlight = () => setVisible(false);
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setSelectedIndex(-1);
-        setSearch(e.target.value);
+        if (e.target.value.length !== search.length) {
+            setSelectedIndex(-1);
+            setSearch(e.target.value);
+        }
     }
 
     // All the hotkeys
@@ -84,7 +86,7 @@ export function SpotlightComponent (): JSX.Element | null {
         e.preventDefault();
         e.stopPropagation();
         setSelectedIndex((last) => {
-            const newIndex = Math.min(indexedResults.length - 1, selectedIndex + 1);
+            const newIndex = Math.min(indexedResults.length - 1, last + 1);
             if (newIndex < 0) return -1;
             document.getElementById(`command-${indexedResults[newIndex].id}`)?.scrollIntoView({
                 behavior: 'smooth',
@@ -96,7 +98,6 @@ export function SpotlightComponent (): JSX.Element | null {
     useHotkeys('enter', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('aaa', selectedIndex);
         if (selectedIndex < 0) return;
         executeItem(indexedResults[selectedIndex]);
         hideSpotlight();
