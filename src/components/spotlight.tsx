@@ -5,19 +5,17 @@ import { useHotkeys, Options } from 'react-hotkeys-hook';
 import { SearchIcon, TimesIcon } from '@/icons/line';
 import { Result } from './result';
 import { Command } from '@/types';
-import { BASE_COMMANDS } from './base-commands';
+import { BASE_COMMANDS } from '../utils/constants/base-commands';
 import { getCommandIcon } from '@/utils/get-command-icon';
+import { COMMANDS } from '@/utils';
 
+// create the spotlight wrapper if this is not already created
 let wrapper = document.querySelector<HTMLDivElement>('#spotlight');
 if (!wrapper) {
     wrapper = document.createElement('div');
     wrapper.id = 'spotlight';
     document.body.append(wrapper);
 }
-
-export const COMMANDS: Command[] = [
-    ...BASE_COMMANDS,
-];
 
 export function SpotlightComponent (): JSX.Element | null {
     const [visible, setVisible] = useState(false);

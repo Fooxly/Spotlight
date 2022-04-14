@@ -1,8 +1,3 @@
-export type ReactChildren =
-    // eslint-disable-next-line no-multi-spaces
-    |       JSX.Element | false | null | undefined | string
-    | Array<JSX.Element | false | null | undefined | string>;
-
 export interface Command {
     id: string;
     title: string;

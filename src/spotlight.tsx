@@ -1,8 +1,33 @@
-import { Command, CommandOptions } from '@/types';
-import { uuid } from '@/utils';
-import { COMMANDS } from './spotlight';
+import React, { useMemo } from 'react';
+import { ThemeProvider } from 'styled-components';
 
-export * from './spotlight';
+import { SpotlightComponent } from './components';
+import { getColorFunction, themes } from './theme';
+import { CommandOptions, Theme } from './types';
+import { COMMANDS, uuid } from './utils';
+
+interface Props {
+    isDarkMode?: boolean;
+}
+
+export function Spotlight ({ isDarkMode }: Props): JSX.Element {
+    const calculatedTheme = useMemo(() => {
+        const selectedTheme: Theme = themes[isDarkMode ? 'dark' : 'light'];
+        return {
+            ...selectedTheme,
+            color: getColorFunction({ ...selectedTheme.color.colors }),
+        };
+    }, [isDarkMode]);
+
+    return (
+        <div id='dev-toolkit'>
+            <ThemeProvider theme={calculatedTheme}>
+                <SpotlightComponent />
+            </ThemeProvider>
+        </div>
+    );
+}
+
 
 export function RegisterJumpTo (title: string, page: string, options?: CommandOptions): string {
     const id = uuid();
@@ -42,8 +67,9 @@ export function Unregister (id: string): void {
     COMMANDS.splice(COMMANDS.findIndex(command => command.id === id), 1);
 }
 
-export const Spotlight = {
+export default {
+    Spotlight,
     RegisterJumpTo,
     RegisterCommand,
-    Unregister
+    Unregister,
 }

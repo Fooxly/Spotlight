@@ -1,1 +1,1 @@
-export * from './dev-toolkit';
+export * from './spotlight';

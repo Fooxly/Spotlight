@@ -1,5 +1,5 @@
 {
-    "name": "@fooxly/devkit",
+    "name": "@fooxly/spotlight",
     "version": "1.0.0",
     "private": true,
     "main": "./lib/cjs/index.js",
