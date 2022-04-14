@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { ThemeProvider } from 'styled-components';
 
 import { COMMANDS, HISTORY_LENGTH_KEY, PAGES } from './utils';
-import { SpotlightComponent } from './components';
+import { SpotlightComponent } from './spotlight';
 import { getColorFunction, themes } from './theme';
 import type { CommandOptions, ItemOptions, ShellCommandOptions, Theme } from './types';
 

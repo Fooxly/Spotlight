@@ -6,7 +6,7 @@ import { SourceCodePro } from './fonts';
 export const AppStyles = createGlobalStyle<{ $animations: boolean }>`
     ${SourceCodePro}
 
-    #dev-toolkit {
+    #fooxly-spotlight {
         font-family: ${(p) => p.theme.text.System.family};
         line-height: 1.3;
         letter-spacing: .02em;
@@ -26,16 +26,16 @@ export const AppStyles = createGlobalStyle<{ $animations: boolean }>`
         `}
     }
 
-    #dev-toolkit pre, kbd, code, samp {
+    #fooxly-spotlight pre, kbd, code, samp {
         font-family: ${(p) => p.theme.text.SourceCodePro.family};
     }
 
-    #dev-toolkit *::placeholder {
+    #fooxly-spotlight *::placeholder {
         font-weight: 400;
         color: ${(p) => p.theme.color.gray3} !important;
     }
 
-    #dev-toolkit input[type="password"]::placeholder {
+    #fooxly-spotlight input[type="password"]::placeholder {
         font-weight: 700;
         letter-spacing: .4em;
     }

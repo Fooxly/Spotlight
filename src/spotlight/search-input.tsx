@@ -1,13 +1,9 @@
-import React, { ChangeEvent, createRef, Ref, useEffect, useMemo, useState } from 'react';
-import ReactDOM from 'react-dom';
+import React, { ChangeEvent, Ref } from 'react';
 import styled from 'styled-components';
-import { useHotkeys, Options } from 'react-hotkeys-hook';
-import { SearchIcon, TimesIcon } from '@/icons/line';
-import { Command, Item, Result } from '@/types';
 
-import { COMMANDS, PAGES, getCommandIcon, filterResults, executeItem, getHistory, updateHistory, clearHistory } from '@/utils';
 import { Loading } from './loading';
-import { Section } from './section';
+
+import { SearchIcon, TimesIcon } from '@/icons/line';
 
 // create the spotlight wrapper if this is not already created
 let wrapper = document.querySelector<HTMLDivElement>('#spotlight');
@@ -32,7 +28,7 @@ export function SearchInput ({ hasResults, placeholder, value, loading, fref, on
         if (e.target.value.length !== value.length) {
             onChange(e.target.value);
         }
-    }
+    };
 
     const handleClear = () => onChange('');
 
@@ -41,7 +37,7 @@ export function SearchInput ({ hasResults, placeholder, value, loading, fref, on
             <Input
                 autoFocus
                 ref={fref}
-                placeholder={placeholder || 'Search or jump to...'}
+                placeholder={placeholder ?? 'Search or jump to...'}
                 value={value}
                 onChange={handleChange}
             />
@@ -51,14 +47,14 @@ export function SearchInput ({ hasResults, placeholder, value, loading, fref, on
                 ) : (
                     <SearchIcon size={24} color='gray4' />
                 )}
-                </SearchIconWrapper>
+            </SearchIconWrapper>
             {value?.length > 0 && (
                 <CloseButton onClick={handleClear}>
                     <TimesIcon size={8} color='gray10' />
                 </CloseButton>
             )}
         </SearchBar>
-    )
+    );
 }
 
 const SearchBar = styled.div<{ $hasResults: boolean }>`

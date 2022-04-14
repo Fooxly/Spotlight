@@ -76,6 +76,8 @@ export const text = (Object.keys(weights) as FontFamily[]).reduce<Text>(function
             func.weight = weight[w];
 
             return { ...acc, family: ff, [w]: func };
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         }, obj),
     };
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 }, obj);

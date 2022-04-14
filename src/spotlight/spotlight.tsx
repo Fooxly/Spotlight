@@ -1,52 +1,65 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { createRef, useEffect, useMemo, useState } from 'react';
+import React, { createRef, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
-import { useHotkeys } from 'react-hotkeys-hook';
+import { useHotkeys, Options } from 'react-hotkeys-hook';
+
 import { SearchInput } from './search-input';
 import { Section } from './section';
 import { Error } from './error';
-import { filterResults, executeItem, updateHistory, clearHistory } from '../utils';
+
+import { Category, Command, Result } from '@/types';
+import { filterResults, executeItem, updateHistory, clearHistory, ERRORS } from '@/utils';
+
 // create the spotlight wrapper if this is not already created
-let wrapper = document.querySelector('#spotlight');
+let wrapper = document.querySelector<HTMLDivElement>('#spotlight');
 if (!wrapper) {
     wrapper = document.createElement('div');
     wrapper.id = 'spotlight';
     document.body.append(wrapper);
 }
-const preventDefault = (e) => {
+
+const preventDefault = (e: KeyboardEvent) => {
     e.preventDefault();
     e.stopPropagation();
 };
-export function SpotlightComponent() {
+
+export function SpotlightComponent (): JSX.Element | null {
     const [visible, setVisible] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [reloadVersion, setReloadVersion] = useState(-1);
-    const [subMenuItem, setSubMenuItem] = useState();
+    const [subMenuItem, setSubMenuItem] = useState<Command | null>();
     const [search, setSearch] = useState('');
     const [error, setError] = useState('');
-    const inputRef = createRef();
-    const HOTKEY_OPTIONS = useMemo(() => ({
+    const inputRef = createRef<HTMLInputElement>();
+
+    const HOTKEY_OPTIONS: Options = useMemo(() => ({
         enabled: visible,
         enableOnTags: ['INPUT', 'TEXTAREA'],
     }), [visible]);
+
     // Get the results which should be indexed and rendered
-    const indexedResults = useMemo(() => {
+    const indexedResults: Category[] = useMemo(() => {
         if (subMenuItem?.options?.options) {
-            return filterResults(search, {
-                title: subMenuItem.title,
-                items: subMenuItem?.options?.options.map((item) => ({
-                    title: item,
-                    type: 'command',
-                    parentCommand: subMenuItem,
-                })),
-            });
+            return filterResults(
+                search,
+                {
+                    title: subMenuItem.title,
+                    items:
+                        subMenuItem?.options?.options.map((item) => ({
+                            title: item,
+                            type: 'command',
+                            parentCommand: subMenuItem,
+                        })),
+                },
+            );
         }
         return filterResults(search);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [visible, reloadVersion, search, subMenuItem]);
+
     const resultCount = useMemo(() => indexedResults.reduce((count, cat) => cat.results.length + count, 0), [indexedResults]);
+
     // When the spotlight is closed, reset all the values
     useEffect(() => {
         setSearch('');
@@ -54,10 +67,13 @@ export function SpotlightComponent() {
         setSelectedIndex(0);
         setSubMenuItem(null);
     }, [visible]);
+
     useEffect(() => setSelectedIndex(0), [search, subMenuItem]);
+
     const toggleVisible = () => setVisible((last) => !last);
     const hideSpotlight = () => setVisible(false);
-    const executeCommand = (command, result) => {
+
+    const executeCommand = (command: Command, result?: string) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const res = executeItem(command, result);
         if (res instanceof Promise) {
@@ -67,19 +83,19 @@ export function SpotlightComponent() {
                 hideSpotlight();
             }).catch((error) => {
                 setLoading(false);
-                // TODO: check for error and show below spotlight
-                console.warn(error);
+                console.log(error);
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                setError(ERRORS[error.message] || ERRORS.UNKNOWN);
             });
-        }
-        else {
+        } else {
             hideSpotlight();
         }
     };
-    const selectResult = (result) => {
+
+    const selectResult = (result: Result) => {
         if (result.item.type === 'command') {
-            const cmd = result.item;
-            if (cmd.parentCommand)
-                return executeCommand(cmd.parentCommand, cmd.title);
+            const cmd = (result.item as Command);
+            if (cmd.parentCommand) return executeCommand(cmd.parentCommand, cmd.title);
             if (cmd.options?.options?.length) {
                 updateHistory(result.item);
                 setSubMenuItem(cmd);
@@ -87,32 +103,34 @@ export function SpotlightComponent() {
             }
             updateHistory(result.item);
             executeCommand(cmd);
-        }
-        else {
+        } else {
             updateHistory(result.item);
             executeItem(result.item);
         }
     };
+
     const removeHistory = () => {
         clearHistory();
         setReloadVersion(Date.now());
     };
+
     useHotkeys('cmd+shift+k, ctrl+shift+k', (e) => {
         preventDefault(e);
         toggleVisible();
     }, {
         enableOnTags: ['INPUT', 'TEXTAREA'],
     }, [visible]);
+
     useHotkeys('esc', (e) => {
         preventDefault(e);
         hideSpotlight();
     }, HOTKEY_OPTIONS);
+
     useHotkeys('up', (e) => {
         preventDefault(e);
         setSelectedIndex((last) => {
             const newIndex = Math.max(-1, last - 1);
-            if (newIndex < 0)
-                return -1;
+            if (newIndex < 0) return -1;
             document.querySelector(`#command-${newIndex}`)?.scrollIntoView({
                 behavior: 'smooth',
                 block: newIndex <= 0 ? 'center' : 'nearest',
@@ -120,12 +138,12 @@ export function SpotlightComponent() {
             return newIndex;
         });
     }, HOTKEY_OPTIONS, [indexedResults, selectedIndex]);
-    useHotkeys('down', (e) => {
+
+    useHotkeys('down', (e: KeyboardEvent) => {
         preventDefault(e);
         setSelectedIndex((last) => {
             const newIndex = Math.min(resultCount - 1, last + 1);
-            if (newIndex < 0)
-                return -1;
+            if (newIndex < 0) return -1;
             document.querySelector(`#command-${newIndex}`)?.scrollIntoView({
                 behavior: 'smooth',
                 block: newIndex === (resultCount - 1) ? 'center' : 'nearest',
@@ -133,21 +151,19 @@ export function SpotlightComponent() {
             return newIndex;
         });
     }, HOTKEY_OPTIONS, [indexedResults, selectedIndex]);
+
     useHotkeys('enter', (e) => {
         preventDefault(e);
-        if (selectedIndex < 0)
-            return;
+        if (selectedIndex < 0) return;
         const cat = indexedResults.find((cat) => cat.results.find((res) => res.index === selectedIndex));
-        if (!cat)
-            return;
+        if (!cat) return;
         const result = cat.results.find((res) => res.index === selectedIndex);
-        if (!result)
-            return;
+        if (!result) return;
         selectResult(result);
     }, HOTKEY_OPTIONS, [indexedResults, selectedIndex]);
+
     useHotkeys('backspace', (e) => {
-        if (search.length > 0)
-            return;
+        if (search.length > 0) return;
         preventDefault(e);
         setSelectedIndex(0);
         setSubMenuItem(null);
@@ -156,18 +172,51 @@ export function SpotlightComponent() {
         ...HOTKEY_OPTIONS,
         enabled: visible && !!subMenuItem,
     }, [search, indexedResults, selectedIndex]);
+
     const resultsHaveIcons = indexedResults.some((cat) => cat.results.some((r) => !!r.item.options?.icon));
-    return ReactDOM.createPortal(!visible ? null : (_jsxs(Container, { children: [_jsx(Background, { onClick: hideSpotlight }), _jsxs(Content, { children: [_jsx(SearchInput, { hasResults: !!indexedResults?.length, placeholder: subMenuItem ? 'Choose an option...' : 'Search or jump to...', value: search, loading: loading, fref: inputRef, 
-                        // eslint-disable-next-line react/jsx-handler-names
-                        onChange: setSearch }), !!error && (_jsx(Error, { message: error })), indexedResults.length > 0 && indexedResults[0].results.length > 0 && (_jsx(Results, { children: indexedResults.map((category) => (_jsx(Section, { title: category.title, results: category.results, showIcons: resultsHaveIcons, selectedIndex: selectedIndex, 
-                            // eslint-disable-next-line react/jsx-handler-names
-                            onResultSoftSelect: setSelectedIndex, 
-                            // eslint-disable-next-line react/jsx-handler-names
-                            onResultSelect: selectResult, 
-                            // eslint-disable-next-line react/jsx-handler-names
-                            onRemove: category.type === 'history' ? removeHistory : undefined }, category.title))) }))] })] })), wrapper);
+
+    return ReactDOM.createPortal(!visible ? null : (
+        <Container id='fooxly-spotlight'>
+            {/* eslint-disable-next-line react/jsx-handler-names */}
+            <Background onClick={hideSpotlight} />
+            <Content>
+                <SearchInput
+                    hasResults={!!indexedResults?.length}
+                    placeholder={subMenuItem ? 'Choose an option...' : 'Search or jump to...'}
+                    value={search}
+                    loading={loading}
+                    fref={inputRef}
+                    // eslint-disable-next-line react/jsx-handler-names
+                    onChange={setSearch}
+                />
+                {!!error && (
+                    <Error message={error} onDismiss={() => setError('')} />
+                )}
+                {indexedResults.length > 0 && indexedResults[0].results.length > 0 && (
+                    <Results>
+                        {indexedResults.map((category) => (
+                            <Section
+                                key={category.title}
+                                title={category.title}
+                                results={category.results}
+                                showIcons={resultsHaveIcons}
+                                selectedIndex={selectedIndex}
+                                // eslint-disable-next-line react/jsx-handler-names
+                                onResultSoftSelect={setSelectedIndex}
+                                // eslint-disable-next-line react/jsx-handler-names
+                                onResultSelect={selectResult}
+                                // eslint-disable-next-line react/jsx-handler-names
+                                onRemove={category.type === 'history' ? removeHistory : undefined}
+                            />
+                        ))}
+                    </Results>
+                )}
+            </Content>
+        </Container>
+    ), wrapper!);
 }
-const Container = styled.div `
+
+const Container = styled.div`
     ${(p) => p.theme.flex.col({ justify: 'center', align: 'center' })}
     position: fixed;
     left: 0;
@@ -177,7 +226,8 @@ const Container = styled.div `
     z-index: 99997;
     transform: translate3d(0, 0, 99999px);
 `;
-const Background = styled.div `
+
+const Background = styled.div`
     position: fixed;
     left: 0;
     top: 0;
@@ -187,7 +237,8 @@ const Background = styled.div `
     background-color: rgba(0, 0, 0, 0.7);
     animation: ${(p) => p.theme.animation.fadeIn} 0.2s ease-in-out;
 `;
-const Content = styled.div `
+
+const Content = styled.div`
     width: 60%;
     max-width: 650px;
     background-color: ${(p) => p.theme.color.gray10};
@@ -205,7 +256,8 @@ const Content = styled.div `
         width: 85%;
     }
 `;
-const Results = styled.div `
+
+const Results = styled.div`
     ${(p) => p.theme.flex.col()};
     height: auto;
     overflow-y: auto;

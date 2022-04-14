@@ -1,14 +1,15 @@
 import Fuse from 'fuse.js';
 
-import { Category, CategoryType, Item, Result } from '@/types';
 import { getHistory } from './history';
 import { COMMANDS, PAGES } from './constants';
+
+import { Category, CategoryType, Item } from '@/types';
 
 const FUSE_PROPS = {
     includeScore: true,
     isCaseSensitive: false,
     keys: ['title', 'options.keywords'],
-}
+};
 
 export function filterResults (searchText: string, menu?: { title: string; items: Item[] }): Category[] {
     const ALL_ITEMS = [...COMMANDS, ...PAGES];
@@ -19,9 +20,14 @@ export function filterResults (searchText: string, menu?: { title: string; items
     // Return first 8 items to help guide the user for commands
     if (!menu && (text.length === 0 || words.length === 0)) {
         return sortResults(ALL_ITEMS, false, true);
-    } else if (!!menu) {
+    } else if (menu) {
         const fuse = new Fuse(menu.items, FUSE_PROPS);
-        return [createCategory(menu.title, (text.length === 0 || words.length === 0) ? menu.items : fuse.search(searchText).map((result) => result.item))];
+        return [
+            createCategory(
+                menu.title,
+                (text.length === 0 || words.length === 0) ? menu.items : fuse.search(searchText).map((result) => result.item),
+            ),
+        ];
     } else {
         const fuse = new Fuse(ALL_ITEMS, FUSE_PROPS);
         return sortResults(fuse.search(searchText).map((result) => result.item));
@@ -29,7 +35,7 @@ export function filterResults (searchText: string, menu?: { title: string; items
 }
 
 function sortResults (items: Item[], hasRecommended = true, useHistory = false): Category[] {
-    if (!items.length) return [];
+    if (items.length === 0) return [];
     const first = items[0];
     const indexOffset = hasRecommended ? 1 : 0;
 
@@ -39,7 +45,7 @@ function sortResults (items: Item[], hasRecommended = true, useHistory = false):
     let history: null | Category = null;
 
     if (useHistory) {
-        rest = rest.filter((item) => !historyItems.includes(item))
+        rest = rest.filter((item) => !historyItems.includes(item));
         history = createCategory('Recently used', historyItems, {
             indexOffset: indexOffset,
             type: 'history',
@@ -64,15 +70,13 @@ function sortResults (items: Item[], hasRecommended = true, useHistory = false):
         ];
     }
 
-    return [useHistory ? history : null, pages, commands].filter((cat) => !!cat) as Category[];
+    return [useHistory && history?.results?.length ? history : null, pages, commands].filter((cat) => !!cat) as Category[];
 }
 
-
-function createCategory (title: string, items: Item[], options?: { indexOffset?: number, type?: CategoryType }): Category {
+function createCategory (title: string, items: Item[], options?: { indexOffset?: number; type?: CategoryType }): Category {
     return {
         title,
         type: options?.type ?? 'normal',
-        results: items.map((item, index) => ({ item, index: index + (options?.indexOffset ?? 0) }))
+        results: items.map((item, index) => ({ item, index: index + (options?.indexOffset ?? 0) })),
     };
 }
-
