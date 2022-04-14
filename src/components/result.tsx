@@ -1,23 +1,23 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Command, Item, JumpTo } from '@/types';
+import { Result as ResultType } from '@/types';
 import { getCommandIcon } from '@/utils/get-command-icon';
 
 interface Props {
     hasIcons: boolean;
-    item: Item;
+    result: ResultType;
     index: number;
     selected: boolean;
     onSoftSelect: (index: number) => void;
-    onSelect: (item: Item) => any | Promise<any>;
+    onSelect: (item: ResultType) => any | Promise<any>;
 }
 
-export function Result ({ hasIcons, item, index, selected, onSoftSelect, onSelect }: Props): JSX.Element | null {
+export function Result ({ hasIcons, result, index, selected, onSoftSelect, onSelect }: Props): JSX.Element | null {
     const enableFocus = () => onSoftSelect(index);
-    const Icon = getCommandIcon(item.options?.icon);
+    const Icon = getCommandIcon(result.item.options?.icon);
 
     const handleAction = () => {
-        onSelect(item);
+        onSelect(result);
     }
 
     return (
@@ -28,10 +28,10 @@ export function Result ({ hasIcons, item, index, selected, onSoftSelect, onSelec
                         {!!Icon && <Icon size={24} color='gray4' />}
                     </IconWrapper>
                 )}
-                <Title>{item.title}</Title>
+                <Title>{result.item.title}</Title>
             </Left>
             {selected && (
-                <Type>{item.type === 'command' ? 'Run command' : 'Jump to'}</Type>
+                <Type>{result.item.type === 'command' ? 'Run command' : 'Jump to'}</Type>
             )}
         </Container>
     );

@@ -4,8 +4,22 @@ export interface Item {
     type: 'command' | 'jump-to';
 }
 
+export interface Category {
+    results: Result[];
+    title: string;
+    type: CategoryType;
+}
+
+export type CategoryType = 'history' | 'normal';
+
+export interface Result {
+    isRecommended?: boolean;
+    index: number;
+    item: Item;
+}
+
 export interface Command extends Item {
-    action: (result?: any) => any | Promise<any | unknown | void>;
+    action: (result?: string) => any | Promise<any | unknown | void>;
     type: 'command';
     parentCommand?: Command;
     options?: CommandOptions;

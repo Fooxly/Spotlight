@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { ThemeProvider } from 'styled-components';
 import { SpotlightComponent } from './components';
 import { getColorFunction, themes } from './theme';
 import { CommandOptions, ItemOptions, Theme } from './types';
-import { COMMANDS, PAGES } from './utils';
+import { COMMANDS, HISTORY_LENGTH_KEY, PAGES } from './utils';
 
 interface Props {
     isDarkMode?: boolean;
@@ -11,6 +11,10 @@ interface Props {
 }
 
 export function Spotlight ({ isDarkMode, showRecentlyUsed = 5 }: Props): JSX.Element {
+    useEffect(() => {
+        localStorage.setItem(HISTORY_LENGTH_KEY, showRecentlyUsed.toString());
+    }, [showRecentlyUsed]);
+
     const calculatedTheme = useMemo(() => {
     const selectedTheme: Theme = themes[isDarkMode ? 'dark' : 'light'];
         return {
@@ -21,7 +25,7 @@ export function Spotlight ({ isDarkMode, showRecentlyUsed = 5 }: Props): JSX.Ele
 
     return (
         <ThemeProvider theme={calculatedTheme}>
-            <SpotlightComponent showRecentlyUsed={showRecentlyUsed} />
+            <SpotlightComponent />
         </ThemeProvider>
     );
 }
@@ -44,7 +48,7 @@ export function RegisterJumpTo (title: string, page: string, options?: ItemOptio
     });
 }
 
-export function RegisterCommand (title: string, action: () => any | Promise<any | unknown | void>, options?: CommandOptions) {
+export function RegisterCommand (title: string, action: (result?: string) => any | Promise<any | unknown | void>, options?: CommandOptions) {
     const oldIndex = COMMANDS.findIndex(({ title: oldTitle }) => oldTitle === title);
     if (oldIndex > -1) COMMANDS.splice(oldIndex, 1);
 

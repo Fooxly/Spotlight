@@ -1,13 +1,12 @@
-import React, { ChangeEvent, createRef, useEffect, useMemo, useState } from 'react';
+import React, { createRef, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { useHotkeys, Options } from 'react-hotkeys-hook';
-import { SearchIcon, TimesIcon } from '@/icons/line';
-import { Result } from './result';
-import { Command, Item } from '@/types';
+import { Category, Command, Result } from '@/types';
 
-import { COMMANDS, PAGES, getCommandIcon, filterResults, executeItem, getHistory, updateHistory, clearHistory } from '@/utils';
-import { Loading } from './loading';
+import { filterResults, executeItem, updateHistory, clearHistory } from '@/utils';
+import { Section } from './section';
+import { SearchInput } from './search-input';
 
 // create the spotlight wrapper if this is not already created
 let wrapper = document.querySelector<HTMLDivElement>('#spotlight');
@@ -17,11 +16,12 @@ if (!wrapper) {
     document.body.append(wrapper);
 }
 
-interface Props {
-    showRecentlyUsed: number;
-}
+const preventDefault = (e: KeyboardEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+};
 
-export function SpotlightComponent ({ showRecentlyUsed }: Props): JSX.Element | null {
+export function SpotlightComponent (): JSX.Element | null {
     const [visible, setVisible] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -35,111 +35,95 @@ export function SpotlightComponent ({ showRecentlyUsed }: Props): JSX.Element | 
         enableOnTags: ['INPUT', 'TEXTAREA'],
     }), [visible]);
 
-    // Receive a list of commands which were used before
-    const history = useMemo(() => getHistory().slice(0, showRecentlyUsed ?? 0), [visible, subMenuItem, reloadVersion]);
     // Get the results which should be indexed and rendered
-    const indexedResults: Item[] = useMemo(() => {
-        if (subMenuItem) {
-            return filterResults(search,
-                        subMenuItem.options?.options?.map((item) => ({
-                            title: item,
-                            type: 'command',
-                            parentCommand: subMenuItem,
-                        })) as Command[],
-                        !!subMenuItem
+    const indexedResults: Category[] = useMemo(() => {
+        if (subMenuItem?.options?.options) {
+            return filterResults(
+                        search,
+                        {
+                            title: subMenuItem.title,
+                            items:
+                                subMenuItem?.options?.options.map((item) => ({
+                                    title: item,
+                                    type: 'command',
+                                    parentCommand: subMenuItem,
+                                }))
+                        },
                     );
         }
-        return filterResults(search, [...PAGES, ...COMMANDS], !!subMenuItem);
-    }, [reloadVersion, visible, search, COMMANDS, PAGES, subMenuItem]);
+        return filterResults(search);
+    }, [visible, search, reloadVersion, subMenuItem]);
 
-    // When a sub menu is opened, reset the search and selected index
-    useEffect(() => {
-        setSearch('');
-        setSelectedIndex(-1);
-    }, [subMenuItem]);
+    const resultCount = useMemo(() => indexedResults.reduce((count, cat) => cat.results.length + count, 0), [indexedResults]);
 
     // When the spotlight is closed, reset all the values
     useEffect(() => {
-        if (visible) return;
         setSearch('');
-        setSelectedIndex(-1);
+        setSelectedIndex(0);
         setSubMenuItem(undefined);
     }, [visible]);
 
-    const isSearching = useMemo(() => search.length > 0, [search]);
-    const hasIcons = useMemo(() => indexedResults.filter((item) => !!getCommandIcon(item.options?.icon)).length > 0, [indexedResults]);
-    const pages = useMemo(() => indexedResults.filter((item) => item.type === 'jump-to' && ((!isSearching && !history.includes(item))|| isSearching)), [indexedResults]);
-    const commands = useMemo(() => indexedResults.filter((item) => item.type === 'command' && ((!isSearching && !history.includes(item))|| isSearching)), [indexedResults]);
-
-    // When changing the index, the input should always receive focus to continue typing
     useEffect(() => {
-        if (!inputRef.current) return;
-        else inputRef.current.focus();
-    }, [selectedIndex, inputRef]);
+        if (!search.length) return setSelectedIndex(0);
+        setSelectedIndex(0);
+    }, [search]);
 
     const toggleVisible = () => setVisible((last) => !last);
     const hideSpotlight = () => setVisible(false);
 
-    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-        // Only update the text when the value is not the same anymore -> important for the hotkeys
-        if (e.target.value.length !== search.length) {
-            setSelectedIndex(-1);
-            setSearch(e.target.value);
-        }
-    }
-    // Clears the search
-    const handleClearSearch = () => setSearch('');
-    // Clears the history and rerenders the results
-    const handleClearHistory = () => {
-        clearHistory();
-        setReloadVersion(new Date().getTime());
-    }
-    // Ability to execute a command with a possible given option
     const executeCommand = (command: Command, result?: string) => {
         const res = executeItem(command, result);
         if (res instanceof Promise) {
             setLoading(true);
-            res.finally(() => {
+            res.then(() => {
                 setLoading(false);
                 hideSpotlight();
+            }).catch((err) => {
+                setLoading(false);
+                // TODO: check for error and show below spotlight
+                console.warn(err);
             });
         } else {
             hideSpotlight();
         }
     }
-    const handleItemSelect = (item: Item) => {
-        if (item.type === 'command') {
-            const cmd = (item as Command);
+
+    const selectResult = (result: Result) => {
+        if (result.item.type === 'command') {
+            const cmd = (result.item as Command);
             if (cmd.parentCommand) return executeCommand(cmd.parentCommand, cmd.title);
             if (cmd.options?.options?.length) {
-                updateHistory(item, showRecentlyUsed);
+                updateHistory(result.item);
                 setSubMenuItem(cmd);
                 return;
             }
-            updateHistory(item, showRecentlyUsed);
+            updateHistory(result.item);
             executeCommand(cmd);
         } else {
-            updateHistory(item, showRecentlyUsed);
-            executeItem(item);
+            updateHistory(result.item);
+            executeItem(result.item);
         }
     }
 
-    // All the hotkeys
+    const removeHistory = () => {
+        clearHistory();
+        setReloadVersion(Date.now());
+    }
+
     useHotkeys('cmd+shift+k, ctrl+shift+k', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        preventDefault(e);
         toggleVisible();
     }, {
         enableOnTags: ['INPUT', 'TEXTAREA'],
     }, [visible]);
+
     useHotkeys('esc', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        preventDefault(e);
         hideSpotlight();
     }, HOTKEY_OPTIONS);
+
     useHotkeys('up', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        preventDefault(e);
         setSelectedIndex((last) => {
             const newIndex = Math.max(-1, last - 1);
             if (newIndex < 0) return -1;
@@ -150,29 +134,33 @@ export function SpotlightComponent ({ showRecentlyUsed }: Props): JSX.Element | 
             return newIndex;
         });
     }, HOTKEY_OPTIONS, [indexedResults, selectedIndex]);
+
     useHotkeys('down', (e: KeyboardEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
+        preventDefault(e);
         setSelectedIndex((last) => {
-            const newIndex = Math.min(indexedResults.length - 1, last + 1);
+            const newIndex = Math.min(resultCount - 1, last + 1);
             if (newIndex < 0) return -1;
             document.getElementById(`command-${newIndex}`)?.scrollIntoView({
                 behavior: 'smooth',
-                block: newIndex === (indexedResults.length - 1) ? 'center' : 'nearest',
+                block: newIndex === (resultCount - 1) ? 'center' : 'nearest',
             });
             return newIndex;
         });
     }, HOTKEY_OPTIONS, [indexedResults, selectedIndex]);
+
     useHotkeys('enter', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        preventDefault(e);
         if (selectedIndex < 0) return;
-        handleItemSelect(indexedResults[selectedIndex]);
+        const cat = indexedResults.find((cat) => cat.results.find((res) => res.index === selectedIndex));
+        if (!cat) return;
+        const result = cat.results.find((res) => res.index === selectedIndex);
+        if (!result) return;
+        selectResult(result);
     }, HOTKEY_OPTIONS, [indexedResults, selectedIndex]);
+
     useHotkeys('backspace', (e) => {
         if (search.length !== 0) return;
-        e.preventDefault();
-        e.stopPropagation();
+        preventDefault(e);
         setSelectedIndex(-1);
         setSubMenuItem(undefined);
         setSearch('');
@@ -181,95 +169,34 @@ export function SpotlightComponent ({ showRecentlyUsed }: Props): JSX.Element | 
         enabled: visible && !!subMenuItem,
     }, [search, indexedResults, selectedIndex]);
 
+    const resultsHaveIcons = !!indexedResults.filter((cat) => cat.results.filter((r) => !!r.item.options?.icon).length > 0).length;
+
     return ReactDOM.createPortal(!visible ? null : (
         <Container>
             <Background onClick={hideSpotlight} />
             <Content>
-                <SearchBar $hasResults={!!indexedResults?.length}>
-                    <SearchInput autoFocus ref={inputRef} placeholder={subMenuItem ? subMenuItem.title : 'Search or jump to...'} value={search} onChange={handleInputChange} />
-                    <SearchIconWrapper>
-                        {loading ? (
-                            <Loading size={22} color='blue' thickness={3} />
-                        ) : (
-                            <SearchIcon size={24} color='gray4' />
-                        )}
-                        </SearchIconWrapper>
-                    {search?.length > 0 && (
-                        <CloseButton onClick={handleClearSearch}>
-                            <TimesIcon size={8} color='gray10' />
-                        </CloseButton>
-                    )}
-                </SearchBar>
+                <SearchInput
+                    hasResults={!!indexedResults?.length}
+                    placeholder={subMenuItem ? 'Choose an option...' : 'Search or jump to...'}
+                    value={search}
+                    loading={loading}
+                    fref={inputRef}
+                    onChange={setSearch}
+                />
                 {!!indexedResults.length && (
                     <Results>
-                        {!!history.length && !isSearching && !subMenuItem && (
-                            <>
-                                <ResultSection>
-                                    <ResultSectionTitle>Recently used</ResultSectionTitle>
-                                    <CloseButton onClick={handleClearHistory}>
-                                        <TimesIcon size={7} color='gray10' />
-                                    </CloseButton>
-                                </ResultSection>
-                                {history.map((item) => {
-                                    const index = indexedResults.findIndex(i => i.title === item.title);
-                                    return (
-                                        <Result
-                                            key={item.title}
-                                            index={index}
-                                            item={item}
-                                            hasIcons={hasIcons}
-                                            selected={selectedIndex === index}
-                                            onSoftSelect={setSelectedIndex}
-                                            onSelect={handleItemSelect}
-                                        />
-                                    )
-                                })}
-                            </>
-                        )}
-                        {!!pages.length && (
-                            <>
-                                <ResultSection>
-                                    <ResultSectionTitle>Pages</ResultSectionTitle>
-                                </ResultSection>
-                                {pages.map((item) => {
-                                    const index = indexedResults.findIndex(i => i.title === item.title);
-                                    return (
-                                        <Result
-                                            key={item.title}
-                                            index={index}
-                                            item={item}
-                                            hasIcons={hasIcons}
-                                            selected={selectedIndex === index}
-                                            onSoftSelect={setSelectedIndex}
-                                            onSelect={handleItemSelect}
-                                        />
-                                    )
-                                })}
-                            </>
-                        )}
-                        {!!commands.length && (
-                            <>
-                                {!subMenuItem && (
-                                    <ResultSection>
-                                        <ResultSectionTitle>Commands</ResultSectionTitle>
-                                    </ResultSection>
-                                )}
-                                {commands.map((item) => {
-                                    const index = indexedResults.findIndex(i => i.title === item.title);
-                                    return (
-                                        <Result
-                                            key={item.title}
-                                            index={index}
-                                            item={item}
-                                            hasIcons={hasIcons}
-                                            selected={selectedIndex === index}
-                                            onSoftSelect={setSelectedIndex}
-                                            onSelect={handleItemSelect}
-                                        />
-                                    )
-                                })}
-                            </>
-                        )}
+                        {indexedResults.map((category) => (
+                            <Section
+                                key={category.title}
+                                title={category.title}
+                                results={category.results}
+                                showIcons={resultsHaveIcons}
+                                selectedIndex={selectedIndex}
+                                onResultSoftSelect={setSelectedIndex}
+                                onResultSelect={selectResult}
+                                onRemove={category.type === 'history' ? removeHistory : undefined}
+                            />
+                        ))}
                     </Results>
                 )}
             </Content>
@@ -318,33 +245,6 @@ const Content = styled.div`
     }
 `;
 
-const SearchBar = styled.div<{ $hasResults: boolean }>`
-    position: relative;
-    ${(p) => p.theme.flex.row({ align: 'center' })}
-
-    ${(p) => p.$hasResults && `
-        border-bottom: 1px solid ${p.theme.color.gray8};
-    `}
-`;
-
-const SearchInput = styled.input`
-    ${(p) => p.theme.text.System.regular(18, 'gray1')}
-    flex: 1;
-    height: 55px;
-    padding: 0 50px;
-
-    ::placeholder {
-        color: ${(p) => p.theme.color.gray6} !important;
-    }
-`;
-
-const SearchIconWrapper = styled.div`
-    ${(p) => p.theme.flex.col({ justify: 'center', align: 'center' })}
-    position: absolute;
-    left: 15px;
-    margin-bottom: 2px;
-`;
-
 const Results = styled.div`
     ${(p) => p.theme.flex.col()};
     height: auto;
@@ -355,41 +255,4 @@ const Results = styled.div`
     @media(max-height: 600px) {
         max-height: 100%;
     }
-`;
-
-const CloseButton = styled.button`
-    ${(p) => p.theme.flex.col({ justify: 'center', align: 'center' })}
-    border-radius: 100px;
-    background-color: ${(p) => p.theme.color.gray2};
-    position: absolute;
-    right: 15px;
-    width: 22px;
-    height: 22px;
-    cursor: pointer;
-`;
-
-const ResultSection = styled.div`
-    ${(p) => p.theme.flex.row({ justify: 'space-between', align: 'center' })}
-    padding: 7px 5px;
-    position: relative;
-
-    > ${CloseButton} {
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s ease-in-out;
-        will-change: opacity, pointer-events;
-        width: 18px;
-        height: 18px;
-    }
-
-    :hover {
-        > ${CloseButton} {
-            pointer-events: auto;
-            opacity: 1;
-        }
-    }
-`;
-
-const ResultSectionTitle = styled.p`
-    ${(p) => p.theme.text.System.semibold(14, 'gray4')}
 `;
