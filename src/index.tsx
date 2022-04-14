@@ -7,9 +7,10 @@ import { COMMANDS, PAGES } from './utils';
 
 interface Props {
     isDarkMode?: boolean;
+    showRecentlyUsed?: number;
 }
 
-export function Spotlight ({ isDarkMode }: Props): JSX.Element {
+export function Spotlight ({ isDarkMode, showRecentlyUsed = 5 }: Props): JSX.Element {
     const calculatedTheme = useMemo(() => {
     const selectedTheme: Theme = themes[isDarkMode ? 'dark' : 'light'];
         return {
@@ -20,7 +21,7 @@ export function Spotlight ({ isDarkMode }: Props): JSX.Element {
 
     return (
         <ThemeProvider theme={calculatedTheme}>
-            <SpotlightComponent />
+            <SpotlightComponent showRecentlyUsed={showRecentlyUsed} />
         </ThemeProvider>
     );
 }

@@ -6,8 +6,7 @@ import { SearchIcon, TimesIcon } from '@/icons/line';
 import { Result } from './result';
 import { Command, Item } from '@/types';
 
-import { COMMANDS, PAGES, getCommandIcon, filterResults } from '@/utils';
-import { executeItem } from '@/utils/execute-item';
+import { COMMANDS, PAGES, getCommandIcon, filterResults, executeItem, getHistory, updateHistory, clearHistory } from '@/utils';
 import { Loading } from './loading';
 
 // create the spotlight wrapper if this is not already created
@@ -18,10 +17,15 @@ if (!wrapper) {
     document.body.append(wrapper);
 }
 
-export function SpotlightComponent (): JSX.Element | null {
+interface Props {
+    showRecentlyUsed: number;
+}
+
+export function SpotlightComponent ({ showRecentlyUsed }: Props): JSX.Element | null {
     const [visible, setVisible] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
+    const [reloadVersion, setReloadVersion] = useState(-1);
     const [subMenuItem, setSubMenuItem] = useState<Command>();
     const [search, setSearch] = useState('');
     const inputRef = createRef<HTMLInputElement>();
@@ -31,6 +35,9 @@ export function SpotlightComponent (): JSX.Element | null {
         enableOnTags: ['INPUT', 'TEXTAREA'],
     }), [visible]);
 
+    // Receive a list of commands which were used before
+    const history = useMemo(() => getHistory().slice(0, showRecentlyUsed ?? 0), [visible, subMenuItem, reloadVersion]);
+    // Get the results which should be indexed and rendered
     const indexedResults: Item[] = useMemo(() => {
         if (subMenuItem) {
             return filterResults(search,
@@ -38,18 +45,20 @@ export function SpotlightComponent (): JSX.Element | null {
                             title: item,
                             type: 'command',
                             parentCommand: subMenuItem,
-                        })) as Command[]
+                        })) as Command[],
+                        !!subMenuItem
                     );
         }
-        const all = [...PAGES, ...COMMANDS];
-        return filterResults(search, all);
-    }, [search, COMMANDS, PAGES, subMenuItem]);
+        return filterResults(search, [...PAGES, ...COMMANDS], !!subMenuItem);
+    }, [reloadVersion, visible, search, COMMANDS, PAGES, subMenuItem]);
 
+    // When a sub menu is opened, reset the search and selected index
     useEffect(() => {
         setSearch('');
         setSelectedIndex(-1);
     }, [subMenuItem]);
 
+    // When the spotlight is closed, reset all the values
     useEffect(() => {
         if (visible) return;
         setSearch('');
@@ -57,10 +66,12 @@ export function SpotlightComponent (): JSX.Element | null {
         setSubMenuItem(undefined);
     }, [visible]);
 
+    const isSearching = useMemo(() => search.length > 0, [search]);
     const hasIcons = useMemo(() => indexedResults.filter((item) => !!getCommandIcon(item.options?.icon)).length > 0, [indexedResults]);
-    const pages = useMemo(() => indexedResults.filter((item) => item.type === 'jump-to'), [indexedResults]);
-    const commands = useMemo(() => indexedResults.filter((item) => item.type === 'command'), [indexedResults]);
+    const pages = useMemo(() => indexedResults.filter((item) => item.type === 'jump-to' && ((!isSearching && !history.includes(item))|| isSearching)), [indexedResults]);
+    const commands = useMemo(() => indexedResults.filter((item) => item.type === 'command' && ((!isSearching && !history.includes(item))|| isSearching)), [indexedResults]);
 
+    // When changing the index, the input should always receive focus to continue typing
     useEffect(() => {
         if (!inputRef.current) return;
         else inputRef.current.focus();
@@ -70,12 +81,20 @@ export function SpotlightComponent (): JSX.Element | null {
     const hideSpotlight = () => setVisible(false);
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+        // Only update the text when the value is not the same anymore -> important for the hotkeys
         if (e.target.value.length !== search.length) {
             setSelectedIndex(-1);
             setSearch(e.target.value);
         }
     }
+    // Clears the search
     const handleClearSearch = () => setSearch('');
+    // Clears the history and rerenders the results
+    const handleClearHistory = () => {
+        clearHistory();
+        setReloadVersion(new Date().getTime());
+    }
+    // Ability to execute a command with a possible given option
     const executeCommand = (command: Command, result?: string) => {
         const res = executeItem(command, result);
         if (res instanceof Promise) {
@@ -92,9 +111,15 @@ export function SpotlightComponent (): JSX.Element | null {
         if (item.type === 'command') {
             const cmd = (item as Command);
             if (cmd.parentCommand) return executeCommand(cmd.parentCommand, cmd.title);
-            if (cmd.options?.options?.length) return setSubMenuItem(cmd);
+            if (cmd.options?.options?.length) {
+                updateHistory(item, showRecentlyUsed);
+                setSubMenuItem(cmd);
+                return;
+            }
+            updateHistory(item, showRecentlyUsed);
             executeCommand(cmd);
         } else {
+            updateHistory(item, showRecentlyUsed);
             executeItem(item);
         }
     }
@@ -177,6 +202,30 @@ export function SpotlightComponent (): JSX.Element | null {
                 </SearchBar>
                 {!!indexedResults.length && (
                     <Results>
+                        {!!history.length && !isSearching && !subMenuItem && (
+                            <>
+                                <ResultSection>
+                                    <ResultSectionTitle>Recently used</ResultSectionTitle>
+                                    <CloseButton onClick={handleClearHistory}>
+                                        <TimesIcon size={7} color='gray10' />
+                                    </CloseButton>
+                                </ResultSection>
+                                {history.map((item) => {
+                                    const index = indexedResults.findIndex(i => i.title === item.title);
+                                    return (
+                                        <Result
+                                            key={item.title}
+                                            index={index}
+                                            item={item}
+                                            hasIcons={hasIcons}
+                                            selected={selectedIndex === index}
+                                            onSoftSelect={setSelectedIndex}
+                                            onSelect={handleItemSelect}
+                                        />
+                                    )
+                                })}
+                            </>
+                        )}
                         {!!pages.length && (
                             <>
                                 <ResultSection>
@@ -320,7 +369,25 @@ const CloseButton = styled.button`
 `;
 
 const ResultSection = styled.div`
+    ${(p) => p.theme.flex.row({ justify: 'space-between', align: 'center' })}
     padding: 7px 5px;
+    position: relative;
+
+    > ${CloseButton} {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease-in-out;
+        will-change: opacity, pointer-events;
+        width: 18px;
+        height: 18px;
+    }
+
+    :hover {
+        > ${CloseButton} {
+            pointer-events: auto;
+            opacity: 1;
+        }
+    }
 `;
 
 const ResultSectionTitle = styled.p`
