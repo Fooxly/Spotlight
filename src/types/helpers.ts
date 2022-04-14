@@ -39,4 +39,9 @@ export interface CommandOptions extends ItemOptions {
     options?: string[];
 }
 
+export interface ShellCommandOptions extends ItemOptions {
+    port?: number;
+    externalTerminal?: boolean;
+}
+
 export type ItemIcon = 'redirect' | 'redo' | 'house' | 'undo';

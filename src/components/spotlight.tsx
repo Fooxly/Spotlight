@@ -103,7 +103,7 @@ export function SpotlightComponent (): JSX.Element | null {
             updateHistory(result.item);
             executeItem(result.item);
         }
-    }
+    };
 
     const removeHistory = () => {
         clearHistory();
