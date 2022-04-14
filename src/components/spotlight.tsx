@@ -1,10 +1,10 @@
-import React, { ChangeEvent, createRef, useEffect, useMemo, useState } from 'react';
+import React, { ChangeEvent, createRef, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { useHotkeys, Options } from 'react-hotkeys-hook';
 import { SearchIcon, TimesIcon } from '@/icons/line';
 import { Result } from './result';
-import { Command, Item } from '@/types';
+import { Item } from '@/types';
 
 import { COMMANDS, PAGES, getCommandIcon, filterResults } from '@/utils';
 import { executeItem } from '@/utils/execute-item';
@@ -50,8 +50,8 @@ export function SpotlightComponent (): JSX.Element | null {
     const hideSpotlight = () => setVisible(false);
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setSearch(e.target.value);
         setSelectedIndex(-1);
+        setSearch(e.target.value);
     }
 
     // All the hotkeys
@@ -61,7 +61,7 @@ export function SpotlightComponent (): JSX.Element | null {
         toggleVisible();
     }, {
         enableOnTags: ['INPUT', 'TEXTAREA'],
-    });
+    }, [visible]);
     useHotkeys('esc', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -79,27 +79,28 @@ export function SpotlightComponent (): JSX.Element | null {
             });
             return newIndex;
         });
-    }, HOTKEY_OPTIONS);
-    useHotkeys('down', (e) => {
+    }, HOTKEY_OPTIONS, [indexedResults, selectedIndex]);
+    useHotkeys('down', (e: KeyboardEvent) => {
         e.preventDefault();
         e.stopPropagation();
-
         setSelectedIndex((last) => {
-            const newIndex = Math.min(indexedResults.length - 1, last + 1);
+            const newIndex = Math.min(indexedResults.length - 1, selectedIndex + 1);
+            if (newIndex < 0) return -1;
             document.getElementById(`command-${indexedResults[newIndex].id}`)?.scrollIntoView({
                 behavior: 'smooth',
                 block: newIndex === (indexedResults.length - 1) ? 'center' : 'nearest',
             });
             return newIndex;
         });
-    }, HOTKEY_OPTIONS);
+    }, HOTKEY_OPTIONS, [indexedResults, selectedIndex]);
     useHotkeys('enter', (e) => {
         e.preventDefault();
         e.stopPropagation();
+        console.log('aaa', selectedIndex);
         if (selectedIndex < 0) return;
         executeItem(indexedResults[selectedIndex]);
         hideSpotlight();
-    }, HOTKEY_OPTIONS);
+    }, HOTKEY_OPTIONS, [indexedResults, selectedIndex]);
 
     const handleClearSearch = () => setSearch('');
 
@@ -110,7 +111,7 @@ export function SpotlightComponent (): JSX.Element | null {
             <Background onClick={hideSpotlight} />
             <Content>
                 <SearchBar $hasResults={!!indexedResults?.length}>
-                    <SearchInput onFocus={() => setSelectedIndex(-1)} autoFocus ref={inputRef} placeholder='Search or jump to...' value={search} onChange={handleInputChange} />
+                    <SearchInput autoFocus ref={inputRef} placeholder='Search or jump to...' value={search} onChange={handleInputChange} />
                     <SearchIcon size={24} color='gray4' />
                     {search?.length > 0 && (
                         <CloseButton onClick={handleClearSearch}>
