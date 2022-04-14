@@ -92,13 +92,14 @@ export function SpotlightComponent ({ showRecentlyUsed }: Props): JSX.Element | 
     // Clears the history and rerenders the results
     const handleClearHistory = () => {
         clearHistory();
-        setReloadVersion(new Date().getTime());
-    }
+        setReloadVersion(Date.now());
+    };
     // Ability to execute a command with a possible given option
     const executeCommand = (command: Command, result?: string) => {
         const res = executeItem(command, result);
         if (res instanceof Promise) {
             setLoading(true);
+            // TODO: use .catch to show error in Spotlight view
             res.finally(() => {
                 setLoading(false);
                 hideSpotlight();
@@ -106,7 +107,7 @@ export function SpotlightComponent ({ showRecentlyUsed }: Props): JSX.Element | 
         } else {
             hideSpotlight();
         }
-    }
+    };
     const handleItemSelect = (item: Item) => {
         if (item.type === 'command') {
             const cmd = (item as Command);
@@ -122,7 +123,7 @@ export function SpotlightComponent ({ showRecentlyUsed }: Props): JSX.Element | 
             updateHistory(item, showRecentlyUsed);
             executeItem(item);
         }
-    }
+    };
 
     // All the hotkeys
     useHotkeys('cmd+shift+k, ctrl+shift+k', (e) => {

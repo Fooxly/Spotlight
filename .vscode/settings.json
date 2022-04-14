@@ -10,7 +10,10 @@
     "tsconfig.json": true,
     "yarn.lock": true,
     ".eslintrc": true,
-    ".vscode": true
+    ".vscode": true,
+    "lib": true,
+    "server/dist": true,
+    "yarn-error.log": true
   },
   "workspace.isHidden": true
 }

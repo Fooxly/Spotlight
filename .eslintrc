@@ -5,13 +5,14 @@
     ],
     "overrides": [
         {
-            "files": ["./scripts/*.ts"],
+            "files": ["./server/src/**/*.ts"],
             "parserOptions": {
-                "project": "./scripts/tsconfig.json"
-            },
-            "rules": {
-                "unicorn/import-style": "off"
+                "project": "./server/tsconfig.json"
             }
         }
-    ]
+    ],
+    "rules": {
+        "import/no-default-export": "off",
+        "@typescript-eslint/no-invalid-void-type": "off"
+    }
 }
