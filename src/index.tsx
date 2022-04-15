@@ -74,9 +74,12 @@ export function unregister (title: string): void {
     PAGES.splice(PAGES.findIndex((page) => page.title === title), 1);
 }
 
+/* eslint-disable @typescript-eslint/no-throw-literal */
 export async function shell (command: string, options?: ShellCommandOptions) {
+    const port = options?.port ?? 1898;
+
     try {
-        const raw = await fetch(`http://localhost:${options?.port ?? 1898}/cmd`, {
+        const raw = await fetch(`http://localhost:${port}/cmd`, {
             method: 'POST',
             body: JSON.stringify({
                 command,
@@ -87,12 +90,12 @@ export async function shell (command: string, options?: ShellCommandOptions) {
             },
         });
 
-        const response = (await raw.json()) as { success: boolean };
+        const response = (await raw.json()) as { success: boolean; error?: string };
 
-        if (!response.success) throw new Error('COMMAND_FAILED');
+        if (!response.success) throw { message: 'COMMAND_FAILED', port, reason: response.error };
     } catch (error) {
-        if ((error as Error).message === 'Load failed') throw new Error('SERVER_DOWN');
-        throw error;
+        if ((error as Error).message === 'Load failed') throw { message: 'SERVER_DOWN', port };
+        throw { message: 'UNKNOWN', port, reason: error };
     }
 }
 

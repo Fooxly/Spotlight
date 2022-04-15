@@ -88,10 +88,12 @@ export function SpotlightComponent (): JSX.Element | null {
             res.then(() => {
                 setLoading(false);
                 hideSpotlight();
-            }).catch((error) => {
+            }).catch((error: { message: string; port: number; reason?: string | Error }) => {
+                let errorMessage = ERRORS[error.message] || ERRORS.UNKNOWN;
+                if (typeof error.port === 'number') errorMessage = errorMessage.replace('{{port}}', String(error.port));
+
+                setError(errorMessage);
                 setLoading(false);
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                setError(ERRORS[error.message] || ERRORS.UNKNOWN);
             });
         } else {
             hideSpotlight();

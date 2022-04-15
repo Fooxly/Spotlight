@@ -12,11 +12,6 @@ export async function cmd (req: Request, res: Response) {
         const { command, inTerminal = false } = req.body as { command: string; inTerminal?: boolean };
 
         await new Promise<void>((resolve, reject) => {
-            const callback = (error: ExecException | null) => {
-                if (error) return reject(error);
-                resolve();
-            };
-
             if (inTerminal) {
                 // TODO: code below is for macOS, add Windows/Linux support
                 exec(`
@@ -24,15 +19,20 @@ osascript -e 'tell application "Terminal"
     activate
     do script "clear && cd \\"${currentDir}\\" && ${command} && echo Press any key to exit \\\\.\\\\.\\\\.; read -k1 -s && exit"
 end tell'
-                `, callback);
+                `, (error: ExecException | null) => {
+                    if (error) return reject(new Error('TERMINAL_FAILED'));
+                    resolve();
+                });
             } else {
-                exec(`cd "${currentDir}" && ${command}`, callback);
+                exec(`cd "${currentDir}" && ${command}`, (error: ExecException | null) => {
+                    if (error) return reject(error);
+                    resolve();
+                });
             }
         });
 
         res.json({ success: true });
     } catch (error) {
-        console.error('cmd', error);
-        res.json({ success: false });
+        res.json({ success: false, error });
     }
 }
