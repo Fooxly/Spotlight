@@ -124,7 +124,7 @@ export function SpotlightComponent (): JSX.Element | null {
         setReloadVersion(Date.now());
     };
 
-    useHotkeys('cmd+shift+k, ctrl+shift+k', (e) => {
+    useHotkeys('cmd+shift+k, ctrl+shift+k, cmd+opt+k, ctrl+alt+k', (e) => {
         preventDefault(e);
         toggleVisible();
     }, {
