@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+
 import { Result as ResultType } from '@/types';
 import { getCommandIcon } from '@/utils/get-command-icon';
 
@@ -18,9 +19,10 @@ export function Result ({ hasIcons, result, index, selected, onSoftSelect, onSel
 
     const handleAction = () => {
         onSelect(result);
-    }
+    };
 
     return (
+        // eslint-disable-next-line react/jsx-handler-names
         <Container id={`command-${index}`} $selected={selected} onClick={handleAction} onMouseMove={enableFocus} onFocus={enableFocus}>
             <Left>
                 {hasIcons && (
@@ -37,7 +39,7 @@ export function Result ({ hasIcons, result, index, selected, onSoftSelect, onSel
     );
 }
 
-const Container = styled.button<{ $selected: boolean; }>`
+const Container = styled.button<{ $selected: boolean }>`
     ${(p) => p.theme.flex.row({ align: 'center' })}
     height: 45px;
     min-height: 45px;
@@ -69,13 +71,23 @@ const IconWrapper = styled.div`
     width: 24px;
     height: 24px;
     margin-right: 15px;
-`
+`;
 
 const Title = styled.p`
     ${(p) => p.theme.text.System.regular(15, 'gray1')}
+
+    white-space: nowrap;
+    overflow: hidden;
+    display: block;
+    text-overflow: ellipsis;
 `;
 
 const Type = styled.p`
     ${(p) => p.theme.text.System.regular(15, 'gray5')}
     animation: ${(p) => p.theme.animation.fadeIn} 0.2s ease-in-out;
+    text-align: right;
+
+    @media(max-width: 450px) {
+        display: none;
+    }
 `;

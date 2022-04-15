@@ -185,7 +185,7 @@ export function SpotlightComponent (): JSX.Element | null {
             <Background onClick={hideSpotlight} />
             <Content>
                 <SearchInput
-                    hasResults={!!indexedResults?.length}
+                    hasResults={!!indexedResults?.length || !!error}
                     placeholder={subMenuItem ? 'Choose an option...' : 'Search or jump to...'}
                     value={search}
                     loading={loading}

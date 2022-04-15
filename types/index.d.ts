@@ -1,4 +1,18 @@
-import { CommandOptions, ItemOptions, ShellCommandOptions } from '@/types';
+export type ItemIcon = 'redirect' | 'redo' | 'house' | 'undo' | 'sun' | 'globe' | 'plus' | 'shield';
+
+export interface ItemOptions {
+    keywords?: string[];
+    icon?: ItemIcon;
+}
+
+export interface CommandOptions extends ItemOptions {
+    options?: string[];
+}
+
+export interface ShellCommandOptions extends ItemOptions {
+    port?: number;
+    externalTerminal?: boolean;
+}
 
 interface Props {
     isDarkMode?: boolean;

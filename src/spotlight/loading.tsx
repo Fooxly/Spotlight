@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { css, keyframes, useTheme } from 'styled-components';
+import styled, { keyframes, useTheme } from 'styled-components';
 
 import type { Color } from '@/types';
 
