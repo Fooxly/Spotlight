@@ -1,6 +1,5 @@
 import { useTheme } from 'styled-components';
-
-import type { Color, Theme } from '@/types';
+import type { Color, Theme } from 'types/theme';
 
 interface IconPropsBase {
     color: Color;

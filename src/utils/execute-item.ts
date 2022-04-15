@@ -1,4 +1,4 @@
-import { Command, Item, JumpTo } from '@/types';
+import type { Command, Item, JumpTo } from 'types';
 
 export function executeItem (item: Item, param?: string): any | Promise<any> {
     if (item.type === 'command') {

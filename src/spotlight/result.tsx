@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+import type { Result as ResultType } from 'types';
 
-import { Result as ResultType } from '@/types';
 import { getCommandIcon } from '@/utils/get-command-icon';
 
 interface Props {
@@ -15,7 +15,7 @@ interface Props {
 
 export function Result ({ hasIcons, result, index, selected, onSoftSelect, onSelect }: Props): JSX.Element | null {
     const enableFocus = () => onSoftSelect(index);
-    const Icon = getCommandIcon(result.item.options?.icon);
+    const Icon = result.item.options?.icon ? getCommandIcon(result.item.options?.icon) : null;
 
     const handleAction = () => {
         onSelect(result);

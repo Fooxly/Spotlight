@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
+import type { Result } from 'types';
 
 import { Result as ResultItem } from './result';
 
 import { TimesIcon } from '@/icons/line';
-import { Result } from '@/types';
 
 interface Props {
     title: string;

@@ -2,12 +2,12 @@ import React, { createRef, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { useHotkeys, Options } from 'react-hotkeys-hook';
+import type { Category, Command, Result } from 'types';
 
 import { SearchInput } from './search-input';
 import { Section } from './section';
 import { Error } from './error';
 
-import { Category, Command, Result } from '@/types';
 import { filterResults, executeItem, updateHistory, clearHistory, ERRORS } from '@/utils';
 
 // create the spotlight wrapper if this is not already created
@@ -47,7 +47,11 @@ export function SpotlightComponent (): JSX.Element | null {
                     title: subMenuItem.title,
                     items:
                         subMenuItem?.options?.options.map((item) => ({
-                            title: item,
+                            title: typeof item === 'string' ? item : item.title,
+                            options: {
+                                icon: typeof item === 'string' ? undefined : item.icon,
+                                keywords: typeof item === 'string' ? undefined : item.keywords,
+                            },
                             type: 'command',
                             parentCommand: subMenuItem,
                         })),

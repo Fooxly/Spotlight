@@ -1,4 +1,5 @@
-import { Command, JumpTo } from '@/types';
+import type { Command, JumpTo } from 'types';
+import { Icons } from 'types/icons';
 
 export const BASE_COMMANDS: Command[] = [
     {
@@ -8,6 +9,16 @@ export const BASE_COMMANDS: Command[] = [
         options: {
             icon: 'redo',
             keywords: ['reload', 'window', 'refresh'],
+        },
+    },
+    {
+        action: console.log,
+        title: 'Spotlight icon list',
+        type: 'command',
+        options: {
+            icon: 'brush',
+            keywords: ['icons'],
+            options: Icons.map((icon) => ({ title: icon, icon })),
         },
     },
 ];
@@ -23,3 +34,12 @@ export const BASE_PAGES: JumpTo[] = [
         },
     },
 ];
+
+export const ICONS: JumpTo[] = Icons.map((icon) => ({
+    title: icon,
+    page: '/',
+    type: 'jump-to',
+    options: {
+        icon,
+    },
+}));

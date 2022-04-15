@@ -18,3 +18,10 @@ export type JustifyContent =
 export { type FontFamily, type TextAlign, type FontWeight } from '@/theme/base/text';
 
 export { type Color, type CSSColor, type HexColor } from '@/theme/base/color';
+
+/**
+ * Extend theme into styled-components props
+ */
+declare module 'styled-components' {
+    export interface DefaultTheme extends Theme {}
+}

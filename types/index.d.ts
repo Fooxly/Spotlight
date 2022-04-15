@@ -1,17 +1,55 @@
-export type ItemIcon = 'redirect' | 'redo' | 'house' | 'undo' | 'sun' | 'globe' | 'plus' | 'shield';
+import { Icons } from './icons';
+
+export type ItemIcon = typeof Icons[number];
 
 export interface ItemOptions {
     keywords?: string[];
     icon?: ItemIcon;
 }
 
+export interface CommandOption extends ItemOptions {
+    title: string;
+}
+
 export interface CommandOptions extends ItemOptions {
-    options?: string[];
+    options?: string[] | CommandOption[];
 }
 
 export interface ShellCommandOptions extends ItemOptions {
     port?: number;
     externalTerminal?: boolean;
+}
+
+export interface Item {
+    title: string;
+    options?: ItemOptions;
+    type: 'command' | 'jump-to';
+}
+
+export interface Category {
+    results: Result[];
+    title: string;
+    type: CategoryType;
+}
+
+export type CategoryType = 'history' | 'normal';
+
+export interface Result {
+    isRecommended?: boolean;
+    index: number;
+    item: Item;
+}
+
+export interface Command extends Item {
+    action: (result?: string) => any | Promise<any | unknown | void>;
+    type: 'command';
+    parentCommand?: Command;
+    options?: CommandOptions;
+}
+
+export interface JumpTo extends Item {
+    page: string;
+    type: 'jump-to';
 }
 
 interface Props {

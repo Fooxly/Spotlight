@@ -1,6 +1,5 @@
 import { css, FlattenSimpleInterpolation } from 'styled-components';
-
-import type { AlignItems, JustifyContent } from '@/types';
+import type { AlignItems, JustifyContent } from 'types/theme';
 
 export interface FlexProps {
     reverse?: boolean;

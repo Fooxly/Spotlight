@@ -1,7 +1,6 @@
 import React from 'react';
 import styled, { keyframes, useTheme } from 'styled-components';
-
-import type { Color } from '@/types';
+import type { Color } from 'types/theme';
 
 interface Props {
     size?: number;

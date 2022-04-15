@@ -1,6 +1,6 @@
-import { COMMANDS, HISTORY_KEY, HISTORY_LENGTH_KEY, PAGES } from './constants';
+import type { Item } from 'types';
 
-import { Item } from '@/types';
+import { COMMANDS, HISTORY_KEY, HISTORY_LENGTH_KEY, PAGES } from './constants';
 
 export function updateHistory (item: Item) {
     let keys: string[] = JSON.parse(localStorage.getItem(HISTORY_KEY) ?? '[]') as string[];

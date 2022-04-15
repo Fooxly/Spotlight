@@ -1,9 +1,8 @@
 import Fuse from 'fuse.js';
+import type { Category, CategoryType, Item } from 'types';
 
 import { getHistory } from './history';
 import { COMMANDS, PAGES } from './constants';
-
-import { Category, CategoryType, Item } from '@/types';
 
 const FUSE_PROPS = {
     includeScore: true,

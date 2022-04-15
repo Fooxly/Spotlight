@@ -1,6 +1,5 @@
 import { css, FlattenInterpolation, ThemeProps } from 'styled-components';
-
-import type { Color, Theme } from '@/types';
+import type { Color, Theme } from 'types/theme';
 
 const weights = {
     System: {

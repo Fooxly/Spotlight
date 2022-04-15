@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo } from 'react';
 import { ThemeProvider } from 'styled-components';
-import type { CommandOptions, ShellCommandOptions } from 'types';
+import type { ItemOptions, CommandOptions, ShellCommandOptions } from 'types';
+import type { Theme } from 'types/theme';
 
 import { COMMANDS, HISTORY_LENGTH_KEY, PAGES } from './utils';
 import { SpotlightComponent } from './spotlight';
 import { getColorFunction, themes } from './theme';
-import type { ItemOptions, Theme } from './types';
 
 interface Props {
     isDarkMode?: boolean;
