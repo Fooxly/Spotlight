@@ -106,13 +106,16 @@ export function SpotlightComponent (): JSX.Element | null {
             const cmd = (result.item as Command);
             if (cmd.parentCommand) return executeCommand(cmd.parentCommand, cmd.title);
             if (cmd.options?.options?.length) {
+                inputRef.current?.focus();
                 updateHistory(result.item);
                 setSubMenuItem(cmd);
                 return;
             }
+            inputRef.current?.focus();
             updateHistory(result.item);
             executeCommand(cmd);
         } else {
+            inputRef.current?.focus();
             updateHistory(result.item);
             executeItem(result.item);
         }
