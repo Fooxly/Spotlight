@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useMemo, useState } from 'react';
+import React, { createRef, useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { useHotkeys, Options } from 'react-hotkeys-hook';
@@ -124,7 +124,13 @@ export function SpotlightComponent (): JSX.Element | null {
         setReloadVersion(Date.now());
     };
 
-    // TODO: support option and alt key?
+    const moveSmoothToIndex = useCallback((index: number) => {
+        document.querySelector(`#command-${index}`)?.scrollIntoView({
+            behavior: 'smooth',
+            block: index <= 0 ? 'end' : index >= resultCount - 1 ? 'start' : 'nearest',
+        });
+    }, [resultCount]);
+
     useHotkeys('cmd+shift+k, ctrl+shift+k', (e) => {
         preventDefault(e);
         toggleVisible();
@@ -140,12 +146,9 @@ export function SpotlightComponent (): JSX.Element | null {
     useHotkeys('up', (e) => {
         preventDefault(e);
         setSelectedIndex((last) => {
-            const newIndex = Math.max(-1, last - 1);
-            if (newIndex < 0) return -1;
-            document.querySelector(`#command-${newIndex}`)?.scrollIntoView({
-                behavior: 'smooth',
-                block: newIndex <= 0 ? 'center' : 'nearest',
-            });
+            let newIndex = Math.max(-1, last - 1);
+            if (newIndex < 0) newIndex = resultCount - 1;
+            moveSmoothToIndex(newIndex);
             return newIndex;
         });
     }, HOTKEY_OPTIONS, [indexedResults, selectedIndex]);
@@ -153,12 +156,9 @@ export function SpotlightComponent (): JSX.Element | null {
     useHotkeys('down', (e: KeyboardEvent) => {
         preventDefault(e);
         setSelectedIndex((last) => {
-            const newIndex = Math.min(resultCount - 1, last + 1);
-            if (newIndex < 0) return -1;
-            document.querySelector(`#command-${newIndex}`)?.scrollIntoView({
-                behavior: 'smooth',
-                block: newIndex === (resultCount - 1) ? 'center' : 'nearest',
-            });
+            let newIndex = Math.min(resultCount, last + 1);
+            if (newIndex > resultCount - 1) newIndex = 0;
+            moveSmoothToIndex(newIndex);
             return newIndex;
         });
     }, HOTKEY_OPTIONS, [indexedResults, selectedIndex]);

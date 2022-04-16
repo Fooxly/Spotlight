@@ -30,7 +30,8 @@
     "scripts": {
         "debug": "concurrently --kill-others \"tsc -w\" \"tsc-alias -w\"",
         "debug:server": "nodemon --ext ts --watch server/src --exec yarn build:server",
-        "build": "yarn build:esm && yarn build:cjs && yarn build:server",
+        "clean": "rm -rf lib && rm -rf server/dist",
+        "build": "yarn clean && yarn build:esm && yarn build:cjs && yarn build:server",
         "build:esm": "tsc && tsc-alias",
         "build:cjs": "tsc --module commonjs --outDir lib/cjs && tsc-alias",
         "build:server": "tsc -p server/tsconfig.json && tsc-alias -p server/tsconfig.json && chmod +x server/dist/index.js",

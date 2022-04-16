@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { MouseEvent, useMemo } from 'react';
 import styled from 'styled-components';
 
-import type { Result as ResultType } from '@/types';
+import type { Command, Result as ResultType } from '@/types';
 import { getCommandIcon } from '@/utils/get-command-icon';
 
 interface Props {
@@ -13,17 +13,34 @@ interface Props {
     onSelect: (item: ResultType) => any | Promise<any>;
 }
 
+let lastMouseX = 0;
+let lastMouseY = 0;
+
 export function Result ({ hasIcons, result, index, selected, onSoftSelect, onSelect }: Props): JSX.Element | null {
     const enableFocus = () => onSoftSelect(index);
     const Icon = result.item.options?.icon ? getCommandIcon(result.item.options?.icon) : null;
+    const TypeText = useMemo(() => {
+        if (result.item.type === 'command') {
+            if ((result.item as Command).parentCommand) return 'Select option';
+            return 'Run command';
+        }
+        return 'Jump to';
+    }, [result]);
 
     const handleAction = () => {
         onSelect(result);
     };
 
+    const handleMouseMove = (e: MouseEvent<HTMLButtonElement>) => {
+        if (e.clientX === lastMouseX && e.clientY === lastMouseY) return;
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+        enableFocus();
+    };
+
     return (
         // eslint-disable-next-line react/jsx-handler-names
-        <Container id={`command-${index}`} $selected={selected} onClick={handleAction} onMouseMove={enableFocus} onFocus={enableFocus}>
+        <Container id={`command-${index}`} $selected={selected} onClick={handleAction} onMouseMove={handleMouseMove} onFocus={enableFocus}>
             <Left>
                 {hasIcons && (
                     <IconWrapper>
@@ -33,7 +50,7 @@ export function Result ({ hasIcons, result, index, selected, onSoftSelect, onSel
                 <Title>{result.item.title}</Title>
             </Left>
             {selected && (
-                <Type>{result.item.type === 'command' ? 'Run command' : 'Jump to'}</Type>
+                <Type>{TypeText}</Type>
             )}
         </Container>
     );
