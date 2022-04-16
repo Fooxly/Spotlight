@@ -58,8 +58,9 @@ export function SearchInput ({ hasResults, placeholder, value, loading, fref, on
 }
 
 const SearchBar = styled.div<{ $hasResults: boolean }>`
-    position: relative;
     ${(p) => p.theme.flex.row({ align: 'center' })}
+    position: relative;
+    background-color: ${(p) => p.theme.color.gray10};
 
     ${(p) => p.$hasResults && `
         border-bottom: 1px solid ${p.theme.color.gray8};
@@ -68,6 +69,7 @@ const SearchBar = styled.div<{ $hasResults: boolean }>`
 
 const Input = styled.input`
     ${(p) => p.theme.text.System.regular(18, 'gray1')}
+    background-color: ${(p) => p.theme.color.gray10};
     flex: 1;
     height: 55px;
     padding: 0 50px;

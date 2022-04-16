@@ -32,6 +32,7 @@ export function SpotlightComponent (): JSX.Element | null {
     const [search, setSearch] = useState('');
     const [error, setError] = useState('');
     const inputRef = createRef<HTMLInputElement>();
+    const resultsRef = createRef<HTMLDivElement>();
 
     const HOTKEY_OPTIONS: Options = useMemo(() => ({
         enabled: visible,
@@ -128,11 +129,12 @@ export function SpotlightComponent (): JSX.Element | null {
     };
 
     const moveSmoothToIndex = useCallback((index: number) => {
-        document.querySelector(`#command-${index}`)?.scrollIntoView({
+        if (!resultsRef?.current) return;
+        resultsRef?.current?.querySelector(`#command-${index}`)?.scrollIntoView({
             behavior: 'smooth',
             block: index <= 0 ? 'end' : index >= resultCount - 1 ? 'start' : 'nearest',
         });
-    }, [resultCount]);
+    }, [resultsRef, resultCount]);
 
     useHotkeys('cmd+shift+k, ctrl+shift+k', (e) => {
         preventDefault(e);
@@ -207,7 +209,7 @@ export function SpotlightComponent (): JSX.Element | null {
                     <Error message={error} onDismiss={() => setError('')} />
                 )}
                 {indexedResults.length > 0 && indexedResults[0].results.length > 0 && (
-                    <Results>
+                    <Results ref={resultsRef}>
                         {indexedResults.map((category) => (
                             <Section
                                 key={category.title}
