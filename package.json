@@ -4,7 +4,11 @@
     "private": true,
     "main": "./lib/cjs/index.js",
     "module": "./lib/esm/index.js",
-    "types": "./types/index.d.ts",
+    "types": "./src/types/index.d.ts",
+    "files": [
+        "/lib",
+        "/src/types"
+    ],
     "bin": {
         "spotlight": "./server/dist/index.js"
     },
