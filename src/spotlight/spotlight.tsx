@@ -89,7 +89,6 @@ export function SpotlightComponent (): JSX.Element | null {
                 setLoading(false);
                 hideSpotlight();
             }).catch((error: { message: string; port: number; reason?: string | Error }) => {
-                console.log('aaaaaa', error);
                 let errorMessage = ERRORS[error.message] || ERRORS.UNKNOWN;
                 if (typeof error.port === 'number') errorMessage = errorMessage.replace('{{port}}', String(error.port));
 

@@ -13,7 +13,10 @@ export const BASE_COMMANDS: Command[] = [
         },
     },
     {
-        action: console.log,
+        action: (icon) => {
+            if (!icon) return;
+            return navigator.clipboard.writeText(icon);
+        },
         title: 'Spotlight icon list',
         type: 'command',
         options: {
