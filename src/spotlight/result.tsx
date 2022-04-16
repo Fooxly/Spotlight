@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import type { Result as ResultType } from 'types';
 
+import type { Result as ResultType } from '@/types';
 import { getCommandIcon } from '@/utils/get-command-icon';
 
 interface Props {

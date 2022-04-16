@@ -1,5 +1,4 @@
-import type { ItemIcon } from 'types';
-
+import type { ItemIcon } from '@/types';
 import {
     BellMuteIcon,
     BellIcon,

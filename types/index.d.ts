@@ -1,4 +1,4 @@
-import { Icons } from './icons';
+import type { Icons } from './icons';
 
 export type ItemIcon = typeof Icons[number];
 

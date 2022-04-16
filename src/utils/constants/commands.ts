@@ -1,5 +1,4 @@
-import type { Command, JumpTo } from 'types';
-
+import type { Command, JumpTo } from '@/types';
 import { BASE_COMMANDS, BASE_PAGES } from './base-commands';
 
 export const COMMANDS: Command[] = [

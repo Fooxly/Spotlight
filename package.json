@@ -8,6 +8,21 @@
     "bin": {
         "spotlight": "./server/dist/index.js"
     },
+    "browserslist": {
+        "production": [
+            "last 1 version",
+            "> 0.4%",
+            "not dead",
+            "not ie <= 10",
+            "not baidu > 1",
+            "not Android > 1",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 safari version"
+        ]
+    },
     "scripts": {
         "debug": "concurrently --kill-others \"tsc -w\" \"tsc-alias -w\"",
         "debug:server": "nodemon --ext ts --watch server/src --exec yarn build:server",

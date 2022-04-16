@@ -2,12 +2,12 @@ import React, { createRef, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { useHotkeys, Options } from 'react-hotkeys-hook';
-import type { Category, Command, Result } from 'types';
 
 import { SearchInput } from './search-input';
 import { Section } from './section';
 import { Error } from './error';
 
+import type { Category, Command, Result } from '@/types';
 import { filterResults, executeItem, updateHistory, clearHistory, ERRORS } from '@/utils';
 
 // create the spotlight wrapper if this is not already created
@@ -89,6 +89,7 @@ export function SpotlightComponent (): JSX.Element | null {
                 setLoading(false);
                 hideSpotlight();
             }).catch((error: { message: string; port: number; reason?: string | Error }) => {
+                console.log('aaaaaa', error);
                 let errorMessage = ERRORS[error.message] || ERRORS.UNKNOWN;
                 if (typeof error.port === 'number') errorMessage = errorMessage.replace('{{port}}', String(error.port));
 
@@ -124,7 +125,8 @@ export function SpotlightComponent (): JSX.Element | null {
         setReloadVersion(Date.now());
     };
 
-    useHotkeys('cmd+shift+k, ctrl+shift+k, cmd+opt+k, ctrl+alt+k', (e) => {
+    // TODO: support option and alt key?
+    useHotkeys('cmd+shift+k, ctrl+shift+k', (e) => {
         preventDefault(e);
         toggleVisible();
     }, {

@@ -1,5 +1,6 @@
-import type { Command, JumpTo } from 'types';
-import { Icons } from 'types/icons';
+import { Icons } from './icons';
+
+import type { Command, JumpTo } from '@/types';
 
 export const BASE_COMMANDS: Command[] = [
     {
