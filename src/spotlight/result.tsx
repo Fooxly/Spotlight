@@ -61,6 +61,8 @@ const Container = styled.button<{ $selected: boolean }>`
     height: 45px;
     min-height: 45px;
     border-radius: 10px;
+    border: 0;
+    outline: 0;
     padding: 0 15px;
     background-color: transparent;
     cursor: pointer;

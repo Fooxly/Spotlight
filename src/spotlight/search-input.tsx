@@ -74,6 +74,10 @@ const Input = styled.input`
     height: 55px;
     padding: 0 50px;
 
+    &:focus {
+        outline: 0;
+    }
+
     ::placeholder {
         color: ${(p) => p.theme.color.gray6} !important;
     }
@@ -88,6 +92,8 @@ const SearchIconWrapper = styled.div`
 
 const CloseButton = styled.button`
     ${(p) => p.theme.flex.col({ justify: 'center', align: 'center' })}
+    border: 0;
+    outline: 0;
     border-radius: 100px;
     background-color: ${(p) => p.theme.color.gray2};
     position: absolute;

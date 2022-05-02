@@ -58,6 +58,8 @@ export function Section ({
 
 const SectionButton = styled.button`
     ${(p) => p.theme.flex.col({ justify: 'center', align: 'center' })}
+    border: 0;
+    outline: 0;
     border-radius: 100px;
     background-color: ${(p) => p.theme.color.gray2};
     position: absolute;

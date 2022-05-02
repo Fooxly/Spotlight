@@ -35,6 +35,7 @@ const Message = styled.p`
 const Button = styled.button`
     ${(p) => p.theme.flex.col({ justify: 'center', align: 'center' })}
     border: 0;
+    outline: 0;
     background-color: transparent;
     cursor: pointer;
     width: 30px;
