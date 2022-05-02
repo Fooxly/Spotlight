@@ -2,7 +2,7 @@
   "extends": "./tsconfig.paths.json",
   "compilerOptions": {
     "outDir": "lib/esm",
-    "target": "esnext",
+    "target": "ES6",
     "lib": [
       "dom",
       "dom.iterable",
