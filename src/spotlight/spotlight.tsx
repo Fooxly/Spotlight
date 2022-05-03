@@ -153,6 +153,10 @@ export function SpotlightComponent (): JSX.Element | null {
     };
 
     const selectResult = (result: Result) => {
+        if (spotlightType === 'question') {
+            submitTextInputResult(result.item.title);
+            return;
+        }
         setError('');
         if (result.item.type === 'command') {
             const cmd = (result.item as Command);
@@ -245,11 +249,6 @@ export function SpotlightComponent (): JSX.Element | null {
         if (!cat) return;
         const result = cat.results.find((res) => res.index === selectedIndex);
         if (!result) return;
-
-        if (spotlightType === 'question') {
-            submitTextInputResult(result.item.title);
-            return;
-        }
         selectResult(result);
     }, HOTKEY_OPTIONS, [indexedResults, selectedIndex, search, spotlightType]);
 
