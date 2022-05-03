@@ -1,5 +1,7 @@
 import { Icons } from './icons';
 
+export type SpotlightType = 'search' | 'input' | 'question';
+
 export type ItemIcon = typeof Icons[number];
 
 export interface ItemOptions {
@@ -68,6 +70,8 @@ export declare function registerCommand (
 
 export declare function unregister (title: string): void;
 
+export declare function question (question: string, answers?: string[] | CommandOption[]): Promise<string>;
+
 export declare function shell (command: string, options?: ShellCommandOptions | undefined): Promise<void>;
 
 declare const _default: {
@@ -75,6 +79,7 @@ declare const _default: {
     registerJumpTo: typeof registerJumpTo;
     registerCommand: typeof registerCommand;
     unregister: typeof unregister;
+    question: typeof question;
     shell: typeof shell;
 };
 

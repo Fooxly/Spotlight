@@ -3,7 +3,8 @@ import styled from 'styled-components';
 
 import { Loading } from './loading';
 
-import { SearchIcon, TimesIcon } from '@/icons/line';
+import { ArrowIcon, SearchIcon, TimesIcon } from '@/icons/line';
+import { SpotlightType } from '@/types';
 
 // create the spotlight wrapper if this is not already created
 let wrapper = document.querySelector<HTMLDivElement>('#spotlight');
@@ -19,10 +20,11 @@ interface Props {
     value: string;
     loading: boolean;
     fref: Ref<HTMLInputElement>;
+    type: SpotlightType;
     onChange: (value: string) => void;
 }
 
-export function SearchInput ({ hasResults, placeholder, value, loading, fref, onChange }: Props): JSX.Element {
+export function SearchInput ({ hasResults, placeholder, value, loading, fref, type, onChange }: Props): JSX.Element {
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         // Only update the text when the value is not the same anymore -> important for the hotkeys
         if (e.target.value.length !== value.length) {
@@ -42,16 +44,18 @@ export function SearchInput ({ hasResults, placeholder, value, loading, fref, on
                 onChange={handleChange}
             />
             <SearchIconWrapper>
-                {loading ? (
+                {type !== 'search' ? (
+                    <ArrowIcon direction='right' size={24} color='gray4' />
+                ) : loading ? (
                     <Loading size={22} color='blue' thickness={3} />
                 ) : (
                     <SearchIcon size={24} color='gray4' />
                 )}
             </SearchIconWrapper>
             {value?.length > 0 && (
-                <CloseButton onClick={handleClear}>
+                <ClearButton onClick={handleClear}>
                     <TimesIcon size={8} color='gray10' />
-                </CloseButton>
+                </ClearButton>
             )}
         </SearchBar>
     );
@@ -90,7 +94,7 @@ const SearchIconWrapper = styled.div`
     margin-bottom: 2px;
 `;
 
-const CloseButton = styled.button`
+const ClearButton = styled.button`
     ${(p) => p.theme.flex.col({ justify: 'center', align: 'center' })}
     border: 0;
     outline: 0;

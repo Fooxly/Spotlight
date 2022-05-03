@@ -1,3 +1,4 @@
+export * from './arrow';
 export * from './bell-mute';
 export * from './bell';
 export * from './brush';

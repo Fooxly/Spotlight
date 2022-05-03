@@ -22,6 +22,7 @@ A package by [Fooxly](https://www.fooxly.com).
 * Search for pages on your website
 * Build custom commands for a better dev experience
 * Run local scripts and commands right from your browser
+* Usable modal for simple questions
 
 ## 🔧&nbsp; How to setup
 
@@ -55,6 +56,19 @@ Spotlight.RegisterCommand('Say Hello', () => console.log('hello world'));
 ```
 
 5. Enjoy.
+
+## 🤔&nbsp; Asking questions
+
+Whilst having a powerful spotlight at the tips of your hands. We also provide an easy way to ask questions. With the following command you can open the Spotlight UI with a specific question to be answered.
+
+```js
+import Spotlight from '@fooxly/spotlight';
+
+Spotlight.question('What is your name?');
+Spotlight.question('What is your favorite animal?', ['Dog', 'Cat', 'Fish']);
+```
+
+When adding custom answers to the question you can use the same syntax as in the `RegisterCommand` method. So there is support for single strings or an object with an `title`, `keywords` and `icon`.
 
 ## 🪄&nbsp; Customization
 

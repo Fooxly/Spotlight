@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo } from 'react';
 import { ThemeProvider } from 'styled-components';
 
-import { COMMANDS, HISTORY_LENGTH_KEY, PAGES } from './utils';
+import { COMMANDS, HISTORY_LENGTH_KEY, INPUT_TYPE_EVENT_KEY, PAGES, TEXT_INPUT_RESULT_EVENT_KEY } from './utils';
 import { SpotlightComponent } from './spotlight';
 import { getColorFunction, themes } from './theme';
 
-import type { ItemOptions, CommandOptions, ShellCommandOptions } from '@/types';
+import type { ItemOptions, CommandOptions, ShellCommandOptions, SpotlightType, CommandOption } from '@/types';
 import type { Theme } from '@/types/theme';
 
 interface Props {
@@ -75,6 +75,27 @@ export function unregister (title: string): void {
     PAGES.splice(PAGES.findIndex((page) => page.title === title), 1);
 }
 
+export function question (question: string, answers?: string[] | CommandOption[]): Promise<string> {
+    return new Promise((resolve) => {
+        const handleInputRequest = (ev: { detail: { value: string } }) => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            document.removeEventListener(TEXT_INPUT_RESULT_EVENT_KEY, handleInputRequest as any);
+            resolve(ev.detail.value);
+        };
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        document.addEventListener(TEXT_INPUT_RESULT_EVENT_KEY, handleInputRequest as any);
+        const ev = new CustomEvent(INPUT_TYPE_EVENT_KEY, {
+            bubbles: false,
+            detail: {
+                type: (answers?.length ? 'question' : 'input') as SpotlightType,
+                question,
+                answers,
+            },
+        });
+        document.dispatchEvent(ev);
+    });
+}
+
 /* eslint-disable @typescript-eslint/no-throw-literal */
 export async function shell (command: string, options?: ShellCommandOptions) {
     const port = options?.port ?? 1898;
@@ -105,5 +126,6 @@ export default {
     registerJumpTo,
     registerCommand,
     unregister,
+    question,
     shell,
 };

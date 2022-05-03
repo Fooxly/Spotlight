@@ -7,8 +7,16 @@ import { SearchInput } from './search-input';
 import { Section } from './section';
 import { Error } from './error';
 
-import type { Category, Command, Result } from '@/types';
-import { filterResults, executeItem, updateHistory, clearHistory, ERRORS } from '@/utils';
+import type { Category, Command, CommandOption, ItemOptions, Result, SpotlightType } from '@/types';
+import {
+    filterResults,
+    executeItem,
+    updateHistory,
+    clearHistory,
+    ERRORS,
+    INPUT_TYPE_EVENT_KEY,
+    TEXT_INPUT_RESULT_EVENT_KEY,
+} from '@/utils';
 
 // create the spotlight wrapper if this is not already created
 let wrapper = document.querySelector<HTMLDivElement>('#spotlight');
@@ -33,6 +41,27 @@ export function SpotlightComponent (): JSX.Element | null {
     const [error, setError] = useState('');
     const inputRef = createRef<HTMLInputElement>();
     const resultsRef = createRef<HTMLDivElement>();
+    const [spotlightType, setSpotlightType] = useState<SpotlightType>('search');
+    const [placeholder, setPlaceholder] = useState<string | null>(null);
+    const [answers, setAnswers] = useState<string[] | CommandOption[] | null>(null);
+
+    useEffect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        document.removeEventListener(INPUT_TYPE_EVENT_KEY, changeInputType as any, false);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        document.addEventListener(INPUT_TYPE_EVENT_KEY, changeInputType as any, false);
+        // return () => {
+        // };
+    }, []);
+
+    const changeInputType = (
+        ev: { detail: { type: SpotlightType; question?: string; answers?: string[] | CommandOption[] | null } },
+    ) => {
+        setVisible(true);
+        setSpotlightType(ev.detail.type);
+        setAnswers(ev.detail.answers!);
+        setPlaceholder(ev.detail.type === 'search' ? null : (ev.detail.question ?? null));
+    };
 
     const HOTKEY_OPTIONS: Options = useMemo(() => ({
         enabled: visible,
@@ -41,6 +70,23 @@ export function SpotlightComponent (): JSX.Element | null {
 
     // Get the results which should be indexed and rendered
     const indexedResults: Category[] = useMemo(() => {
+        if (answers) {
+            return filterResults(
+                search,
+                {
+                    title: placeholder ?? 'Options',
+                    items: answers.map((answer) => ({
+                        title: typeof answer === 'string' ? answer : answer.title,
+                        options: {
+                            icon: typeof answer === 'string' ? null : answer.icon,
+                            keywords: typeof answer === 'string' ? null : answer.keywords,
+                        } as ItemOptions,
+                        type: 'command',
+                    })),
+                },
+            );
+        }
+
         if (subMenuItem?.options?.options) {
             return filterResults(
                 search,
@@ -61,14 +107,19 @@ export function SpotlightComponent (): JSX.Element | null {
         }
         return filterResults(search);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [visible, reloadVersion, search, subMenuItem]);
+    }, [answers, placeholder, visible, reloadVersion, search, subMenuItem]);
 
     const resultCount = useMemo(() => indexedResults.reduce((count, cat) => cat.results.length + count, 0), [indexedResults]);
 
     // When the spotlight is closed, reset all the values
     useEffect(() => {
+        if (visible) return;
         setSearch('');
         setError('');
+        setSpotlightType('search');
+        setPlaceholder(null);
+        setAnswers(null);
+        setLoading(false);
         setSelectedIndex(0);
         setSubMenuItem(null);
     }, [visible]);
@@ -136,6 +187,21 @@ export function SpotlightComponent (): JSX.Element | null {
         });
     }, [resultsRef, resultCount]);
 
+    const submitTextInputResult = (answer?: string) => {
+        // Only submit text when there is any text
+        if (!answer?.trim?.()?.length) return;
+        // Revert the input back to the search input
+        hideSpotlight();
+        // Submit the result
+        const ev = new CustomEvent(TEXT_INPUT_RESULT_EVENT_KEY, {
+            bubbles: false,
+            detail: {
+                value: answer.trim(),
+            },
+        });
+        document.dispatchEvent(ev);
+    };
+
     useHotkeys('cmd+shift+k, ctrl+shift+k', (e) => {
         preventDefault(e);
         toggleVisible();
@@ -170,13 +236,22 @@ export function SpotlightComponent (): JSX.Element | null {
 
     useHotkeys('enter', (e) => {
         preventDefault(e);
+        if (spotlightType === 'input') {
+            submitTextInputResult(search);
+            return;
+        }
         if (selectedIndex < 0) return;
         const cat = indexedResults.find((cat) => cat.results.find((res) => res.index === selectedIndex));
         if (!cat) return;
         const result = cat.results.find((res) => res.index === selectedIndex);
         if (!result) return;
+
+        if (spotlightType === 'question') {
+            submitTextInputResult(result.item.title);
+            return;
+        }
         selectResult(result);
-    }, HOTKEY_OPTIONS, [indexedResults, selectedIndex]);
+    }, HOTKEY_OPTIONS, [indexedResults, selectedIndex, search, spotlightType]);
 
     useHotkeys('backspace', (e) => {
         if (search.length > 0) return;
@@ -191,14 +266,17 @@ export function SpotlightComponent (): JSX.Element | null {
 
     const resultsHaveIcons = indexedResults.some((cat) => cat.results.some((r) => !!r.item.options?.icon));
 
+    const fallbackTitle = (answers ?? subMenuItem) ? 'Choose an option...' : 'Search or jump to...';
+
     return ReactDOM.createPortal(!visible ? null : (
         <Container id='fooxly-spotlight'>
             {/* eslint-disable-next-line react/jsx-handler-names */}
             <Background onClick={hideSpotlight} />
             <Content>
                 <SearchInput
+                    type={spotlightType}
                     hasResults={!!indexedResults?.length || !!error}
-                    placeholder={subMenuItem ? 'Choose an option...' : 'Search or jump to...'}
+                    placeholder={spotlightType === 'input' ? placeholder ?? 'Enter text here...' : fallbackTitle}
                     value={search}
                     loading={loading}
                     fref={inputRef}
@@ -208,25 +286,29 @@ export function SpotlightComponent (): JSX.Element | null {
                 {!!error && (
                     <Error message={error} onDismiss={() => setError('')} />
                 )}
-                {indexedResults.length > 0 && indexedResults[0].results.length > 0 && (
-                    <Results ref={resultsRef}>
-                        {indexedResults.map((category) => (
-                            <Section
-                                key={category.title}
-                                title={category.title}
-                                results={category.results}
-                                showIcons={resultsHaveIcons}
-                                selectedIndex={selectedIndex}
-                                // eslint-disable-next-line react/jsx-handler-names
-                                onResultSoftSelect={setSelectedIndex}
-                                // eslint-disable-next-line react/jsx-handler-names
-                                onResultSelect={selectResult}
-                                // eslint-disable-next-line react/jsx-handler-names
-                                onRemove={category.type === 'history' ? removeHistory : undefined}
-                            />
-                        ))}
-                    </Results>
-                )}
+                {
+                    (spotlightType === 'search' || spotlightType === 'question') &&
+                    indexedResults.length > 0 &&
+                    indexedResults[0].results.length > 0 && (
+                        <Results ref={resultsRef}>
+                            {indexedResults.map((category) => (
+                                <Section
+                                    key={category.title}
+                                    title={category.title}
+                                    results={category.results}
+                                    showIcons={resultsHaveIcons}
+                                    selectedIndex={selectedIndex}
+                                    // eslint-disable-next-line react/jsx-handler-names
+                                    onResultSoftSelect={setSelectedIndex}
+                                    // eslint-disable-next-line react/jsx-handler-names
+                                    onResultSelect={selectResult}
+                                    // eslint-disable-next-line react/jsx-handler-names
+                                    onRemove={category.type === 'history' ? removeHistory : undefined}
+                                />
+                            ))}
+                        </Results>
+                    )
+                }
             </Content>
         </Container>
     ), wrapper!);
