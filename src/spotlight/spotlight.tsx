@@ -162,7 +162,9 @@ export function SpotlightComponent (): JSX.Element | null {
             const cmd = (result.item as Command);
             if (cmd.options?.options?.length) {
                 inputRef.current?.focus();
-                updateHistory(result.item);
+                if (!cmd.parentCommand) {
+                    updateHistory(result.item);
+                }
                 setSubMenuItem(cmd);
                 return;
             }
@@ -176,11 +178,9 @@ export function SpotlightComponent (): JSX.Element | null {
                 return executeCommand(parent, cmd.title);
             }
             inputRef.current?.focus();
-            updateHistory(result.item);
             executeCommand(cmd);
         } else {
             inputRef.current?.focus();
-            updateHistory(result.item);
             executeItem(result.item);
         }
     };
