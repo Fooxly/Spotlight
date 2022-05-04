@@ -88,4 +88,6 @@ const ResultSection = styled.div`
 
 const ResultSectionTitle = styled.p`
     ${(p) => p.theme.text.System.semibold(14, 'gray4')}
+    margin: 0;
+    padding: 0;
 `;

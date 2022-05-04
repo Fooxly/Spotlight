@@ -98,7 +98,8 @@ const IconWrapper = styled.div`
 
 const Title = styled.p`
     ${(p) => p.theme.text.System.regular(15, 'gray1')}
-
+    margin: 0;
+    padding: 0;
     white-space: nowrap;
     overflow: hidden;
     display: block;
@@ -108,6 +109,8 @@ const Title = styled.p`
 const Type = styled.p`
     ${(p) => p.theme.text.System.regular(15, 'gray5')}
     animation: ${(p) => p.theme.animation.fadeIn} 0.2s ease-in-out;
+    margin: 0;
+    padding: 0;
     text-align: right;
 
     @media(max-width: 450px) {
