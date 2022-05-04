@@ -36,7 +36,7 @@ const preventDefault = (e: KeyboardEvent) => {
 const decodeHTML = (html: string): string => {
     const e = document.createElement('div');
     e.innerHTML = html;
-    return e.childNodes.length === 0 ? '' : (e.childNodes[0].nodeValue ?? '');
+    return e.innerHTML;
 };
 
 interface Props {
@@ -399,8 +399,10 @@ const Results = styled.div`
 
 const Tip = styled.p`
     ${(p) => p.theme.text.System.regular(13, 'gray3')}
+    margin: 0;
     margin-bottom: 10px;
     margin-left: 5px;
+    padding: 0;
 
     > kbd {
         display: inline-block;
