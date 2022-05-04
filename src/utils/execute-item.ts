@@ -4,10 +4,10 @@ import type { Command, Item, JumpTo } from '@/types';
 
 export function executeItem (item: Item, param?: string): any | Promise<any> {
     if (
-        item.options?.warnBeforeUse &&
+        item.options?.confirm &&
         !confirm(
-            typeof item.options.warnBeforeUse === 'string'
-                ? item.options.warnBeforeUse
+            typeof item.options.confirm === 'string'
+                ? item.options.confirm
                 : 'Are you sure you want to continue? This could have major consequences.',
         )
     ) return;

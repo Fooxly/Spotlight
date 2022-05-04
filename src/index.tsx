@@ -11,9 +11,10 @@ import type { Theme } from '@/types/theme';
 interface Props {
     isDarkMode?: boolean;
     showRecentlyUsed?: number;
+    showTips?: boolean;
 }
 
-export function Spotlight ({ isDarkMode, showRecentlyUsed = 5 }: Props): JSX.Element {
+export function Spotlight ({ isDarkMode, showRecentlyUsed = 5, showTips = true }: Props): JSX.Element {
     useEffect(() => {
         localStorage.setItem(HISTORY_LENGTH_KEY, showRecentlyUsed.toString());
     }, [showRecentlyUsed]);
@@ -28,7 +29,7 @@ export function Spotlight ({ isDarkMode, showRecentlyUsed = 5 }: Props): JSX.Ele
 
     return (
         <ThemeProvider theme={calculatedTheme}>
-            <SpotlightComponent />
+            <SpotlightComponent showTips={showTips} />
         </ThemeProvider>
     );
 }

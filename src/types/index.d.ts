@@ -11,7 +11,7 @@ export interface ItemOptions {
     // Icon can be set to make an item stand out more and give it more personality.
     icon?: ItemIcon;
     // Should the user be warned when they try to execute the item? (A custom warning message can be written here if needed)
-    warnBeforeUse?: boolean | string;
+    confirm?: boolean | string;
 }
 
 export interface CommandOption extends ItemOptions {
@@ -86,6 +86,8 @@ interface Props {
     isDarkMode?: boolean;
     // The amount of items which will be shown in the spotlight. (Default value is 5)
     showRecentlyUsed?: number;
+    // If the tips should be visible when nothing has been typed yet.
+    showTips?: boolean;
 }
 
 export declare function Spotlight ({ isDarkMode, showRecentlyUsed }: Props): JSX.Element;

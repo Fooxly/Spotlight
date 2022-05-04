@@ -18,6 +18,7 @@ import {
     TEXT_INPUT_RESULT_EVENT_KEY,
     SpotlightContext,
 } from '@/utils';
+import { TIPS } from '@/utils/constants/tips';
 
 // create the spotlight wrapper if this is not already created
 let wrapper = document.querySelector<HTMLDivElement>('#spotlight');
@@ -32,7 +33,17 @@ const preventDefault = (e: KeyboardEvent) => {
     e.stopPropagation();
 };
 
-export function SpotlightComponent (): JSX.Element | null {
+const decodeHTML = (html: string): string => {
+    const e = document.createElement('div');
+    e.innerHTML = html;
+    return e.childNodes.length === 0 ? '' : (e.childNodes[0].nodeValue ?? '');
+};
+
+interface Props {
+    showTips?: boolean;
+}
+
+export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
     const [visible, setVisible] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -52,6 +63,9 @@ export function SpotlightComponent (): JSX.Element | null {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         document.addEventListener(INPUT_TYPE_EVENT_KEY, changeInputType as any, false);
     }, []);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const activeTip = useMemo(() => TIPS[Math.floor(Math.random() * TIPS.length)], [TIPS, visible]);
 
     const changeInputType = (
         ev: { detail: { type: SpotlightType; question?: string; answers?: string[] | CommandOption[] | null } },
@@ -303,6 +317,9 @@ export function SpotlightComponent (): JSX.Element | null {
                         indexedResults.length > 0 &&
                         indexedResults[0].results.length > 0 && (
                             <Results ref={resultsRef}>
+                                {!search?.length && showTips && (
+                                    <Tip dangerouslySetInnerHTML={{ __html: decodeHTML(activeTip) ?? '' }} />
+                                )}
                                 {indexedResults.map((category) => (
                                     <Section
                                         key={category.title}
@@ -369,7 +386,7 @@ const Content = styled.div`
 `;
 
 const Results = styled.div`
-    ${(p) => p.theme.flex.col()};
+    ${(p) => p.theme.flex.col()}
     height: auto;
     overflow-y: auto;
     max-height: 400px;
@@ -377,5 +394,27 @@ const Results = styled.div`
 
     @media(max-height: 600px) {
         max-height: 100%;
+    }
+`;
+
+const Tip = styled.p`
+    ${(p) => p.theme.text.System.regular(13, 'gray3')}
+    margin-bottom: 10px;
+    margin-left: 5px;
+
+    > kbd {
+        display: inline-block;
+        min-width: 21px;
+        ${(p) => p.theme.text.System.regular(12, 'gray1')}
+        padding: 0 4px;
+        text-align: center;
+        border: 1px solid ${(p) => p.theme.color.gray7};
+        border-radius: 6px;
+        box-shadow: none;
+    }
+
+    &:before {
+        content: 'Tip: ';
+        ${(p) => p.theme.text.System.bold(13, 'gray1')}
     }
 `;

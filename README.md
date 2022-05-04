@@ -45,6 +45,7 @@ Settings up Spotlight is quite easy and straightforward. After setting up the to
 
 - `isDarkMode`: Set to `true` to enable dark mode.
 - `showRecentlyUsed`: Amount of items which should be remembered and showed in the recently used section.
+- `showTips`: Set to `false` to disable tips.
 
 4. Create custom commands for your project.
 
@@ -72,7 +73,7 @@ When adding custom answers to the question you can use the same syntax as in the
 
 ## 🪄&nbsp; Customization
 
-While customizing the spotlight itself is only limited to the `isDarkMode` and `showRecentlyUsed` property, our results can also be customized. Every result can have it's own icon. We have a library of icons which you can choose from.
+While customizing the spotlight itself is only limited to the `isDarkMode`, `showRecentlyUsed` and `showTips` property, our results can also be customized. Every result can have it's own icon. We have a library of icons which you can choose from.
 
 ## Future plans
 
