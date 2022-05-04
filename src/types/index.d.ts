@@ -11,6 +11,7 @@ export interface ItemOptions {
 
 export interface CommandOption extends ItemOptions {
     title: string;
+    options?: string[] | CommandOption[];
 }
 
 export interface CommandOptions extends ItemOptions {

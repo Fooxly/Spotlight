@@ -51,8 +51,6 @@ export function SpotlightComponent (): JSX.Element | null {
         document.removeEventListener(INPUT_TYPE_EVENT_KEY, changeInputType as any, false);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         document.addEventListener(INPUT_TYPE_EVENT_KEY, changeInputType as any, false);
-        // return () => {
-        // };
     }, []);
 
     const changeInputType = (
@@ -99,6 +97,7 @@ export function SpotlightComponent (): JSX.Element | null {
                             options: {
                                 icon: typeof item === 'string' ? undefined : item.icon,
                                 keywords: typeof item === 'string' ? undefined : item.keywords,
+                                options: typeof item === 'string' ? null : item.options,
                             },
                             type: 'command',
                             parentCommand: subMenuItem,
@@ -161,12 +160,20 @@ export function SpotlightComponent (): JSX.Element | null {
         setError('');
         if (result.item.type === 'command') {
             const cmd = (result.item as Command);
-            if (cmd.parentCommand) return executeCommand(cmd.parentCommand, cmd.title);
             if (cmd.options?.options?.length) {
                 inputRef.current?.focus();
                 updateHistory(result.item);
                 setSubMenuItem(cmd);
                 return;
+            }
+            if (cmd.parentCommand) {
+                // Get the most parent command and execute it
+                let parent = cmd.parentCommand;
+                while (parent.parentCommand) {
+                    parent = parent.parentCommand;
+                }
+                // Execute the parent command
+                return executeCommand(parent, cmd.title);
             }
             inputRef.current?.focus();
             updateHistory(result.item);
