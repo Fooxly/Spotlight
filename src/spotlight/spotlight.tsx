@@ -16,6 +16,7 @@ import {
     ERRORS,
     INPUT_TYPE_EVENT_KEY,
     TEXT_INPUT_RESULT_EVENT_KEY,
+    SpotlightContext,
 } from '@/utils';
 
 // create the spotlight wrapper if this is not already created
@@ -269,46 +270,52 @@ export function SpotlightComponent (): JSX.Element | null {
 
     return ReactDOM.createPortal(!visible ? null : (
         <Container id='fooxly-spotlight'>
-            {/* eslint-disable-next-line react/jsx-handler-names */}
-            <Background onClick={hideSpotlight} />
-            <Content>
-                <SearchInput
-                    type={spotlightType}
-                    hasResults={!!indexedResults?.length || !!error}
-                    placeholder={spotlightType === 'input' ? placeholder ?? 'Enter text here...' : fallbackTitle}
-                    value={search}
-                    loading={loading}
-                    fref={inputRef}
-                    // eslint-disable-next-line react/jsx-handler-names
-                    onChange={setSearch}
-                />
-                {!!error && (
-                    <Error message={error} onDismiss={() => setError('')} />
-                )}
-                {
-                    (spotlightType === 'search' || spotlightType === 'question') &&
-                    indexedResults.length > 0 &&
-                    indexedResults[0].results.length > 0 && (
-                        <Results ref={resultsRef}>
-                            {indexedResults.map((category) => (
-                                <Section
-                                    key={category.title}
-                                    title={category.title}
-                                    results={category.results}
-                                    showIcons={resultsHaveIcons}
-                                    selectedIndex={selectedIndex}
-                                    // eslint-disable-next-line react/jsx-handler-names
-                                    onResultSoftSelect={setSelectedIndex}
-                                    // eslint-disable-next-line react/jsx-handler-names
-                                    onResultSelect={selectResult}
-                                    // eslint-disable-next-line react/jsx-handler-names
-                                    onRemove={category.type === 'history' ? removeHistory : undefined}
-                                />
-                            ))}
-                        </Results>
-                    )
-                }
-            </Content>
+            <SpotlightContext.Provider
+                value={{
+                    type: spotlightType,
+                }}
+            >
+                {/* eslint-disable-next-line react/jsx-handler-names */}
+                <Background onClick={hideSpotlight} />
+                <Content>
+                    <SearchInput
+                        type={spotlightType}
+                        hasResults={!!indexedResults?.length || !!error}
+                        placeholder={spotlightType === 'input' ? placeholder ?? 'Enter text here...' : fallbackTitle}
+                        value={search}
+                        loading={loading}
+                        fref={inputRef}
+                        // eslint-disable-next-line react/jsx-handler-names
+                        onChange={setSearch}
+                    />
+                    {!!error && (
+                        <Error message={error} onDismiss={() => setError('')} />
+                    )}
+                    {
+                        (spotlightType === 'search' || spotlightType === 'question') &&
+                        indexedResults.length > 0 &&
+                        indexedResults[0].results.length > 0 && (
+                            <Results ref={resultsRef}>
+                                {indexedResults.map((category) => (
+                                    <Section
+                                        key={category.title}
+                                        title={category.title}
+                                        results={category.results}
+                                        showIcons={resultsHaveIcons}
+                                        selectedIndex={selectedIndex}
+                                        // eslint-disable-next-line react/jsx-handler-names
+                                        onResultSoftSelect={setSelectedIndex}
+                                        // eslint-disable-next-line react/jsx-handler-names
+                                        onResultSelect={selectResult}
+                                        // eslint-disable-next-line react/jsx-handler-names
+                                        onRemove={category.type === 'history' ? removeHistory : undefined}
+                                    />
+                                ))}
+                            </Results>
+                        )
+                    }
+                </Content>
+            </SpotlightContext.Provider>
         </Container>
     ), wrapper!);
 }

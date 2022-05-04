@@ -4,3 +4,4 @@ export * from './history';
 export * from './filter-results';
 export * from './get-command-icon';
 export * from './lens';
+export * from './spotlight-context';

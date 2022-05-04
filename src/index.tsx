@@ -92,7 +92,10 @@ export function question (question: string, answers?: string[] | CommandOption[]
                 answers,
             },
         });
-        document.dispatchEvent(ev);
+        // Add a small timeout to wait for possible rerenders inside the spotlight
+        setTimeout(() => {
+            document.dispatchEvent(ev);
+        }, 10);
     });
 }
 

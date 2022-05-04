@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import type { Command, Result as ResultType } from '@/types';
 import { getCommandIcon } from '@/utils/get-command-icon';
+import { useSpotlightContext } from '@/utils';
 
 interface Props {
     hasIcons: boolean;
@@ -17,15 +18,18 @@ let lastMouseX = 0;
 let lastMouseY = 0;
 
 export function Result ({ hasIcons, result, index, selected, onSoftSelect, onSelect }: Props): JSX.Element | null {
+    const spotlight = useSpotlightContext();
     const enableFocus = () => onSoftSelect(index);
     const Icon = result.item.options?.icon ? getCommandIcon(result.item.options?.icon) : null;
     const TypeText = useMemo(() => {
+        if (spotlight.type === 'question') return 'Select option';
+
         if (result.item.type === 'command') {
             if ((result.item as Command).parentCommand) return 'Select option';
             return 'Run command';
         }
         return 'Jump to';
-    }, [result]);
+    }, [spotlight, result]);
 
     const handleAction = () => {
         onSelect(result);
