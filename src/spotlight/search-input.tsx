@@ -76,6 +76,7 @@ const Input = styled.input`
     background-color: ${(p) => p.theme.color.gray10};
     flex: 1;
     height: 55px;
+    border: 0;
     padding: 0 50px;
 
     &:focus {

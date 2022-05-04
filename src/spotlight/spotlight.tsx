@@ -167,6 +167,7 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
     };
 
     const selectResult = (result: Result) => {
+        setSearch('');
         if (spotlightType === 'question') {
             submitTextInputResult(result.item.title);
             return;
@@ -317,7 +318,7 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
                         indexedResults.length > 0 &&
                         indexedResults[0].results.length > 0 && (
                             <Results ref={resultsRef}>
-                                {!search?.length && showTips && (
+                                {!search?.length && !subMenuItem && spotlightType === 'search' && showTips && (
                                     <Tip dangerouslySetInnerHTML={{ __html: decodeHTML(activeTip) ?? '' }} />
                                 )}
                                 {indexedResults.map((category) => (
@@ -408,6 +409,7 @@ const Tip = styled.p`
         display: inline-block;
         min-width: 21px;
         ${(p) => p.theme.text.System.regular(12, 'gray1')}
+        background-color: ${(p) => p.theme.color.gray9};
         padding: 2px 4px;
         text-align: center;
         border: 1px solid ${(p) => p.theme.color.gray7};
