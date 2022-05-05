@@ -98,10 +98,6 @@ const Container = styled.button<{ $selected: boolean }>`
 
     ${(p) => p.$selected && `
         background-color: ${p.theme.color.gray9};
-
-        ${IconWrapper} > svg path, rect, circle {
-            fill: ${p.theme.color.blue} !important;
-        }
     `}
 
     @media(max-width: 600px) {
@@ -119,11 +115,6 @@ const IconWrapper = styled.div`
     width: 24px;
     height: 24px;
     margin-right: 15px;
-
-    svg, path, rect, circle {
-        transition: fill 0.2s ease-in-out;
-        will-change: fill;
-    }
 `;
 
 const Title = styled.p`
@@ -149,9 +140,8 @@ const Type = styled.p`
 `;
 
 const TextIcon = styled.p`
-    ${(p) => p.theme.text.System.regular(14, 'gray4')}
+    ${(p) => p.theme.text.System.regular(16, 'gray4')}
     width: 24px;
-    height: 24px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
