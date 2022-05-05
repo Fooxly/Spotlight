@@ -9,7 +9,7 @@ export interface ItemOptions {
     // every keyword will be searched for invidually.
     keywords?: string[];
     // Icon can be set to make an item stand out more and give it more personality.
-    icon?: ItemIcon;
+    icon?: ItemIcon | string;
     // Should the user be warned when they try to execute the item? (A custom warning message can be written here if needed)
     confirm?: boolean | string;
 }

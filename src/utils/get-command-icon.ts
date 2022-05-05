@@ -25,7 +25,7 @@ import {
 } from '@/icons/line';
 import { IconProps } from '@/icons/line/_icon';
 
-export function getCommandIcon (icon: ItemIcon): ((props: IconProps) => JSX.Element) {
+export function getCommandIcon (icon: ItemIcon): ((props: IconProps) => JSX.Element) | undefined {
     switch (icon) {
         case 'bell-mute': return BellMuteIcon;
         case 'bell': return BellIcon;
@@ -49,5 +49,6 @@ export function getCommandIcon (icon: ItemIcon): ((props: IconProps) => JSX.Elem
         case 'unlock': return UnlockIcon;
         case 'upload': return UploadIcon;
         case 'wand': return WandIcon;
+        default: return undefined;
     }
 }

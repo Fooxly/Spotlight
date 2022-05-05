@@ -73,4 +73,4 @@ When adding custom answers to the question you can use the same syntax as in the
 
 ## 🪄&nbsp; Customization
 
-While customizing the spotlight itself is only limited to the `isDarkMode`, `showRecentlyUsed` and `showTips` property, our results can also be customized. Every result can have it's own icon. We have a library of icons which you can choose from.
+While customizing the spotlight itself is only limited to the `isDarkMode`, `showRecentlyUsed` and `showTips` property, our results can also be customized. Every result can have it's own icon. We have a library of icons which you can choose from or link to custom images. And to make it even better, we support emojis 🤩 as icons too.

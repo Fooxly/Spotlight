@@ -1,7 +1,7 @@
 import React, { MouseEvent, useMemo } from 'react';
 import styled from 'styled-components';
 
-import type { Command, Result as ResultType } from '@/types';
+import type { Command, ItemIcon, Result as ResultType } from '@/types';
 import { getCommandIcon } from '@/utils/get-command-icon';
 import { useSpotlightContext } from '@/utils';
 
@@ -20,11 +20,31 @@ let lastMouseY = 0;
 export function Result ({ hasIcons, result, index, selected, onSoftSelect, onSelect }: Props): JSX.Element | null {
     const spotlight = useSpotlightContext();
     const enableFocus = () => onSoftSelect(index);
-    const Icon = result.item.options?.icon ? getCommandIcon(result.item.options?.icon) : null;
+
+    const icon = useMemo(() => {
+        if (!result.item.options?.icon) return null;
+        // Check if the icon is within the icon set
+        const Icon = getCommandIcon(result.item.options.icon as ItemIcon);
+        if (Icon) return <Icon size={24} color='gray4' />;
+        // Check if the icon is an image url
+        let url;
+        try {
+            url = new URL(result.item.options.icon);
+        } catch {}
+        /// Display the image
+        if (url?.protocol === 'https:' || url?.protocol === 'http:') {
+            return <ImageIcon src={url.href} />;
+        }
+        // Display the possible text / emoji
+        return <TextIcon>{result.item.options.icon}</TextIcon>;
+    }, [result]);
+
     const TypeText = useMemo(() => {
+        // When a question is shown, the type should always return "Select option"
         if (spotlight.type === 'question') return 'Select option';
 
         if (result.item.type === 'command') {
+            // When a question is shown, the type should always return "Select option"
             if ((result.item as Command).parentCommand) return 'Select option';
             return 'Run command';
         }
@@ -35,6 +55,7 @@ export function Result ({ hasIcons, result, index, selected, onSoftSelect, onSel
         onSelect(result);
     };
 
+    // Register the mouse movement to check if the mouse has actually moved or the content below has shifted.
     const handleMouseMove = (e: MouseEvent<HTMLButtonElement>) => {
         if (e.clientX === lastMouseX && e.clientY === lastMouseY) return;
         lastMouseX = e.clientX;
@@ -48,7 +69,7 @@ export function Result ({ hasIcons, result, index, selected, onSoftSelect, onSel
             <Left>
                 {hasIcons && (
                     <IconWrapper>
-                        {!!Icon && <Icon size={24} color='gray4' />}
+                        {icon}
                     </IconWrapper>
                 )}
                 <Title>{result.item.title}</Title>
@@ -77,6 +98,10 @@ const Container = styled.button<{ $selected: boolean }>`
 
     ${(p) => p.$selected && `
         background-color: ${p.theme.color.gray9};
+
+        ${IconWrapper} > svg path, rect, circle {
+            fill: ${p.theme.color.blue} !important;
+        }
     `}
 
     @media(max-width: 600px) {
@@ -94,6 +119,11 @@ const IconWrapper = styled.div`
     width: 24px;
     height: 24px;
     margin-right: 15px;
+
+    svg, path, rect, circle {
+        transition: fill 0.2s ease-in-out;
+        will-change: fill;
+    }
 `;
 
 const Title = styled.p`
@@ -116,4 +146,20 @@ const Type = styled.p`
     @media(max-width: 450px) {
         display: none;
     }
+`;
+
+const TextIcon = styled.p`
+    ${(p) => p.theme.text.System.regular(14, 'gray4')}
+    width: 24px;
+    height: 24px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+`;
+
+const ImageIcon = styled.img`
+    border-radius: 5px;
+    width: 24px;
+    height: 24px;
 `;
