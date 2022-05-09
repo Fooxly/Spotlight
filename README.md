@@ -4,8 +4,8 @@
 
 <br/>
 
-```json
-"@fooxly/spotlight": "https://github.com/Fooxly/Spotlight"
+```bash
+npm install @fooxly/spotlight
 ```
 
 <br/>
@@ -30,9 +30,17 @@ Settings up Spotlight is quite easy and straightforward. After setting up the to
 
 1. Install the package by adding the following line to your package.json dependencies and running npm or yarn install afterwards.
 
-```json
-"@fooxly/spotlight": "https://github.com/Fooxly/Spotlight"
+
+```bash
+npm install @fooxly/spotlight
 ```
+
+OR
+
+```bash
+yarn add @fooxly/spotlight
+```
+
 
 2. Add the Spotlight component to your project.
 

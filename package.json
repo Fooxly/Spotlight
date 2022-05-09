@@ -1,6 +1,6 @@
 {
     "name": "@fooxly/spotlight",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Helping your web development expierence with spotlight",
     "private": false,
     "main": "./lib/cjs/index.js",
