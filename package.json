@@ -1,7 +1,8 @@
 {
     "name": "@fooxly/spotlight",
     "version": "1.0.0",
-    "private": true,
+    "description": "Helping your web development expierence with spotlight",
+    "private": false,
     "main": "./lib/cjs/index.js",
     "module": "./lib/esm/index.js",
     "types": "./src/types/index.d.ts",
@@ -9,6 +10,26 @@
         "/lib",
         "/src/types"
     ],
+    "keywords": [
+        "spotlight",
+        "fooxly",
+        "web",
+        "development",
+        "helper",
+        "ease-of-use",
+        "extension"
+    ],
+    "author": "Fooxly <hello@fooxly.com> (https://developers.fooxly.com)",
+    "homepage": "https://github.com/Fooxly/Spotlight",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Fooxly/Spotlight.git"
+    },
+    "bugs": {
+      "url": "https://github.com/Fooxly/Spotlight/issues",
+      "email": "bugs@fooxly.com"
+    },
     "bin": {
         "spotlight": "./server/dist/index.js"
     },
