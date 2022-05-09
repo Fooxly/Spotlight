@@ -141,6 +141,8 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
     useEffect(() => {
         setError('');
         setSelectedIndex(0);
+        moveSmoothToIndex(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search, subMenuItem]);
 
     const toggleVisible = () => setVisible((last) => !last);
