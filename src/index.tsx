@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo } from 'react';
 import { ThemeProvider } from 'styled-components';
 
-import { COMMANDS, HISTORY_LENGTH_KEY, INPUT_TYPE_EVENT_KEY, PAGES, TEXT_INPUT_RESULT_EVENT_KEY } from './utils';
-import { SpotlightComponent } from './spotlight';
+import { COMMANDS, HISTORY_LENGTH_KEY, INPUT_TYPE_EVENT_KEY, PAGES, TEXT_INPUT_RESULT_EVENT_KEY, TOAT_EVENT_KEY } from './utils';
+import { SpotlightComponent, Toast } from './components';
 import { getColorFunction, themes } from './theme';
 
 import type { ItemOptions, CommandOptions, ShellCommandOptions, SpotlightType, CommandOption } from '@/types';
@@ -30,6 +30,7 @@ export function Spotlight ({ isDarkMode, showRecentlyUsed = 5, showTips = true }
     return (
         <ThemeProvider theme={calculatedTheme}>
             <SpotlightComponent showTips={showTips} />
+            <Toast />
         </ThemeProvider>
     );
 }
@@ -76,15 +77,34 @@ export function unregister (title: string): void {
     PAGES.splice(PAGES.findIndex((page) => page.title === title), 1);
 }
 
+export function toast (message: string) {
+    const handleRequest = (ev: CustomEvent<{ value: string }>) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        document.removeEventListener(TOAT_EVENT_KEY, handleRequest as any);
+    };
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    document.addEventListener(TOAT_EVENT_KEY, handleRequest as any);
+    const ev = new CustomEvent(TOAT_EVENT_KEY, {
+        bubbles: false,
+        detail: {
+            value: message,
+        },
+    });
+    // Add a small timeout to wait for possible rerenders inside the spotlight
+    setTimeout(() => {
+        document.dispatchEvent(ev);
+    }, 10);
+}
+
 export function question (question: string, answers?: string[] | CommandOption[]): Promise<string> {
     return new Promise((resolve) => {
-        const handleInputRequest = (ev: { detail: { value: string } }) => {
+        const handleRequest = (ev: CustomEvent<{ value: string }>) => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            document.removeEventListener(TEXT_INPUT_RESULT_EVENT_KEY, handleInputRequest as any);
+            document.removeEventListener(TEXT_INPUT_RESULT_EVENT_KEY, handleRequest as any);
             resolve(ev.detail.value);
         };
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        document.addEventListener(TEXT_INPUT_RESULT_EVENT_KEY, handleInputRequest as any);
+        document.addEventListener(TEXT_INPUT_RESULT_EVENT_KEY, handleRequest as any);
         const ev = new CustomEvent(INPUT_TYPE_EVENT_KEY, {
             bubbles: false,
             detail: {

@@ -21,11 +21,11 @@ import {
 import { TIPS } from '@/utils/constants/tips';
 
 // create the spotlight wrapper if this is not already created
-let wrapper = document.querySelector<HTMLDivElement>('#spotlight');
-if (!wrapper) {
-    wrapper = document.createElement('div');
-    wrapper.id = 'spotlight';
-    document.body.append(wrapper);
+let spotlightWrapper = document.querySelector<HTMLDivElement>('#spotlight');
+if (!spotlightWrapper) {
+    spotlightWrapper = document.createElement('div');
+    spotlightWrapper.id = 'spotlight';
+    document.body.append(spotlightWrapper);
 }
 
 const preventDefault = (e: KeyboardEvent) => {
@@ -68,7 +68,7 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
     const activeTip = useMemo(() => TIPS[Math.floor(Math.random() * TIPS.length)], [TIPS, visible]);
 
     const changeInputType = (
-        ev: { detail: { type: SpotlightType; question?: string; answers?: string[] | CommandOption[] | null } },
+        ev: CustomEvent<{ type: SpotlightType; question?: string; answers?: string[] | CommandOption[] | null }>,
     ) => {
         setVisible(true);
         setSpotlightType(ev.detail.type);
@@ -344,7 +344,7 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
                 </Content>
             </SpotlightContext.Provider>
         </Container>
-    ), wrapper!);
+    ), spotlightWrapper!);
 }
 
 const Container = styled.div`
@@ -354,8 +354,8 @@ const Container = styled.div`
     top: 0;
     right: 0;
     bottom: 0;
-    z-index: 99997;
-    transform: translate3d(0, 0, 99999px);
+    z-index: 99996;
+    transform: translate3d(0, 0, 99996px);
 `;
 
 const Background = styled.div`
@@ -364,7 +364,7 @@ const Background = styled.div`
     top: 0;
     right: 0;
     bottom: 0;
-    z-index: 99998;
+    z-index: 99997;
     background-color: rgba(0, 0, 0, 0.7);
     animation: ${(p) => p.theme.animation.fadeIn} 0.2s ease-in-out;
 `;
@@ -377,7 +377,7 @@ const Content = styled.div`
     border: 2px solid ${(p) => p.theme.light ? p.theme.color.gray4 : p.theme.color.gray8};
     overflow: hidden;
     animation: ${(p) => p.theme.animation.fadeInWithPulse} 0.25s ease-in-out;
-    z-index: 99999;
+    z-index: 99998;
 
     @media(max-width: 900px) {
         width: 70%;

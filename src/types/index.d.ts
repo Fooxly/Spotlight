@@ -90,19 +90,28 @@ interface Props {
     showTips?: boolean;
 }
 
+// The base Spotlight component.
 export declare function Spotlight ({ isDarkMode, showRecentlyUsed }: Props): JSX.Element;
 
+// Register a custom redirect.
 export declare function registerJumpTo (title: string, page: string, options?: ItemOptions): void;
 
+// Register a custom command.
 export declare function registerCommand (
     title: string, action: (result?: string) => any | Promise<any | unknown | void>,
     options?: CommandOptions,
 ): void;
 
+// Removes a command /page from the registered commands / page lists.
 export declare function unregister (title: string): void;
 
+// Shows a toast message at the bottom of the screen.
+export declare function toast (message: string): void;
+
+// Ask the user for a question with possible answers.
 export declare function question (question: string, answers?: string[] | CommandOption[]): Promise<string>;
 
+// Execute a shell command in an external script. (This only runs when the spotlight server is running)
 export declare function shell (command: string, options?: ShellCommandOptions | undefined): Promise<void>;
 
 declare const _default: {

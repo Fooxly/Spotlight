@@ -1,6 +1,7 @@
 import { Icons } from './icons';
 
 import type { Command, JumpTo } from '@/types';
+import { toast } from '@/index';
 
 export const BASE_COMMANDS: Command[] = [
     {
@@ -15,6 +16,7 @@ export const BASE_COMMANDS: Command[] = [
     {
         action: (icon) => {
             if (!icon) return;
+            toast(`"${icon}" is copied to your clipboard!`);
             return navigator.clipboard.writeText(icon);
         },
         title: 'Spotlight icon list',
