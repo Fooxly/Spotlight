@@ -79,6 +79,17 @@ Spotlight.question('What is your favorite animal?', ['Dog', 'Cat', 'Fish']);
 
 When adding custom answers to the question you can use the same syntax as in the `RegisterCommand` method. So there is support for single strings or an object with an `title`, `keywords` and `icon`.
 
+## ✅&nbsp; In need of confirmations?
+
+We support an easy to use messaging system which allows you to show toast notifications to the user. With the following command the user will be shown a toast with the given message. (This message will be shown for 3 seconds and then be removed automatically)
+
+```js
+import Spotlight from '@fooxly/spotlight';
+
+Spotlight.toast('Hello world!');
+```
+
+
 ## 🪄&nbsp; Customization
 
 While customizing the spotlight itself is only limited to the `isDarkMode`, `showRecentlyUsed` and `showTips` property, our results can also be customized. Every result can have it's own icon. We have a library of icons which you can choose from or link to custom images. And to make it even better, we support emojis 🤩 as icons too.
