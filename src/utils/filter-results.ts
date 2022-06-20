@@ -8,7 +8,7 @@ import type { Category, CategoryType, Item } from '@/types';
 const FUSE_PROPS = {
     includeScore: true,
     isCaseSensitive: false,
-    keys: ['title', 'options.keywords'],
+    keys: ['title', 'options.keywords', 'page'],
 };
 
 export function filterResults (searchText: string, menu?: { title: string; items: Item[] }): Category[] {
@@ -17,8 +17,20 @@ export function filterResults (searchText: string, menu?: { title: string; items
     const text = searchText.toLowerCase().trim();
     const words = text.split(' ').filter((word) => word.length > 1);
 
-    // Return first 8 items to help guide the user for commands
-    if (!menu && (text.length === 0 || words.length === 0)) {
+    if (text?.length && text.charAt(0) === '>') {
+        if (text.length === 1) {
+            return sortResults(COMMANDS, false, true);
+        }
+        const fuse = new Fuse(COMMANDS, FUSE_PROPS);
+        return sortResults(fuse.search(searchText).map((result) => result.item));
+    } else if (text?.length && text.charAt(0) === '/') {
+        if (text.length === 1) {
+            return sortResults(PAGES, false, true);
+        }
+        const fuse = new Fuse(PAGES, FUSE_PROPS);
+        return sortResults(fuse.search(searchText).map((result) => result.item));
+    } else if (!menu && (text.length === 0 || words.length === 0)) {
+        // Return all the items if the search text is empty.
         return sortResults(ALL_ITEMS, false, true);
     } else if (menu) {
         const fuse = new Fuse(menu.items, FUSE_PROPS);
@@ -54,12 +66,12 @@ function sortResults (items: Item[], hasRecommended = true, useHistory = false):
 
     const pages = createCategory('Pages', rest.filter((i) => i.type === 'jump-to'), {
         indexOffset: indexOffset + (history?.results?.length ?? 0),
-        type: 'normal',
+        type: 'pages',
     });
 
     const commands = createCategory('Commands', rest.filter((i) => i.type === 'command'), {
         indexOffset: indexOffset + (history?.results?.length ?? 0) + pages.results.length,
-        type: 'normal',
+        type: 'commands',
     });
 
     if (hasRecommended) {
@@ -76,7 +88,7 @@ function sortResults (items: Item[], hasRecommended = true, useHistory = false):
 function createCategory (title: string, items: Item[], options?: { indexOffset?: number; type?: CategoryType }): Category {
     return {
         title,
-        type: options?.type ?? 'normal',
+        type: options?.type ?? 'mixed',
         results: items.map((item, index) => ({ item, index: index + (options?.indexOffset ?? 0) })),
     };
 }

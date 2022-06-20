@@ -14,6 +14,8 @@ export interface ItemOptions {
     confirm?: boolean | string;
 }
 
+export type CommandAction = (result?: string) => any | Promise<any | null | unknown | void>;
+
 export interface CommandOption extends ItemOptions {
     // The title which will be shown inside the spotlight results.
     title: string;
@@ -21,9 +23,14 @@ export interface CommandOption extends ItemOptions {
     options?: string[] | CommandOption[];
 }
 
+export interface CommandOptionWithAction extends CommandOption {
+    // The action which will be executed when the command is clicked.
+    action: CommandAction;
+}
+
 export interface CommandOptions extends ItemOptions {
     // A list of sub options the user will be shown when clicking on the command. (e.g. a list of themes)
-    options?: string[] | CommandOption[];
+    options?: string[] | CommandOption[] | CommandOptionWithAction[];
 }
 
 export interface ShellCommandOptions extends ItemOptions {
@@ -49,10 +56,12 @@ export interface Category {
     title: string;
     // The type of category.
     type: CategoryType;
+    action?: () => void;
+    actionText?: string;
 }
 
 // Category types. This is used to determine how the category will be displayed.
-export type CategoryType = 'history' | 'normal';
+export type CategoryType = 'history' | 'mixed' | 'pages' | 'commands';
 
 export interface Result {
     // Is this result recommended to the user? This is used to determine how the result will be displayed.
@@ -65,11 +74,13 @@ export interface Result {
 
 export interface Command extends Item {
     // The action which will be executed when the command is clicked.
-    action: (result?: string) => any | Promise<any | unknown | void>;
+    action: CommandAction;
     // The type to diffirentiate between commands and pages.
     type: 'command';
     // When the user is inside a nested list, the parent command will always be remembered to execute their action in the end.
     parentCommand?: Command;
+    // This is used internally to detach parents from command when they should not be used.
+    detachAsParent?: boolean;
     // Customizability for an item.
     options?: CommandOptions;
 }

@@ -14,6 +14,8 @@ interface Props {
     onResultSoftSelect: (index: number) => void;
     onResultSelect: (result: Result) => any | Promise<any>;
     onRemove?: () => void;
+    action?: () => void;
+    actionText?: string;
 }
 
 export function Section ({
@@ -24,12 +26,20 @@ export function Section ({
     onResultSoftSelect,
     onResultSelect,
     onRemove,
+    action,
+    actionText,
 }: Props): JSX.Element | null {
     if (!results?.length) return null;
     return (
         <>
             <ResultSection>
                 <ResultSectionTitle>{title}</ResultSectionTitle>
+                {action && actionText && (
+                    // eslint-disable-next-line react/jsx-handler-names
+                    <SectionAction onClick={action}>
+                        {actionText}
+                    </SectionAction>
+                )}
                 {!!onRemove && (
                     // eslint-disable-next-line react/jsx-handler-names
                     <SectionButton onClick={onRemove}>
@@ -63,14 +73,31 @@ const SectionButton = styled.button`
     border-radius: 100px;
     background-color: ${(p) => p.theme.color.gray2};
     position: absolute;
-    right: 15px;
+    right: 0;
     width: 18px;
     height: 18px;
     cursor: pointer;
+    padding: 2px 6px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease-in-out;
     will-change: opacity, pointer-events;
+`;
+
+const SectionAction = styled.button`
+    ${(p) => p.theme.flex.col({ justify: 'center', align: 'center' })}
+    ${(p) => p.theme.text.System.regular(14, 'blue')}
+    border: 0;
+    outline: 0;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
+    will-change: opacity, color, pointer-events;
+
+    &:hover {
+        color: ${(p) => p.theme.color.teal};
+    }
 `;
 
 const ResultSection = styled.div`
@@ -79,7 +106,7 @@ const ResultSection = styled.div`
     position: relative;
 
     :hover {
-        > ${SectionButton} {
+        > ${SectionButton}, > ${SectionAction} {
             pointer-events: auto;
             opacity: 1;
         }

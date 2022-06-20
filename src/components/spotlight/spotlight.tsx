@@ -7,7 +7,16 @@ import { SearchInput } from './search-input';
 import { Section } from './section';
 import { Error } from './error';
 
-import type { Category, Command, CommandOption, ItemOptions, Result, SpotlightType } from '@/types';
+import type {
+    Category,
+    CategoryType,
+    Command,
+    CommandOption,
+    CommandOptionWithAction,
+    ItemOptions,
+    Result,
+    SpotlightType,
+} from '@/types';
 import {
     filterResults,
     executeItem,
@@ -17,6 +26,8 @@ import {
     INPUT_TYPE_EVENT_KEY,
     TEXT_INPUT_RESULT_EVENT_KEY,
     SpotlightContext,
+    PAGES,
+    COMMANDS,
 } from '@/utils';
 import { TIPS } from '@/utils/constants/tips';
 
@@ -114,7 +125,12 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
                                 options: typeof item === 'string' ? null : item.options,
                             },
                             type: 'command',
-                            parentCommand: subMenuItem,
+                            parentCommand: subMenuItem.detachAsParent ? undefined : subMenuItem,
+                            ...(
+                                typeof item !== 'string' && (item as CommandOptionWithAction)?.action
+                                    ? { action: (item as CommandOptionWithAction)?.action }
+                                    : {}
+                            ),
                         })),
                 },
             );
@@ -188,7 +204,7 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
             if (cmd.parentCommand) {
                 // Get the most parent command and execute it
                 let parent = cmd.parentCommand;
-                while (parent.parentCommand) {
+                while (!!parent.parentCommand && !parent.action) {
                     parent = parent.parentCommand;
                 }
                 // Execute the parent command
@@ -230,6 +246,60 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
         });
         document.dispatchEvent(ev);
     };
+
+    const onSectionAction = useCallback((type: CategoryType) => {
+        if (type === 'pages') {
+            setSubMenuItem(
+                {
+                    title: 'All Pages',
+                    action: (page) => {
+                        const foundPage = PAGES.find((p) => p.title === page);
+                        if (foundPage) {
+                            selectResult({
+                                index: 0,
+                                item: foundPage,
+                            });
+                        }
+                    },
+                    type: 'command',
+                    options: {
+                        options: PAGES.map((page) => ({
+                            title: page.title,
+                            icon: page.options?.icon,
+                        })),
+                    },
+                },
+            );
+        } else if (type === 'commands') {
+            setSubMenuItem(
+                {
+                    title: 'All Commands',
+                    // eslint-disable-next-line @typescript-eslint/no-empty-function
+                    action: () => {},
+                    detachAsParent: true,
+                    type: 'command',
+                    options: {
+                        options: COMMANDS.map((command) => ({
+                            title: command.title,
+                            icon: command.options?.icon,
+                            keywords: command.options?.keywords,
+                            options: command.options?.options,
+                            action: command.action,
+                        })),
+                    },
+                },
+            );
+        }
+    }, []);
+
+    const sectionActionText = useCallback(
+        (type: CategoryType): string | undefined => {
+            switch (type) {
+                case 'pages': return 'All Pages';
+                case 'commands': return 'All Commands';
+                default: return undefined;
+            }
+        }, []);
 
     useHotkeys('cmd+shift+k, ctrl+shift+k', (e) => {
         preventDefault(e);
@@ -334,6 +404,8 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
                                         onResultSoftSelect={setSelectedIndex}
                                         // eslint-disable-next-line react/jsx-handler-names
                                         onResultSelect={selectResult}
+                                        action={() => onSectionAction(category.type)}
+                                        actionText={sectionActionText(category.type)}
                                         // eslint-disable-next-line react/jsx-handler-names
                                         onRemove={category.type === 'history' ? removeHistory : undefined}
                                     />
@@ -416,6 +488,10 @@ const Tip = styled.p`
         border: 1px solid ${(p) => p.theme.color.gray7};
         border-radius: 6px;
         box-shadow: none;
+    }
+
+    > b {
+        font-weight: bold;
     }
 
     &:before {
