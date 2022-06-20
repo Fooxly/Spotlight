@@ -290,6 +290,7 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
                 },
             );
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const sectionActionText = useCallback(

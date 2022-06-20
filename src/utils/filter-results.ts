@@ -19,13 +19,13 @@ export function filterResults (searchText: string, menu?: { title: string; items
 
     if (text?.length && text.charAt(0) === '>') {
         if (text.length === 1) {
-            return sortResults(COMMANDS, false, true);
+            return sortResults(COMMANDS, false, false);
         }
         const fuse = new Fuse(COMMANDS, FUSE_PROPS);
         return sortResults(fuse.search(searchText).map((result) => result.item));
     } else if (text?.length && text.charAt(0) === '/') {
         if (text.length === 1) {
-            return sortResults(PAGES, false, true);
+            return sortResults(PAGES, false, false);
         }
         const fuse = new Fuse(PAGES, FUSE_PROPS);
         return sortResults(fuse.search(searchText).map((result) => result.item));
