@@ -1,0 +1,20 @@
+# dependencies
+/node_modules
+
+# misc
+.DS_Store
+.env
+.env.test
+
+yarn-debug.log*
+yarn-error.log*
+
+.github
+.vscode
+/server/src
+.editorconfig
+.eslintrc
+.gitattributes
+.gitignore
+.tsconfig.json
+.tsconfig.paths.json

@@ -1,6 +1,6 @@
 {
     "name": "@fooxly/spotlight",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "Helping your web development expierence with spotlight",
     "private": false,
     "main": "./lib/cjs/index.js",
@@ -8,6 +8,7 @@
     "types": "./src/types/index.d.ts",
     "files": [
         "/lib",
+        "/server/dist",
         "/src/types"
     ],
     "keywords": [
