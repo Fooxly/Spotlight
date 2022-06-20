@@ -16,8 +16,16 @@ export const BASE_COMMANDS: Command[] = [
     {
         action: (icon) => {
             if (!icon) return;
-            toast(`"${icon}" is copied to your clipboard!`);
-            return navigator.clipboard.writeText(icon);
+            try {
+                if (navigator.clipboard) {
+                    toast(`"${icon}" is copied to your clipboard!`);
+                    return navigator.clipboard?.writeText?.(icon);
+                } else {
+                    throw new Error('CLIPBOARD_API_NOT_SUPPORTED');
+                }
+            } catch {
+                toast(`We were not able to copy "${icon}" to your clipboard.`);
+            }
         },
         title: 'Spotlight icon list',
         type: 'command',

@@ -175,6 +175,7 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
             }).catch((error: { message: string; port: number; reason?: string | Error }) => {
                 let errorMessage = ERRORS[error.message] || ERRORS.UNKNOWN;
                 if (typeof error.port === 'number') errorMessage = errorMessage.replace('{{port}}', String(error.port));
+                errorMessage = errorMessage.replace('{{error.message}}', String(error.message));
 
                 setError(errorMessage);
                 setLoading(false);
