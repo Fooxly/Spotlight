@@ -82,7 +82,11 @@ function sortResults (items: Item[], hasRecommended = true, useHistory = false):
         ];
     }
 
-    return [useHistory && history?.results?.length ? history : null, pages, commands].filter((cat) => !!cat) as Category[];
+    return [
+        useHistory && history?.results?.length ? history : null,
+        pages,
+        commands,
+    ].filter((cat) => cat ? cat?.results?.length > 0 : false) as Category[];
 }
 
 function createCategory (title: string, items: Item[], options?: { indexOffset?: number; type?: CategoryType }): Category {
