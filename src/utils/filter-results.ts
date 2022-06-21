@@ -17,13 +17,13 @@ export function filterResults (searchText: string, menu?: { title: string; items
     const text = searchText.toLowerCase().trim();
     const words = text.split(' ').filter((word) => word.length > 1);
 
-    if (text?.length && text.charAt(0) === '>') {
+    if (text?.length && text.charAt(0) === '>' && !menu) {
         if (text.length === 1) {
             return sortResults(COMMANDS, false, false);
         }
         const fuse = new Fuse(COMMANDS, FUSE_PROPS);
         return sortResults(fuse.search(searchText).map((result) => result.item));
-    } else if (text?.length && text.charAt(0) === '/') {
+    } else if (text?.length && text.charAt(0) === '/' && !menu) {
         if (text.length === 1) {
             return sortResults(PAGES, false, false);
         }

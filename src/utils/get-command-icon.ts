@@ -22,6 +22,7 @@ import {
     UnlockIcon,
     UploadIcon,
     WandIcon,
+    WarningIcon,
 } from '@/icons/line';
 import { IconProps } from '@/icons/line/_icon';
 
@@ -49,6 +50,7 @@ export function getCommandIcon (icon: ItemIcon): ((props: IconProps) => JSX.Elem
         case 'unlock': return UnlockIcon;
         case 'upload': return UploadIcon;
         case 'wand': return WandIcon;
+        case 'warning': return WarningIcon;
         default: return undefined;
     }
 }

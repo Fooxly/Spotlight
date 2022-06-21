@@ -23,4 +23,5 @@ export const Icons: typeof IconsType = [
     'unlock',
     'upload',
     'wand',
+    'warning',
 ];

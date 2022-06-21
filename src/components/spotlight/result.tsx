@@ -92,6 +92,7 @@ const Container = styled.button<{ $selected: boolean }>`
     background-color: transparent;
     cursor: pointer;
     overflow: hidden;
+    box-sizing: border-box;
 
     transition: background-color 0.2s ease-in-out;
     will-change: background-color;
@@ -107,6 +108,7 @@ const Container = styled.button<{ $selected: boolean }>`
 
 const Left = styled.div`
     ${(p) => p.theme.flex.row({ align: 'center' })}
+    box-sizing: border-box;
     flex: 1;
 `;
 
@@ -114,6 +116,7 @@ const IconWrapper = styled.div`
     ${(p) => p.theme.flex.row({ justify: 'center', align: 'center' })}
     width: 24px;
     height: 24px;
+    box-sizing: border-box;
     margin-right: 15px;
 `;
 

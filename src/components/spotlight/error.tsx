@@ -21,9 +21,10 @@ export function Error ({ message, onDismiss }: Props): JSX.Element | null {
 }
 
 const Container = styled.div`
-    ${(p) => p.theme.flex.row({ justify: 'space-between', align: 'center' })}
+    ${(p) => p.theme.flex.row({ justify: 'space-between', align: 'center', fullWidth: true })}
     background-color: ${(p) => p.theme.color.red}60;
     padding: 15px;
+    box-sizing: border-box;
 `;
 
 const Message = styled.p`

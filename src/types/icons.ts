@@ -21,4 +21,5 @@ export const Icons = <const>[
     'unlock',
     'upload',
     'wand',
+    'warning',
 ];

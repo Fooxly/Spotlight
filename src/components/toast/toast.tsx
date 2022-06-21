@@ -61,6 +61,7 @@ const Container = styled.div`
     z-index: 99999;
     transform: translate3d(0, 0, 99999px);
     pointer-events: none;
+    box-sizing: border-box;
 `;
 
 const Pill = styled.div<{ $enabled: boolean }>`

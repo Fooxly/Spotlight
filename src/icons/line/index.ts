@@ -23,3 +23,4 @@ export * from './undo';
 export * from './unlock';
 export * from './upload';
 export * from './wand';
+export * from './warning';
