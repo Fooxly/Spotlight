@@ -1,6 +1,6 @@
 {
     "name": "@fooxly/spotlight",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "description": "Helping your web development expierence with spotlight",
     "private": false,
     "main": "./lib/cjs/index.js",
@@ -54,8 +54,8 @@
         "debug:server": "nodemon --ext ts --watch server/src --exec yarn build:server",
         "clean": "rm -rf lib && rm -rf server/dist",
         "build": "yarn clean && yarn build:esm && yarn build:cjs && yarn build:server",
-        "build:esm": "tsc && tsc-alias",
-        "build:cjs": "tsc --module commonjs --outDir lib/cjs && tsc-alias",
+        "build:esm": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+        "build:cjs": "tsc --project tsconfig.cjs.json && tsc-alias -p tsconfig.cjs.json",
         "build:server": "tsc -p server/tsconfig.json && tsc-alias -p server/tsconfig.json && chmod +x server/dist/index.js",
         "typecheck": "tsc --noEmit",
         "lint": "eslint --ext ts,tsx src server/src",
@@ -83,7 +83,7 @@
         "concurrently": "^7.1.0",
         "jest": "^27.5.1",
         "nodemon": "^2.0.15",
-        "tsc-alias": "^1.6.6",
+        "tsc-alias": "^1.6.11",
         "typescript": "^4.6.3"
     },
     "peerDependencies": {
