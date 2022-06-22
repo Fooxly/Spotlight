@@ -8,6 +8,7 @@ import { Section } from './section';
 import { Error } from './error';
 
 import type {
+    Answer,
     Category,
     CategoryType,
     Command,
@@ -32,11 +33,14 @@ import {
 import { TIPS } from '@/utils/constants/tips';
 
 // create the spotlight wrapper if this is not already created
-let spotlightWrapper = document.querySelector<HTMLDivElement>('#spotlight');
-if (!spotlightWrapper) {
-    spotlightWrapper = document.createElement('div');
-    spotlightWrapper.id = 'spotlight';
-    document.body.append(spotlightWrapper);
+let spotlightWrapper: HTMLDivElement | null = null;
+if (typeof window !== 'undefined') {
+    spotlightWrapper = document.querySelector<HTMLDivElement>('#spotlight');
+    if (!spotlightWrapper) {
+        spotlightWrapper = document.createElement('div');
+        spotlightWrapper.id = 'spotlight';
+        document.body.append(spotlightWrapper);
+    }
 }
 
 const preventDefault = (e: KeyboardEvent) => {
@@ -66,7 +70,7 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
     const resultsRef = createRef<HTMLDivElement>();
     const [spotlightType, setSpotlightType] = useState<SpotlightType>('search');
     const [placeholder, setPlaceholder] = useState<string | null>(null);
-    const [answers, setAnswers] = useState<string[] | CommandOption[] | null>(null);
+    const [answers, setAnswers] = useState<string[] | Answer[] | CommandOption[] | null>(null);
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -79,7 +83,11 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
     const activeTip = useMemo(() => TIPS[Math.floor(Math.random() * TIPS.length)], [TIPS, visible]);
 
     const changeInputType = (
-        ev: CustomEvent<{ type: SpotlightType; question?: string; answers?: string[] | CommandOption[] | null }>,
+        ev: CustomEvent<{
+            type: SpotlightType;
+            question?: string;
+            answers?: string[] | Answer[] | CommandOption[] | null;
+        }>,
     ) => {
         setVisible(true);
         setSpotlightType(ev.detail.type);
@@ -100,10 +108,18 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
                 {
                     title: placeholder ?? 'Options',
                     items: answers.map((answer) => ({
-                        title: typeof answer === 'string' ? answer : answer.title,
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                        title: typeof answer === 'string' ? answer : (answer as CommandOption).title ?? (answer as Answer).label,
+                        returnKey:
+                            typeof answer === 'string' ? answer : (answer as CommandOption).title ?? (answer as Answer).key,
                         options: {
-                            icon: typeof answer === 'string' ? null : answer.icon,
-                            keywords: typeof answer === 'string' ? null : answer.keywords,
+                            icon:
+                                typeof answer === 'string' ? null : (answer as CommandOption).icon,
+                            keywords:
+                                typeof answer === 'string'
+                                    ? null
+                                    : (answer as Answer).key ? [(answer as Answer).key]
+                                        : (answer as CommandOption).keywords,
                         } as ItemOptions,
                         type: 'command',
                     })),
@@ -188,7 +204,8 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
     const selectResult = (result: Result) => {
         setSearch('');
         if (spotlightType === 'question') {
-            submitTextInputResult(result.item.title);
+            const answer = result.item as Command;
+            submitTextInputResult(answer.returnKey);
             return;
         }
         setError('');
@@ -216,6 +233,7 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
         } else {
             inputRef.current?.focus();
             executeItem(result.item);
+            hideSpotlight();
         }
     };
 
@@ -363,6 +381,8 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
     const resultsHaveIcons = indexedResults.some((cat) => cat.results.some((r) => !!r.item.options?.icon));
 
     const fallbackTitle = (answers ?? subMenuItem) ? 'Choose an option...' : 'Search or jump to...';
+
+    if (typeof window === 'undefined') return null;
 
     return ReactDOM.createPortal(!visible ? null : (
         <Container id='fooxly-spotlight'>

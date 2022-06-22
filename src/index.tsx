@@ -5,7 +5,7 @@ import { COMMANDS, HISTORY_LENGTH_KEY, INPUT_TYPE_EVENT_KEY, PAGES, TEXT_INPUT_R
 import { SpotlightComponent, Toast } from './components';
 import { getColorFunction, themes } from './theme';
 
-import type { ItemOptions, CommandOptions, ShellCommandOptions, SpotlightType, CommandOption } from '@/types';
+import type { ItemOptions, CommandOptions, ShellCommandOptions, SpotlightType, CommandOption, Answer } from '@/types';
 import type { Theme } from '@/types/theme';
 
 interface Props {
@@ -35,7 +35,18 @@ export function Spotlight ({ isDarkMode, showRecentlyUsed = 5, showTips = true }
     );
 }
 
-export function registerJumpTo (title: string, page: string, options?: ItemOptions) {
+export function unregister (title: string): void {
+    const commandIndex = COMMANDS.findIndex((command) => command.title === title);
+    if (commandIndex !== -1) {
+        COMMANDS.splice(commandIndex, 1);
+    }
+    const pagesIndex = PAGES.findIndex((page) => page.title === title);
+    if (pagesIndex !== -1) {
+        PAGES.splice(pagesIndex, 1);
+    }
+}
+
+export function registerPage (title: string, page: string, options?: ItemOptions): () => void {
     const oldIndex = PAGES.findIndex(({ title: oldTitle }) => oldTitle === title);
     if (oldIndex > -1) PAGES.splice(oldIndex, 1);
 
@@ -51,13 +62,15 @@ export function registerJumpTo (title: string, page: string, options?: ItemOptio
             ...options,
         },
     });
+
+    return () => unregister(title);
 }
 
 export function registerCommand (
     title: string,
     action: (result?: string) => any | Promise<any | unknown | void>,
     options?: CommandOptions,
-) {
+): () => void {
     const oldIndex = COMMANDS.findIndex(({ title: oldTitle }) => oldTitle === title);
     if (oldIndex > -1) COMMANDS.splice(oldIndex, 1);
 
@@ -70,11 +83,8 @@ export function registerCommand (
         type: 'command',
         options,
     });
-}
 
-export function unregister (title: string): void {
-    COMMANDS.splice(COMMANDS.findIndex((command) => command.title === title), 1);
-    PAGES.splice(PAGES.findIndex((page) => page.title === title), 1);
+    return () => unregister(title);
 }
 
 export function toast (message: string) {
@@ -96,7 +106,10 @@ export function toast (message: string) {
     }, 10);
 }
 
-export function question (question: string, answers?: string[] | CommandOption[]): Promise<string> {
+export function question (
+    question: string,
+    answers?: string[] | Answer[] | CommandOption[],
+): Promise<string> {
     return new Promise((resolve) => {
         const handleRequest = (ev: CustomEvent<{ value: string }>) => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -147,9 +160,10 @@ export async function shell (command: string, options?: ShellCommandOptions) {
 
 export default {
     Spotlight,
-    registerJumpTo,
+    registerPage,
     registerCommand,
     unregister,
     question,
     shell,
+    toast,
 };

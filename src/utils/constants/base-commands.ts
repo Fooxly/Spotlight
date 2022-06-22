@@ -3,27 +3,7 @@ import { Icons } from './icons';
 import type { Command, JumpTo } from '@/types';
 import { toast } from '@/index';
 
-const DEVELOPER_COMMANDS: Command[] = [
-    {
-        action: () => {
-            return new Promise(() => {
-                throw new Error(
-                    // eslint-disable-next-line max-len
-                    'Test error extra long and heavy, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis auctor dui elit, nec bibendum leo luctus non. Phasellus mattis ullamcorper dui',
-                );
-            });
-        },
-        title: 'Throw error',
-        type: 'command',
-        options: {
-            icon: 'gear',
-            keywords: ['error'],
-        },
-    },
-];
-
 export const BASE_COMMANDS: Command[] = [
-    ...DEVELOPER_COMMANDS,
     {
         action: () => { window.location.reload(); },
         title: 'Reload window',

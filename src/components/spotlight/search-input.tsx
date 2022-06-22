@@ -7,11 +7,14 @@ import { ArrowIcon, SearchIcon, TimesIcon } from '@/icons/line';
 import { SpotlightType } from '@/types';
 
 // create the spotlight wrapper if this is not already created
-let wrapper = document.querySelector<HTMLDivElement>('#spotlight');
-if (!wrapper) {
-    wrapper = document.createElement('div');
-    wrapper.id = 'spotlight';
-    document.body.append(wrapper);
+let spotlightWrapper: HTMLDivElement | null = null;
+if (typeof window !== 'undefined') {
+    spotlightWrapper = document.querySelector<HTMLDivElement>('#spotlight');
+    if (!spotlightWrapper) {
+        spotlightWrapper = document.createElement('div');
+        spotlightWrapper.id = 'spotlight';
+        document.body.append(spotlightWrapper);
+    }
 }
 
 interface Props {

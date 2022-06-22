@@ -3,7 +3,7 @@ import Fuse from 'fuse.js';
 import { getHistory } from './history';
 import { COMMANDS, PAGES } from './constants';
 
-import type { Category, CategoryType, Item } from '@/types';
+import type { Category, CategoryType, Item, Result } from '@/types';
 
 const FUSE_PROPS = {
     includeScore: true,
@@ -90,9 +90,32 @@ function sortResults (items: Item[], hasRecommended = true, useHistory = false):
 }
 
 function createCategory (title: string, items: Item[], options?: { indexOffset?: number; type?: CategoryType }): Category {
+    const sortedItems = items;
+    // Sort the mappedItems alfabetically by title
+    if (options?.type !== 'history') {
+        sortedItems.sort((a, b) => {
+            const titleA = a.title.toLowerCase();
+            const titleB = b.title.toLowerCase();
+            if (titleA < titleB) return -1;
+            if (titleA > titleB) return 1;
+            return 0;
+        });
+    }
+    const mappedItems = sortedItems
+        .map((item, index) => ({ item, index: index + (options?.indexOffset ?? 0) }));
+
+    // Place the icon list command at the bottom of the list
+    const iconListCommandIndex =
+        mappedItems
+            .findIndex((item) => item.item.title === 'Spotlight icon list');
+    const iconListCommand = iconListCommandIndex > -1 ? mappedItems[iconListCommandIndex] : undefined;
+
     return {
         title,
         type: options?.type ?? 'mixed',
-        results: items.map((item, index) => ({ item, index: index + (options?.indexOffset ?? 0) })),
+        results: ([
+            ...mappedItems.filter((item) => item.item.title !== 'Spotlight icon list'),
+            iconListCommand,
+        ].filter((item) => !!item)) as Result[],
     };
 }

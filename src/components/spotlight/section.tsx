@@ -72,8 +72,6 @@ const SectionButton = styled.button`
     outline: 0;
     border-radius: 100px;
     background-color: ${(p) => p.theme.color.gray2};
-    position: absolute;
-    right: 0;
     width: 18px;
     height: 18px;
     cursor: pointer;

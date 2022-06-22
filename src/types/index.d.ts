@@ -16,6 +16,8 @@ export interface ItemOptions {
 
 export type CommandAction = (result?: string) => any | Promise<any | null | unknown | void>;
 
+export interface Answer { key: string; label: string }
+
 export interface CommandOption extends ItemOptions {
     // The title which will be shown inside the spotlight results.
     title: string;
@@ -77,9 +79,14 @@ export interface Command extends Item {
     action: CommandAction;
     // The type to diffirentiate between commands and pages.
     type: 'command';
+    // When asking for a question, there can be a key result which does not have to be shown in the spotlight.
+    /** @private */
+    returnKey?: string;
     // When the user is inside a nested list, the parent command will always be remembered to execute their action in the end.
+    /** @private */
     parentCommand?: Command;
     // This is used internally to detach parents from command when they should not be used.
+    /** @private */
     detachAsParent?: boolean;
     // Customizability for an item.
     options?: CommandOptions;
@@ -105,13 +112,13 @@ interface Props {
 export declare function Spotlight ({ isDarkMode, showRecentlyUsed }: Props): JSX.Element;
 
 // Register a custom redirect.
-export declare function registerJumpTo (title: string, page: string, options?: ItemOptions): void;
+export declare function registerPage (title: string, page: string, options?: ItemOptions): () => void;
 
 // Register a custom command.
 export declare function registerCommand (
     title: string, action: (result?: string) => any | Promise<any | unknown | void>,
     options?: CommandOptions,
-): void;
+): () => void;
 
 // Removes a command /page from the registered commands / page lists.
 export declare function unregister (title: string): void;
@@ -120,18 +127,22 @@ export declare function unregister (title: string): void;
 export declare function toast (message: string): void;
 
 // Ask the user for a question with possible answers.
-export declare function question (question: string, answers?: string[] | CommandOption[]): Promise<string>;
+export declare function question (
+    question: string,
+    answers?: string[] | Answer[] | CommandOption[]
+): Promise<string>;
 
 // Execute a shell command in an external script. (This only runs when the spotlight server is running)
 export declare function shell (command: string, options?: ShellCommandOptions | undefined): Promise<void>;
 
 declare const _default: {
     Spotlight: typeof Spotlight;
-    registerJumpTo: typeof registerJumpTo;
+    registerPage: typeof registerPage;
     registerCommand: typeof registerCommand;
     unregister: typeof unregister;
     question: typeof question;
     shell: typeof shell;
+    toast: typeof toast;
 };
 
 export default _default;
