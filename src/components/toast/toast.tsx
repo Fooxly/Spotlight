@@ -4,11 +4,15 @@ import styled from 'styled-components';
 
 import { TOAT_EVENT_KEY } from '@/utils';
 
-let toastWrapper = document.querySelector<HTMLDivElement>('#spotlight-toast');
-if (!toastWrapper) {
-    toastWrapper = document.createElement('div');
-    toastWrapper.id = 'spotlight-toast';
-    document.body.append(toastWrapper);
+// create the spotlight toast wrapper if this is not already created
+let toastWrapper: HTMLDivElement | null = null;
+if (typeof window !== 'undefined') {
+    toastWrapper = document.querySelector<HTMLDivElement>('#spotlight-toast');
+    if (!toastWrapper) {
+        toastWrapper = document.createElement('div');
+        toastWrapper.id = 'spotlight-toast';
+        document.body.append(toastWrapper);
+    }
 }
 
 let timeout: NodeJS.Timeout | null = null;
