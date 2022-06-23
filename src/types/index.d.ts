@@ -11,6 +11,7 @@ export type ReactChildren =
     | Array<JSX.Element | JSX.Element[] | false | null | undefined | string>;
 
 export interface ColorPickerOptions {
+    title?: string;
     modes?: ColorMode[];
     alpha?: boolean;
 }

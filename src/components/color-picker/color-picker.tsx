@@ -40,6 +40,7 @@ export function ColorPicker (): JSX.Element | null {
     const [colorModes, setColorModes] = useState<ColorMode[]>(ALL_COLOR_MODES);
     const [activeColorMode, setActiveColorMode] = useState<ColorMode>('hex');
     const [useAlpha, setUseAlpha] = useState<boolean>(true);
+    const [title, setTitle] = useState<string>();
     const [showContinue, setShowContinue] = useState<boolean>(false);
 
     // Current values
@@ -66,6 +67,8 @@ export function ColorPicker (): JSX.Element | null {
             setColorModes(ALL_COLOR_MODES);
             setUseAlpha(true);
             setCopied(false);
+            // eslint-disable-next-line unicorn/no-useless-undefined
+            setTitle(undefined);
             setShowContinue(false);
         }
     }, [visible]);
@@ -86,6 +89,7 @@ export function ColorPicker (): JSX.Element | null {
         setColorModes(ev.detail.modes ?? ['hex']);
         setActiveColorMode(ev.detail.modes?.[0] ?? 'hex');
         setUseAlpha(ev.detail.alpha === undefined ? true : ev.detail.alpha);
+        setTitle(ev.detail.title ?? undefined);
     };
 
     const getRectSize = () => {
@@ -196,10 +200,16 @@ export function ColorPicker (): JSX.Element | null {
             {/* eslint-disable-next-line react/jsx-handler-names */}
             <Background onClick={hideColorPicker} />
             <Content>
+                {!!title && (
+                    <>
+                        <Title>{title}</Title>
+                    </>
+                )}
                 {/* eslint-disable-next-line react/jsx-handler-names */}
                 <Picker
                     ref={colorAreaDimsRef}
                     onMouseDown={() => setAreaFocus(true)}
+                    $hasTitle={!!title}
                     style={{
                         backgroundColor: HSLString,
                         backgroundImage: `linear-gradient(rgba(0,0,0,0), #000), linear-gradient(90deg, #fff, ${HSLString})`,
@@ -213,7 +223,6 @@ export function ColorPicker (): JSX.Element | null {
                         }}
                     />
                 </Picker>
-                <Divider />
                 <Settings>
                     <HueWrapper>
                         <SliderInput max={360} value={hue} onChange={(ev) => setHue(Number(ev.target.value))} />
@@ -301,6 +310,7 @@ const Background = styled.div`
 const Content = styled.div`
     width: 60%;
     max-width: 275px;
+    max-height: 90%;
     background-color: ${(p) => p.theme.color.gray10};
     border-radius: 10px;
     border: 2px solid ${(p) => p.theme.light ? p.theme.color.gray4 : p.theme.color.gray8};
@@ -316,14 +326,24 @@ const Content = styled.div`
     }
 `;
 
-const Picker = styled.div`
+const Title = styled.p`
+    ${(p) => p.theme.text.System.semibold(15, 'gray2')}
+    margin: 15px 10px;
+    padding: 0;
+    user-select: none;
+`;
+
+const Picker = styled.div<{ $hasTitle: boolean }>`
     position: relative;
     width: 100%;
     height: 250px;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
     cursor: pointer !important;
     will-change: background-color;
+
+    ${(p) => !p.$hasTitle && `
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    `}
 `;
 
 const PickerMarker = styled.div`
@@ -338,12 +358,6 @@ const PickerMarker = styled.div`
     border-radius: 50%;
     cursor: pointer !important;
     will-change: background-color;
-`;
-
-const Divider = styled.div`
-    width: 100%;
-    height: 1px;
-    background-color: ${(p) => p.theme.light ? p.theme.color.gray4 : p.theme.color.gray8};
 `;
 
 const Settings = styled.div`
