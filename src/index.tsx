@@ -1,11 +1,29 @@
 import React, { useEffect, useMemo } from 'react';
 import { ThemeProvider } from 'styled-components';
 
-import { COMMANDS, HISTORY_LENGTH_KEY, INPUT_TYPE_EVENT_KEY, PAGES, TEXT_INPUT_RESULT_EVENT_KEY, TOAT_EVENT_KEY } from './utils';
-import { SpotlightComponent, Toast } from './components';
+import {
+    ALL_COLOR_MODES,
+    COLOR_PICKER_EVENT_KEY,
+    COLOR_PICKER_RESULT_EVENT_KEY,
+    COMMANDS,
+    HISTORY_LENGTH_KEY,
+    INPUT_TYPE_EVENT_KEY,
+    PAGES,
+    TEXT_INPUT_RESULT_EVENT_KEY,
+    TOAST_EVENT_KEY,
+} from './utils';
+import { ColorPicker, SpotlightComponent, Toast } from './components';
 import { getColorFunction, themes } from './theme';
 
-import type { ItemOptions, CommandOptions, ShellCommandOptions, SpotlightType, CommandOption, Answer } from '@/types';
+import type {
+    ItemOptions,
+    CommandOptions,
+    ShellCommandOptions,
+    SpotlightType,
+    CommandOption,
+    Answer,
+    ColorPickerOptions,
+} from '@/types';
 import type { Theme } from '@/types/theme';
 
 interface Props {
@@ -30,6 +48,7 @@ export function Spotlight ({ isDarkMode, showRecentlyUsed = 5, showTips = true }
     return (
         <ThemeProvider theme={calculatedTheme}>
             <SpotlightComponent showTips={showTips} />
+            <ColorPicker />
             <Toast />
         </ThemeProvider>
     );
@@ -90,11 +109,11 @@ export function registerCommand (
 export function toast (message: string) {
     const handleRequest = (ev: CustomEvent<{ value: string }>) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        document.removeEventListener(TOAT_EVENT_KEY, handleRequest as any);
+        document.removeEventListener(TOAST_EVENT_KEY, handleRequest as any);
     };
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    document.addEventListener(TOAT_EVENT_KEY, handleRequest as any);
-    const ev = new CustomEvent(TOAT_EVENT_KEY, {
+    document.addEventListener(TOAST_EVENT_KEY, handleRequest as any);
+    const ev = new CustomEvent(TOAST_EVENT_KEY, {
         bubbles: false,
         detail: {
             value: message,
@@ -124,6 +143,37 @@ export function question (
                 type: (answers?.length ? 'question' : 'input') as SpotlightType,
                 question,
                 answers,
+            },
+        });
+        // Add a small timeout to wait for possible rerenders inside the spotlight
+        setTimeout(() => {
+            document.dispatchEvent(ev);
+        }, 10);
+    });
+}
+
+export function pickColor (options?: ColorPickerOptions): Promise<Record<string, string>> {
+    const baseOptions: ColorPickerOptions = {
+        modes: ALL_COLOR_MODES,
+        alpha: true,
+    };
+    return new Promise((resolve, reject) => {
+        const handleRequest = (ev: CustomEvent<{ value?: Record<string, string>; error?: Error }>) => {
+            if (!ev.detail.value || ev.detail.error) {
+                reject(ev.detail.error ?? new Error('COLOR_PICK_FAILED'));
+                return;
+            }
+            resolve(ev.detail.value);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            document.removeEventListener(COLOR_PICKER_RESULT_EVENT_KEY, handleRequest as any);
+        };
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        document.addEventListener(COLOR_PICKER_RESULT_EVENT_KEY, handleRequest as any);
+        const ev = new CustomEvent(COLOR_PICKER_EVENT_KEY, {
+            bubbles: false,
+            detail: {
+                ...baseOptions,
+                ...options,
             },
         });
         // Add a small timeout to wait for possible rerenders inside the spotlight
@@ -166,4 +216,5 @@ export default {
     question,
     shell,
     toast,
+    pickColor,
 };

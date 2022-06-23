@@ -1,6 +1,19 @@
 import { Icons } from './icons';
+import './colors';
 
 export type SpotlightType = 'search' | 'input' | 'question';
+
+export type ColorMode = 'hex' | 'rgba' | 'hsla';
+
+export type ReactChildren =
+    // eslint-disable-next-line no-multi-spaces
+    |       JSX.Element | JSX.Element[] | false | null | undefined | string
+    | Array<JSX.Element | JSX.Element[] | false | null | undefined | string>;
+
+export interface ColorPickerOptions {
+    modes?: ColorMode[];
+    alpha?: boolean;
+}
 
 export type ItemIcon = typeof Icons[number];
 
@@ -16,7 +29,7 @@ export interface ItemOptions {
 
 export type CommandAction = (result?: string) => any | Promise<any | null | unknown | void>;
 
-export interface Answer { key: string; label: string }
+export interface Answer { key: string; label: string; icon?: ItemIcon }
 
 export interface CommandOption extends ItemOptions {
     // The title which will be shown inside the spotlight results.
@@ -132,6 +145,8 @@ export declare function question (
     answers?: string[] | Answer[] | CommandOption[]
 ): Promise<string>;
 
+export declare function pickColor (options?: ColorPickerOptions): Promise<Record<string, string>>;
+
 // Execute a shell command in an external script. (This only runs when the spotlight server is running)
 export declare function shell (command: string, options?: ShellCommandOptions | undefined): Promise<void>;
 
@@ -143,6 +158,7 @@ declare const _default: {
     question: typeof question;
     shell: typeof shell;
     toast: typeof toast;
+    pickColor: typeof pickColor;
 };
 
 export default _default;

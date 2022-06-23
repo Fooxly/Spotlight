@@ -3,6 +3,8 @@ export * from './bell-mute';
 export * from './bell';
 export * from './brush';
 export * from './camera';
+export * from './checkmark';
+export * from './chevron';
 export * from './clock';
 export * from './download';
 export * from './gear';

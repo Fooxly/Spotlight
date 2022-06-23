@@ -4,6 +4,7 @@ import {
     BellIcon,
     BrushIcon,
     CameraIcon,
+    CheckmarkIcon,
     ClockIcon,
     DownloadIcon,
     GearIcon,
@@ -32,6 +33,7 @@ export function getCommandIcon (icon: ItemIcon): ((props: IconProps) => JSX.Elem
         case 'bell': return BellIcon;
         case 'brush': return BrushIcon;
         case 'camera': return CameraIcon;
+        case 'checkmark': return CheckmarkIcon;
         case 'clock': return ClockIcon;
         case 'download': return DownloadIcon;
         case 'gear': return GearIcon;

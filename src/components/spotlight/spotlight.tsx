@@ -382,6 +382,7 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
 
     const fallbackTitle = (answers ?? subMenuItem) ? 'Choose an option...' : 'Search or jump to...';
 
+    // If we are not able to find the window element, we can not render
     if (typeof window === 'undefined') return null;
 
     return ReactDOM.createPortal(!visible ? null : (

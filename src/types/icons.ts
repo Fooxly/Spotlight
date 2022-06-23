@@ -3,6 +3,7 @@ export const Icons = <const>[
     'bell',
     'brush',
     'camera',
+    'checkmark',
     'clock',
     'download',
     'gear',

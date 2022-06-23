@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 
-import { TOAT_EVENT_KEY } from '@/utils';
+import { TOAST_EVENT_KEY } from '@/utils';
 
 // create the spotlight toast wrapper if this is not already created
 let toastWrapper: HTMLDivElement | null = null;
@@ -23,9 +23,9 @@ export function Toast (): JSX.Element | null {
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        document.removeEventListener(TOAT_EVENT_KEY, handleNewToastMessage as any, false);
+        document.removeEventListener(TOAST_EVENT_KEY, handleNewToastMessage as any, false);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        document.addEventListener(TOAT_EVENT_KEY, handleNewToastMessage as any, false);
+        document.addEventListener(TOAST_EVENT_KEY, handleNewToastMessage as any, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

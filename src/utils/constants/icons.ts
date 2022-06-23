@@ -5,6 +5,7 @@ export const Icons: typeof IconsType = [
     'bell',
     'brush',
     'camera',
+    'checkmark',
     'clock',
     'download',
     'gear',
