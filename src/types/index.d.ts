@@ -138,7 +138,7 @@ export declare function registerCommand (
 export declare function unregister (title: string): void;
 
 // Shows a toast message at the bottom of the screen.
-export declare function toast (message: string): void;
+export declare function toast (message: string | JSX.Element): void;
 
 // Ask the user for a question with possible answers.
 export declare function question (

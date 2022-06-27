@@ -87,6 +87,7 @@ const SectionAction = styled.button`
     ${(p) => p.theme.text.System.regular(14, 'blue')}
     border: 0;
     outline: 0;
+    background-color: transparent;
     cursor: pointer;
     opacity: 0;
     pointer-events: none;

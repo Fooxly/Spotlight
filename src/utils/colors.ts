@@ -6,24 +6,51 @@ if (typeof window !== 'undefined') {
     ctx = document.createElement('canvas').getContext('2d');
 }
 
+export function RGBAToLuma (color: RGBA): number {
+    return (0.2126 * color.r) + (0.7152 * color.g) + (0.0722 * color.b);
+}
+
+export function HexToLuma (color: string): number {
+    const rgb = HexToRGBA(color);
+    return (0.2126 * rgb.r) + (0.7152 * rgb.g) + (0.0722 * rgb.b);
+}
+
+export function combineHexColors (hex1: string, hex2: string): string {
+    const base = HexToRGBA(hex1);
+    const added = HexToRGBA(hex2);
+
+    const mix: RGBA = {
+        r: 0,
+        g: 0,
+        b: 0,
+        a: 0,
+    };
+    mix.a = 1 - (1 - added.a) * (1 - base.a); // alpha
+    mix.r = Math.round((added.r * added.a / mix.a) + (base.r * base.a * (1 - added.a) / mix.a)); // red
+    mix.g = Math.round((added.g * added.a / mix.a) + (base.g * base.a * (1 - added.a) / mix.a)); // green
+    mix.b = Math.round((added.b * added.a / mix.a) + (base.b * base.a * (1 - added.a) / mix.a)); // blue
+
+    return RGBAToHex(mix);
+}
+
 export function getColorFromHex (mode: ColorMode, hex: string, alpha = true): RGBA | HSLA | string {
     switch (mode) {
-        case 'hex': return strToHex(hex);
-        case 'rgba': return strToRGBA(hex);
-        case 'hsla': return strToHSLA(hex);
+        case 'hex': return strToHex(hex, alpha);
+        case 'rgba': return HexToRGBA(hex);
+        case 'hsla': return HexToHSLA(hex);
     }
 }
 
 export function getColorStringForMode (mode: ColorMode, hex: string, alpha = true): string {
     const startHex = hex.toUpperCase();
     switch (mode) {
-        case 'hex': return strToHex(hex);
+        case 'hex': return strToHex(startHex, alpha);
         case 'rgba': {
-            const rgba = strToRGBA(startHex);
+            const rgba = HexToRGBA(startHex);
             return `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`;
         }
         case 'hsla': {
-            const hsla = strToHSLA(startHex);
+            const hsla = HexToHSLA(startHex);
             return `hsla(${hsla.h}, ${hsla.s}%, ${hsla.l}%, ${hsla.a})`;
         }
     }
@@ -38,7 +65,7 @@ export function strToHex (str: string, alpha = true): string {
 }
 
 // Convert a hex string to RGBA object
-export function strToRGBA (str: string): RGBA {
+export function HexToRGBA (str: string): RGBA {
     const regex = /^((rgba)|rgb)\D+([\d.]+)\D+([\d.]+)\D+([\d.]+)\D*?([\d.]+|$)/i;
     let match, rgba;
 
@@ -77,8 +104,8 @@ export function strToRGBA (str: string): RGBA {
 }
 
 // Convert a hex string to HSLA object
-export function strToHSLA (str: string): HSLA {
-    return HSVAtoHSLA(RGBAtoHSVA(strToRGBA(str)));
+export function HexToHSLA (str: string): HSLA {
+    return HSVAtoHSLA(RGBAtoHSVA(HexToRGBA(str)));
 }
 
 export function RGBAToHex (rgba: RGBA, alpha = true): string {

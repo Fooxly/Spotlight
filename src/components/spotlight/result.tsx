@@ -14,8 +14,8 @@ interface Props {
     onSelect: (item: ResultType) => any | Promise<any>;
 }
 
-let lastMouseX = 0;
-let lastMouseY = 0;
+let lastMouseX = -1;
+let lastMouseY = -1;
 
 export function Result ({ hasIcons, result, index, selected, onSoftSelect, onSelect }: Props): JSX.Element | null {
     const spotlight = useSpotlightContext();
@@ -58,9 +58,10 @@ export function Result ({ hasIcons, result, index, selected, onSoftSelect, onSel
     // Register the mouse movement to check if the mouse has actually moved or the content below has shifted.
     const handleMouseMove = (e: MouseEvent<HTMLButtonElement>) => {
         if (e.clientX === lastMouseX && e.clientY === lastMouseY) return;
+        const updateFocus = (lastMouseX > -1 && lastMouseY > -1);
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
-        enableFocus();
+        if (updateFocus) enableFocus();
     };
 
     return (
@@ -144,6 +145,7 @@ const Type = styled.p`
 
 const TextIcon = styled.p`
     ${(p) => p.theme.text.System.regular(16, 'gray4')}
+    margin: 0;
     width: 24px;
     overflow: hidden;
     text-overflow: ellipsis;

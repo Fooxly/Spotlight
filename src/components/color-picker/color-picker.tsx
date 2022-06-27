@@ -1,14 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { Options, useHotkeys } from 'react-hotkeys-hook';
 
 import { Tooltip } from '../tooltip';
 
-import { getColorFromHex, getColorStringForMode, HSVAtoRGBA, RGBAToHex } from '@/utils/colors';
+import { combineHexColors, getColorFromHex, getColorStringForMode, HSVAtoRGBA, RGBAToHex, HexToLuma } from '@/utils/colors';
 import { ALL_COLOR_MODES, COLOR_PICKER_EVENT_KEY, COLOR_PICKER_RESULT_EVENT_KEY } from '@/utils';
 import { ColorMode, ColorPickerOptions } from '@/types';
 import { CheckmarkIcon, ChevronIcon } from '@/icons/line';
+import { toast } from '@/commands';
 
 // create the spotlight color picker wrapper if this is not already created
 let spotlightColorPickerWrapper: HTMLDivElement | null = null;
@@ -27,6 +28,8 @@ const preventDefault = (e: KeyboardEvent) => {
 };
 
 export function ColorPicker (): JSX.Element | null {
+    const theme = useTheme();
+
     const colorPickerRef = useRef<HTMLDivElement>(null);
     const colorAreaDimsRef = useRef<HTMLDivElement>(null);
 
@@ -60,10 +63,6 @@ export function ColorPicker (): JSX.Element | null {
     // Reset the state when the color picker is closed for next use
     useEffect(() => {
         if (!visible) {
-            setActiveColor('#FFFFFFFF');
-            setHue(0);
-            setAlpha(1);
-            setPosition({ x: 0, y: 0 });
             setColorModes(ALL_COLOR_MODES);
             setUseAlpha(true);
             setCopied(false);
@@ -86,6 +85,10 @@ export function ColorPicker (): JSX.Element | null {
     const handleNewColorPicker = (ev: CustomEvent<ColorPickerOptions>) => {
         setShowContinue(true);
         setVisible(true);
+        setActiveColor('#FFFFFFFF');
+        setHue(0);
+        setAlpha(1);
+        setPosition({ x: 0, y: 0 });
         setColorModes(ev.detail.modes ?? ['hex']);
         setActiveColorMode(ev.detail.modes?.[0] ?? 'hex');
         setUseAlpha(ev.detail.alpha === undefined ? true : ev.detail.alpha);
@@ -192,6 +195,35 @@ export function ColorPicker (): JSX.Element | null {
     }, {
         enableOnTags: ['INPUT', 'TEXTAREA'],
     }, [visible]);
+
+    useHotkeys('enter', (e) => {
+        preventDefault(e);
+        if (showContinue) {
+            handleContinue();
+            return;
+        }
+        if (navigator.clipboard) {
+            handleCopy();
+            const outgoingColor = getColorStringForMode(activeColorMode, activeColor, useAlpha);
+            toast(
+                <>
+                    Copied{'\u00A0'}
+                    <span
+                        style={{
+                            borderRadius: '5px',
+                            backgroundColor: activeColor,
+                            padding: '3px 7px',
+                            color: HexToLuma(combineHexColors(theme.color.gray10, activeColor)) > 165 ? '#000' : '#fff',
+                        }}
+                    >
+                        {outgoingColor}
+                    </span>
+                    {'\u00A0'}to your clipboard
+                </>,
+            );
+        }
+        hideColorPicker();
+    }, HOTKEY_OPTIONS, [activeColor, showContinue]);
 
     // If we are not able to find the window element, we can not render
     if (typeof window === 'undefined') return null;
@@ -316,6 +348,7 @@ const Content = styled.div`
     border: 2px solid ${(p) => p.theme.light ? p.theme.color.gray4 : p.theme.color.gray8};
     animation: ${(p) => p.theme.animation.fadeInWithPulse} 0.25s ease-in-out;
     z-index: 99998;
+    box-sizing: border-box;
 
     @media(max-width: 900px) {
         width: 70%;
@@ -367,6 +400,7 @@ const Settings = styled.div`
     margin-top: 10px;
     padding: 10px 15px;
     padding-bottom: 0;
+    box-sizing: border-box;
 `;
 
 const Slider = styled.div`
@@ -451,6 +485,7 @@ const Results = styled.div`
     width: 100%;
     padding: 10px;
     padding-top: 0;
+    box-sizing: border-box;
 `;
 
 const StyledCheckmarkIcon = styled(CheckmarkIcon)`
@@ -498,6 +533,8 @@ const ColorTextWrapper = styled.div`
 
 const ColorText = styled.p`
     ${(p) => p.theme.text.System.regular(13, 'gray1', 'center')}
+    margin: 0;
+    padding: 0;
     width: 100%;
     text-overflow: ellipsis;
     overflow: hidden;

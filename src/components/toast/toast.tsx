@@ -18,7 +18,7 @@ if (typeof window !== 'undefined') {
 let timeout: NodeJS.Timeout | null = null;
 
 export function Toast (): JSX.Element | null {
-    const [message, setMessage] = useState<string | null>();
+    const [message, setMessage] = useState<string | JSX.Element | null>(null);
     const [show, setShow] = useState<boolean>(false);
 
     useEffect(() => {
@@ -38,7 +38,7 @@ export function Toast (): JSX.Element | null {
         }
     }, [message, show]);
 
-    const handleNewToastMessage = (ev: CustomEvent<{ value: string }>) => {
+    const handleNewToastMessage = (ev: CustomEvent<{ value: string | JSX.Element }>) => {
         if (timeout) clearTimeout(timeout);
         setShow(true);
         setMessage(ev.detail.value);

@@ -41,7 +41,7 @@ var node_child_process_1 = require("node:child_process");
 var currentDir = process.cwd();
 function cmd(req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var _a, command_1, _b, inTerminal_1, error_1;
+        var _a, command_1, _b, inTerminal_1, result, error_1;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
@@ -53,23 +53,23 @@ function cmd(req, res) {
                     return [4 /*yield*/, new Promise(function (resolve, reject) {
                             if (inTerminal_1) {
                                 // TODO: code below is for macOS, add Windows/Linux support
-                                (0, node_child_process_1.exec)("\nosascript -e 'tell application \"Terminal\"\n    activate\n    do script \"clear && cd \\\"".concat(currentDir, "\\\" && ").concat(command_1, " && echo Press any key to exit \\\\.\\\\.\\\\.; read -k1 -s && exit\"\nend tell'\n                "), function (error) {
+                                (0, node_child_process_1.exec)("\nosascript -e 'tell application \"Terminal\"\n    activate\n    do script \"clear && cd \\\"".concat(currentDir, "\\\" && ").concat(command_1, " && echo Press any key to exit \\\\.\\\\.\\\\.; read -k1 -s && exit\"\nend tell'\n                "), function (error, stdout) {
                                     if (error)
                                         return reject(new Error('TERMINAL_FAILED'));
-                                    resolve();
+                                    resolve(stdout);
                                 });
                             }
                             else {
-                                (0, node_child_process_1.exec)("cd \"".concat(currentDir, "\" && ").concat(command_1), function (error) {
+                                (0, node_child_process_1.exec)("cd \"".concat(currentDir, "\" && ").concat(command_1), function (error, stdout) {
                                     if (error)
                                         return reject(error);
-                                    resolve();
+                                    resolve(stdout);
                                 });
                             }
                         })];
                 case 1:
-                    _c.sent();
-                    res.json({ success: true });
+                    result = _c.sent();
+                    res.json({ success: true, result: result });
                     return [3 /*break*/, 3];
                 case 2:
                     error_1 = _c.sent();
