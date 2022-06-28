@@ -149,7 +149,7 @@ export declare function question (
 export declare function pickColor (options?: ColorPickerOptions): Promise<Record<string, string>>;
 
 // Execute a shell command in an external script. (This only runs when the spotlight server is running)
-export declare function shell (command: string, options?: ShellCommandOptions | undefined): Promise<void>;
+export declare function shell (command: string, options?: ShellCommandOptions | undefined): Promise<string | null>;
 
 declare const _default: {
     Spotlight: typeof Spotlight;
