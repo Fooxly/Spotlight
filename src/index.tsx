@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ThemeProvider } from 'styled-components';
 
 import {
@@ -6,9 +6,18 @@ import {
 } from './utils';
 import { ColorPicker, SpotlightComponent, Toast } from './components';
 import { getColorFunction, themes } from './theme';
+import { isSystemInDarkMode } from './utils/appearance';
 
 import type { Theme } from '@/types/theme';
-import { pickColor, registerPage, registerCommand, unregister, shell, question, toast } from '@/commands';
+import {
+    pickColor,
+    registerPage,
+    registerCommand,
+    unregister,
+    shell,
+    question,
+    toast,
+} from '@/commands';
 
 interface Props {
     isDarkMode?: boolean;
@@ -17,17 +26,39 @@ interface Props {
 }
 
 export function Spotlight ({ isDarkMode, showRecentlyUsed = 5, showTips = true }: Props): JSX.Element {
+    const [darkMode, setDarkMode] = useState<boolean>(isDarkMode ?? false);
+
+    const listenerDarkMode = useCallback(() => {
+        if (typeof isDarkMode === 'boolean') return;
+        setDarkMode(isSystemInDarkMode());
+    }, [isDarkMode]);
+
+    useEffect(() => {
+        const matchDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
+
+        // The user has manually set the dark mode property
+        if (typeof isDarkMode === 'boolean') {
+            matchDarkMode.removeEventListener('change', listenerDarkMode);
+            setDarkMode(isDarkMode);
+            return;
+        }
+
+        matchDarkMode.addEventListener('change', listenerDarkMode);
+        listenerDarkMode();
+        return () => { matchDarkMode.removeEventListener('change', listenerDarkMode); };
+    }, [isDarkMode, listenerDarkMode]);
+
     useEffect(() => {
         localStorage.setItem(HISTORY_LENGTH_KEY, showRecentlyUsed.toString());
     }, [showRecentlyUsed]);
 
     const calculatedTheme = useMemo(() => {
-        const selectedTheme: Theme = themes[isDarkMode ? 'dark' : 'light'];
+        const selectedTheme: Theme = themes[darkMode ? 'dark' : 'light'];
         return {
             ...selectedTheme,
             color: getColorFunction({ ...selectedTheme.color.colors }),
         };
-    }, [isDarkMode]);
+    }, [darkMode]);
 
     return (
         <ThemeProvider theme={calculatedTheme}>

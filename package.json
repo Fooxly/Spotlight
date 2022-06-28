@@ -67,7 +67,8 @@
         "cors": "^2.8.5",
         "express": "^4.17.3",
         "fuse.js": "^6.5.3",
-        "react-hotkeys-hook": "^3.4.4"
+        "react-hotkeys-hook": "^3.4.4",
+        "styled-components": "^5.3.5"
     },
     "devDependencies": {
         "@fooxly/eslint-config": "https://github.com/Fooxly/eslint-config",
@@ -88,7 +89,6 @@
     },
     "peerDependencies": {
         "react": "^17.0.2",
-        "react-dom": "^17.0.2",
-        "styled-components": "^5.3.5"
+        "react-dom": "^17.0.2"
     }
 }

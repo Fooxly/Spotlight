@@ -1,5 +1,15 @@
 import { Answer, CommandOption, CommandOptions, ItemOptions, ShellCommandOptions, SpotlightType } from '@/types';
-import { COMMANDS, INPUT_TYPE_EVENT_KEY, PAGES, TEXT_INPUT_RESULT_EVENT_KEY } from '@/utils';
+import { COMMANDS, INPUT_TYPE_EVENT_KEY, PAGES, TEXT_INPUT_RESULT_EVENT_KEY, UPDATE_SPOTLIGHT_EVENT_KEY } from '@/utils';
+
+function updateSpotlightRegistry (): void {
+    const ev = new CustomEvent(UPDATE_SPOTLIGHT_EVENT_KEY, {
+        bubbles: false,
+    });
+    // Add a small timeout to wait for possible rerenders inside the spotlight
+    setTimeout(() => {
+        document.dispatchEvent(ev);
+    }, 10);
+}
 
 export function unregister (title: string): void {
     const commandIndex = COMMANDS.findIndex((command) => command.title === title);
@@ -28,7 +38,7 @@ export function registerPage (title: string, page: string, options?: ItemOptions
             ...options,
         },
     });
-
+    updateSpotlightRegistry();
     return () => unregister(title);
 }
 
@@ -49,7 +59,7 @@ export function registerCommand (
         type: 'command',
         options,
     });
-
+    updateSpotlightRegistry();
     return () => unregister(title);
 }
 

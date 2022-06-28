@@ -29,6 +29,7 @@ import {
     SpotlightContext,
     PAGES,
     COMMANDS,
+    UPDATE_SPOTLIGHT_EVENT_KEY,
 } from '@/utils';
 import { TIPS } from '@/utils/constants/tips';
 
@@ -77,6 +78,11 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
         document.removeEventListener(INPUT_TYPE_EVENT_KEY, changeInputType as any, false);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         document.addEventListener(INPUT_TYPE_EVENT_KEY, changeInputType as any, false);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        document.removeEventListener(UPDATE_SPOTLIGHT_EVENT_KEY, forceUpdateSpotlight as any, false);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        document.addEventListener(UPDATE_SPOTLIGHT_EVENT_KEY, forceUpdateSpotlight as any, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -93,6 +99,10 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
         setSpotlightType(ev.detail.type);
         setAnswers(ev.detail.answers!);
         setPlaceholder(ev.detail.type === 'search' ? null : (ev.detail.question ?? null));
+    };
+
+    const forceUpdateSpotlight = () => {
+        setReloadVersion(Date.now());
     };
 
     const HOTKEY_OPTIONS: Options = useMemo(() => ({
