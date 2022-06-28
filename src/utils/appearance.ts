@@ -1,4 +1,4 @@
-import { Appearance } from '@/types/theme';
+import { Appearance } from '@/types';
 
 export function isSystemInDarkMode (): boolean {
     try {

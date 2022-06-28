@@ -8,7 +8,7 @@
       "dom.iterable",
       "esnext"
     ],
-    "declaration": false,
+    "declaration": true,
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -24,6 +24,6 @@
     "jsx": "react-jsx",
     "baseUrl": "."
   },
-  "include": ["src", "types"],
+  "include": ["src"],
   "exclude": ["node_modules", "lib"]
 }

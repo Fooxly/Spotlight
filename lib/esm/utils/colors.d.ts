@@ -1,0 +1,13 @@
+import { ColorMode, HSLA, HSVA, RGBA } from '../types';
+export declare function RGBAToLuma(color: RGBA): number;
+export declare function HexToLuma(color: string): number;
+export declare function combineHexColors(hex1: string, hex2: string): string;
+export declare function getColorFromHex(mode: ColorMode, hex: string, alpha?: boolean): RGBA | HSLA | string;
+export declare function getColorStringForMode(mode: ColorMode, hex: string, alpha?: boolean): string;
+export declare function strToHex(str: string, alpha?: boolean): string;
+export declare function HexToRGBA(str: string): RGBA;
+export declare function HexToHSLA(str: string): HSLA;
+export declare function RGBAToHex(rgba: RGBA, alpha?: boolean): string;
+export declare function HSVAtoRGBA(hsva: HSVA): RGBA;
+export declare function RGBAtoHSVA(rgba: RGBA): HSVA;
+export declare function HSVAtoHSLA(hsva: HSVA): HSLA;

@@ -3,8 +3,7 @@ import React from 'react';
 
 import { THEME_UPDATE_EVENT_KEY } from './utils';
 
-import { SpotlightOptions } from '@/types';
-import { Appearance } from '@/types/theme';
+import { Appearance, SpotlightOptions } from '@/types';
 import {
     pickColor,
     registerPage,
@@ -26,7 +25,7 @@ const DefaultConfig: SpotlightOptions = {
 
 let lastConfigSettings = DefaultConfig;
 
-function Config (options: SpotlightOptions) {
+function config (options: SpotlightOptions) {
     // Merge the default options (or last chosen options) with the new user chosen ones
     lastConfigSettings = { ...lastConfigSettings, ...options };
     // Get the major react version the project is running on
@@ -35,16 +34,16 @@ function Config (options: SpotlightOptions) {
     // #region React 18 and above
     if (majorReactVersion >= 18) {
         void (async () => {
-            const { Setup } = await import('./renderers/r18');
-            Setup(lastConfigSettings);
+            const { setup } = await import('./renderers/r18');
+            setup(lastConfigSettings);
         })();
     }
     // #endregion
     // #region React 15 - 17
     else if (majorReactVersion >= 15 && majorReactVersion <= 17) {
         void (async () => {
-            const { Setup } = await import('./renderers/r17');
-            Setup(lastConfigSettings);
+            const { setup } = await import('./renderers/r17');
+            setup(lastConfigSettings);
         })();
     }
     // #endregion
@@ -55,7 +54,7 @@ function Config (options: SpotlightOptions) {
     // #endregion
 }
 
-function SetAppearance (appearance: Appearance) {
+function setAppearance (appearance: Appearance) {
     if (typeof window === 'undefined') {
         console.error('Unable to set appearance. Window is not defined.');
         return;
@@ -72,13 +71,13 @@ function SetAppearance (appearance: Appearance) {
 export * from '@/commands';
 
 export default {
-    Config,
-    SetAppearance,
+    config,
+    setAppearance,
+    toast,
     registerPage,
     registerCommand,
     unregister,
     question,
     shell,
-    toast,
     pickColor,
 };

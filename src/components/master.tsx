@@ -10,9 +10,7 @@ import { Toast } from '../components/toast';
 import { getColorFunction, themes } from '../theme';
 import { getTheme } from '../utils/appearance';
 
-import type { Appearance, Theme } from '@/types/theme';
-import { SpotlightOptions } from '@/types';
-import { ChangeThemeEvent } from '@/types/events';
+import type { Appearance, Theme, SpotlightOptions, ChangeThemeEvent } from '@/types';
 
 export function Master (props: SpotlightOptions): JSX.Element {
     const [appearance, SetAppearance] = useState<Appearance>(props.appearance ?? 'auto');
@@ -35,7 +33,6 @@ export function Master (props: SpotlightOptions): JSX.Element {
 
     useEffect(() => {
         const matchDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
-
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         document.addEventListener(THEME_UPDATE_EVENT_KEY, changeAppearance as any, false);
         matchDarkMode.addEventListener('change', changeSystemDarkMode);
@@ -46,6 +43,7 @@ export function Master (props: SpotlightOptions): JSX.Element {
         };
     }, [changeSystemDarkMode]);
 
+    // Update the prop values with the current active state
     useEffect(() => {
         if (props.appearance) {
             SetAppearance(props.appearance);
@@ -55,6 +53,7 @@ export function Master (props: SpotlightOptions): JSX.Element {
         }
     }, [props]);
 
+    // Get the theme based on the current appearance
     const calculatedTheme = useMemo(() => {
         const selectedTheme: Theme = themes[getTheme(appearance)];
         return {

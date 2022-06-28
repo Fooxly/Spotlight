@@ -7,10 +7,11 @@ import { Master } from '@/components';
 
 let root: Root | null = null;
 
-export function Setup (options: SpotlightOptions) {
+export function setup (options: SpotlightOptions) {
     const mainComponent = getMainComponent();
     if (!mainComponent) {
         console.error('Spotlight was unable to create a root component.');
+        options?.onLoadFailed?.(new Error('SPOTLIGHT_NO_ROOT_COMPONENT'));
         return;
     }
     if (!root) {

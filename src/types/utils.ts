@@ -1,7 +1,7 @@
 import { Icons } from './icons';
-import './colors';
-import './events';
 import { Appearance } from './theme';
+
+export type ToastType = 'warning' | 'error' | 'info';
 
 export type SpotlightType = 'search' | 'input' | 'question';
 
@@ -132,63 +132,6 @@ export interface SpotlightOptions {
     customTips?: string[];
     // Event which fires when the spotlight has loaded.
     onLoaded?: () => void;
+    // Event which fires when the spotlight was not loaded successfully.
+    onLoadFailed?: (error: Error) => void;
 }
-
-declare function Config (options: SpotlightOptions): void;
-
-declare function SetAppearance (mode: Appearance): void;
-
-// #region Old types
-interface Props {
-    // Should the spotlight be rendered in dark mode?
-    isDarkMode?: boolean;
-    // The amount of items which will be shown in the spotlight. (Default value is 5)
-    showRecentlyUsed?: number;
-    // If the tips should be visible when nothing has been typed yet.
-    showTips?: boolean;
-}
-
-// The base Spotlight component.
-export declare function Spotlight ({ isDarkMode, showRecentlyUsed }: Props): JSX.Element;
-
-// Register a custom redirect.
-export declare function registerPage (title: string, page: string, options?: ItemOptions): () => void;
-
-// Register a custom command.
-export declare function registerCommand (
-    title: string, action: (result?: string) => any | Promise<any | unknown | void>,
-    options?: CommandOptions,
-): () => void;
-
-// Removes a command /page from the registered commands / page lists.
-export declare function unregister (title: string): void;
-
-// Shows a toast message at the bottom of the screen.
-export declare function toast (message: string | JSX.Element): void;
-
-// Ask the user for a question with possible answers.
-export declare function question (
-    question: string,
-    answers?: string[] | Answer[] | CommandOption[]
-): Promise<string>;
-
-export declare function pickColor (options?: ColorPickerOptions): Promise<Record<string, string>>;
-
-// Execute a shell command in an external script. (This only runs when the spotlight server is running)
-export declare function shell (command: string, options?: ShellCommandOptions | undefined): Promise<void>;
-
-// #endregion
-
-declare const _default: {
-    Config: typeof Config;
-    SetAppearance: typeof SetAppearance;
-    registerPage: typeof registerPage;
-    registerCommand: typeof registerCommand;
-    unregister: typeof unregister;
-    question: typeof question;
-    shell: typeof shell;
-    toast: typeof toast;
-    pickColor: typeof pickColor;
-};
-
-export default _default;

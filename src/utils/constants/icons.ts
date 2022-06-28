@@ -1,4 +1,4 @@
-import type { Icons as IconsType } from '@/types/icons';
+import type { Icons as IconsType } from '@/types';
 
 export const Icons: typeof IconsType = [
     'bell-mute',

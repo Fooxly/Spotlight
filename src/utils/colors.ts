@@ -1,5 +1,4 @@
-import { ColorMode } from '@/types';
-import { HSLA, HSVA, RGBA } from '@/types/colors';
+import { ColorMode, HSLA, HSVA, RGBA } from '@/types';
 
 let ctx: CanvasRenderingContext2D | null;
 if (typeof window !== 'undefined') {
