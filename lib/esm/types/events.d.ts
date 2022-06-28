@@ -1,6 +1,6 @@
 /// <reference types="react" />
-import { Appearance } from './theme';
-import { ToastType } from './utils';
+import { Appearance } from './colors';
+import { ToastType } from './toast';
 export interface ChangeThemeEvent {
     appearance: Appearance;
 }

@@ -1,0 +1,114 @@
+$themes: (
+    color-green: (
+        light: #34C759,
+        dark: #32D74B,
+    ),
+    color-yellow: (
+        light: #FFCC00,
+        dark: #FFD60A,
+    ),
+    color-orange: (
+        light: #FF9500,
+        dark: #FF9F0A,
+    ),
+    color-red: (
+        light: #FF3B30,
+        dark: #FF453A,
+    ),
+    color-teal: (
+        light: #5AC8FA,
+        dark: #64D2FF,
+    ),
+    color-blue: (
+        light: #007AFF,
+        dark: #0A84FF,
+    ),
+    color-indigo: (
+        light: #5856D6,
+        dark: #5E5CE6,
+    ),
+    color-purple: (
+        light: #AF52DE,
+        dark: #BF5AF2,
+    ),
+    color-pink: (
+        light: #FF2D55,
+        dark: #FF2D55,
+    ),
+    // Shades
+    color-gray10: (
+        light: #FFFFFF,
+        dark: #000000,
+    ),
+    color-gray9: (
+        light: #F2F2F7,
+        dark: #1C1C1E,
+    ),
+    color-gray8: (
+        light: #E5E5EA,
+        dark: #2C2C2E,
+    ),
+    color-gray7: (
+        light: #D1D1D6,
+        dark: #3A3A3C,
+    ),
+    color-gray6: (
+        light: #C7C7CC,
+        dark: #48484A,
+    ),
+    color-gray5: (
+        light: #AEAEB2,
+        dark: #636366,
+    ),
+    color-gray4: (
+        light: #8E8E93,
+        dark: #8E8E93,
+    ),
+    color-gray3: (
+        light: #636366,
+        dark: #C7C7CC,
+    ),
+    color-gray2: (
+        light: #3A3A3C,
+        dark: #E5E5EA,
+    ),
+    color-gray1: (
+        light: #000000,
+        dark: #FFFFFF,
+    ),
+);
+
+@mixin styles($mode) {
+    @each $key, $map in $themes {
+        @each $prop, $color in $map {
+            @if $prop == $mode {
+                --#{$key}: #{$color};
+            }
+        }
+    }
+}
+
+#spotlight {
+    &.spotlight-light {
+        @include styles("light");
+    }
+    &.spotlight-dark {
+        @include styles("dark");
+    }
+
+    @keyframes slideFromBottom {
+        from {
+            opacity: 0;
+            transform: translate3d(0, 100%, 0);
+        }
+        to {
+            opacity: 1;
+            transform: translate3d(0, 0%, 0);
+        }
+    }
+
+    @keyframes fadeOut {
+        from { opacity: 1 }
+        to { opacity: 0 }
+    }
+}

@@ -26,8 +26,8 @@
         "url": "https://github.com/Fooxly/Spotlight.git"
     },
     "bugs": {
-      "url": "https://github.com/Fooxly/Spotlight/issues",
-      "email": "bugs@fooxly.com"
+        "url": "https://github.com/Fooxly/Spotlight/issues",
+        "email": "bugs@fooxly.com"
     },
     "bin": {
         "spotlight": "./server/dist/index.js"
@@ -48,12 +48,14 @@
         ]
     },
     "scripts": {
-        "debug": "concurrently --kill-others \"tsc -w --project tsconfig.cjs.json\" \"tsc-alias -w -p tsconfig.cjs.json\" \"tsc -w --project tsconfig.json\" \"tsc-alias -w -p tsconfig.json\"",
+        "debug": "concurrently --kill-others \"yarn debug:cjs\" \"yarn debug:esm\"",
+        "debug:cjs": "concurrently --kill-others \"tsc -w --project tsconfig.cjs.json\" \"sass --watch src:lib/cjs\" \"tsc-alias -w -p tsconfig.cjs.json\"",
+        "debug:esm": "concurrently --kill-others \"tsc -w --project tsconfig.json\" \"sass --watch src:lib/esm\" \"tsc-alias -w -p tsconfig.json\"",
         "debug:server": "nodemon --ext ts --watch server/src --exec yarn build:server",
         "clean": "rm -rf lib && rm -rf server/dist",
         "build": "yarn clean && yarn build:esm && yarn build:cjs && yarn build:server",
-        "build:esm": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
-        "build:cjs": "tsc --project tsconfig.cjs.json && tsc-alias -p tsconfig.cjs.json",
+        "build:esm": "tsc --project tsconfig.json && sass src:lib/esm && tsc-alias -p tsconfig.json",
+        "build:cjs": "tsc --project tsconfig.cjs.json && sass src:lib/cjs && tsc-alias -p tsconfig.cjs.json",
         "build:server": "tsc -p server/tsconfig.json && tsc-alias -p server/tsconfig.json && chmod +x server/dist/index.js",
         "typecheck": "tsc --noEmit",
         "lint": "eslint --ext ts,tsx src server/src",
@@ -65,8 +67,7 @@
         "cors": "^2.8.5",
         "express": "^4.17.3",
         "fuse.js": "^6.5.3",
-        "react-hotkeys-hook": "^3.4.4",
-        "styled-components": "^5.3.5"
+        "react-hotkeys-hook": "^3.4.4"
     },
     "devDependencies": {
         "@fooxly/eslint-config": "https://github.com/Fooxly/eslint-config",
@@ -76,16 +77,14 @@
         "@types/express": "^4.17.13",
         "@types/react": "^18.0.2",
         "@types/react-dom": "^18.0.0",
-        "@types/react-transition-group": "^4.4.4",
-        "@types/styled-components": "^5.1.25",
-        "@zerollup/ts-transform-paths": "^1.7.18",
         "concurrently": "^7.1.0",
         "jest": "^27.5.1",
         "nodemon": "^2.0.15",
-        "tsc-alias": "^1.6.11",
-        "typescript": "^4.6.3",
         "react": "^17.0.2",
-        "react-dom": "^17.0.2"
+        "react-dom": "^17.0.2",
+        "sass": "^1.53.0",
+        "tsc-alias": "^1.6.11",
+        "typescript": "^4.6.3"
     },
     "peerDependencies": {
         "react": "15 - 18",

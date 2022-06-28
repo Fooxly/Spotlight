@@ -5,12 +5,6 @@ import { THEME_UPDATE_EVENT_KEY } from './utils';
 
 import { Appearance, SpotlightOptions } from '@/types';
 import {
-    pickColor,
-    registerPage,
-    registerCommand,
-    unregister,
-    shell,
-    question,
     toast,
 } from '@/commands';
 
@@ -25,6 +19,7 @@ const DefaultConfig: SpotlightOptions = {
 
 let lastConfigSettings = DefaultConfig;
 
+// Update / set the config for spotlight
 function config (options: SpotlightOptions) {
     // Merge the default options (or last chosen options) with the new user chosen ones
     lastConfigSettings = { ...lastConfigSettings, ...options };
@@ -54,6 +49,7 @@ function config (options: SpotlightOptions) {
     // #endregion
 }
 
+// Update the appearance of spotlight
 function setAppearance (appearance: Appearance) {
     if (typeof window === 'undefined') {
         console.error('Unable to set appearance. Window is not defined.');
@@ -69,15 +65,8 @@ function setAppearance (appearance: Appearance) {
 }
 
 export * from '@/commands';
-
 export default {
     config,
     setAppearance,
     toast,
-    registerPage,
-    registerCommand,
-    unregister,
-    question,
-    shell,
-    pickColor,
 };

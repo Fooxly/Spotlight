@@ -1,21 +1,15 @@
 export * from './constants';
-export * from './execute-item';
-export * from './history';
-export * from './filter-results';
-export * from './get-command-icon';
-export * from './lens';
-export * from './spotlight-context';
 
 export function getMainComponent () {
     let spotlightMain: HTMLDivElement | null = null;
     if (typeof window !== 'undefined') {
-        spotlightMain = document.querySelector<HTMLDivElement>('#spotlight-main');
+        spotlightMain = document.querySelector<HTMLDivElement>('#spotlight');
         if (!spotlightMain) {
             spotlightMain = document.createElement('div');
-            spotlightMain.id = 'spotlight-main';
+            spotlightMain.id = 'spotlight';
             document.body.append(spotlightMain);
         }
-        return document.querySelector('#spotlight-main') as HTMLDivElement;
+        return document.querySelector('#spotlight') as HTMLDivElement;
     }
     return null;
 }

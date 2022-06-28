@@ -4,7 +4,6 @@
     "build": false,
     ".editorconfig": false,
     ".gitattributes": false,
-    ".gitignore": false,
     "craco.config.js": false,
     "tsconfig.paths.json": false,
     "tsconfig.json": false,
@@ -13,7 +12,11 @@
     ".vscode": false,
     "lib": false,
     "server/dist": false,
-    "yarn-error.log": false
+    "yarn-error.log": false,
+    "tsconfig.cjs.json": false,
+    ".npmignore": false,
+    ".gitignore": false,
+    ".github": false
   },
   "workspace.isHidden": false
 }

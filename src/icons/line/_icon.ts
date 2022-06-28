@@ -1,9 +1,7 @@
-import { useTheme } from 'styled-components';
-
-import type { Color, Theme } from '@/types';
+import { getColor } from '@/utils/appearance';
 
 interface IconPropsBase {
-    color: Color;
+    color: string;
     size: number | string;
     className?: string;
 }
@@ -16,13 +14,11 @@ export type IconProps <NotRequired extends IconProp | undefined = undefined> = N
 
 export function $icon<NotRequired extends IconProp> (
     props: IconProps<NotRequired>,
-    color: Color | '' = 'gray1',
+    color: string | '' = 'gray1',
     size = 25,
 ): [string | undefined, number] {
-    const colorFunc = (useTheme() as Theme).color;
-
     return [
-        color === '' ? undefined : colorFunc(props.color ?? color),
+        color === '' ? undefined : getColor(props.color ?? color),
         typeof props.size === 'string' ? Number.parseInt(props.size) : props.size ?? size,
     ];
 }

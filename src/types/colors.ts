@@ -18,3 +18,9 @@ export interface RGBA {
     b: number;
     a: number;
 }
+
+export type ColorMode = 'hex' | 'rgba' | 'hsla';
+
+export type Appearance = 'light' | 'dark' | 'auto';
+
+export type Theme = 'light' | 'dark';
