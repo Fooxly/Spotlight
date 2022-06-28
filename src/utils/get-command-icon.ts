@@ -10,6 +10,7 @@ import {
     GearIcon,
     GlobeIcon,
     HouseIcon,
+    InfoIcon,
     LinkIcon,
     LockIcon,
     PinIcon,
@@ -39,6 +40,7 @@ export function getCommandIcon (icon: ItemIcon): ((props: IconProps) => JSX.Elem
         case 'gear': return GearIcon;
         case 'globe': return GlobeIcon;
         case 'house': return HouseIcon;
+        case 'info': return InfoIcon;
         case 'link': return LinkIcon;
         case 'lock': return LockIcon;
         case 'pin': return PinIcon;

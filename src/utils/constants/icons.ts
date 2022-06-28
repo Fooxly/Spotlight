@@ -11,6 +11,7 @@ export const Icons: typeof IconsType = [
     'gear',
     'globe',
     'house',
+    'info',
     'link',
     'lock',
     'pin',

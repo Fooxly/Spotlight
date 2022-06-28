@@ -9,6 +9,7 @@ export const Icons = <const>[
     'gear',
     'globe',
     'house',
+    'info',
     'link',
     'lock',
     'pin',

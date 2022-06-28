@@ -1,5 +1,7 @@
 import { Icons } from './icons';
 import './colors';
+import './events';
+import { Appearance } from './theme';
 
 export type SpotlightType = 'search' | 'input' | 'question';
 
@@ -113,6 +115,30 @@ export interface JumpTo extends Item {
     type: 'jump-to';
 }
 
+export interface SpotlightOptions {
+    // If the spotlight is in dev mode or not. Dev mode will give more features but is not suitable for production.
+    devMode: boolean;
+    // The appearance spotlight should start with. (Default value is auto)
+    appearance?: Appearance;
+    // A shortcut for the spotlight view. (Default vaue is cmd+shift+k, ctrl+shift+k)
+    spotlightShortcut?: string;
+    // A shortcut for the color picker. (Default value is null)
+    colorPickerShortcut?: string;
+    // The amount of items which will be shown in the recently used section in spotlight. (Default value is 5)
+    showRecentlyUsed?: number;
+    // This can disable the tips view all together. (Default value is true)
+    showTips?: boolean;
+    // Ability to add your own tips to the tips menu besides the default ones.
+    customTips?: string[];
+    // Event which fires when the spotlight has loaded.
+    onLoaded?: () => void;
+}
+
+declare function Config (options: SpotlightOptions): void;
+
+declare function SetAppearance (mode: Appearance): void;
+
+// #region Old types
 interface Props {
     // Should the spotlight be rendered in dark mode?
     isDarkMode?: boolean;
@@ -151,8 +177,11 @@ export declare function pickColor (options?: ColorPickerOptions): Promise<Record
 // Execute a shell command in an external script. (This only runs when the spotlight server is running)
 export declare function shell (command: string, options?: ShellCommandOptions | undefined): Promise<void>;
 
+// #endregion
+
 declare const _default: {
-    Spotlight: typeof Spotlight;
+    Config: typeof Config;
+    SetAppearance: typeof SetAppearance;
     registerPage: typeof registerPage;
     registerCommand: typeof registerCommand;
     unregister: typeof unregister;

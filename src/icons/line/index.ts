@@ -10,6 +10,7 @@ export * from './download';
 export * from './gear';
 export * from './globe';
 export * from './house';
+export * from './info';
 export * from './link';
 export * from './lock';
 export * from './pin';
