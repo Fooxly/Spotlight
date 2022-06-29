@@ -1,0 +1,53 @@
+.spotlight-toast {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    z-index: 99999;
+    transform: translate3d(0, 0, 99999px);
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
+.spotlight-toast-pill {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 30px;
+    padding-left: 0;
+    max-width: 50%;
+    border-radius: 30px;
+    box-sizing: border-box;
+    background-color: var(--color-gray10);
+    border: 2px solid var(--color-gray8);
+    box-shadow: 0px 0px 30px 0px rgba(0, 0, 0, 0.1);
+
+    > svg {
+        margin-right: 8px;
+        margin-left: 12px;
+        min-width: 28px;
+        min-height: 28px;
+    }
+
+    &.spotlight-pill-enabled {
+        animation: slideFromBottom 0.2s ease-in-out;
+        animation-fill-mode: forwards;
+    }
+
+    &.spotlight-pill-disabled {
+        animation: fadeOut 0.2s ease-in-out;
+        animation-fill-mode: forwards;
+    }
+}
+
+.spotlight-toast-text {
+    margin: 0;
+    padding: 0;
+    color: var(--color-gray1);
+    font-size: 15px;
+}

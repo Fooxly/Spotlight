@@ -1,0 +1,12 @@
+.spotlight-container {
+  background-color: var(--color-gray10);
+  border-radius: 10px;
+}
+.spotlight-container.spotlight-container-light {
+  border: 2px solid var(--color-gray4);
+}
+.spotlight-container.spotlight-container-dark {
+  border: 2px solid var(--color-gray8);
+}
+
+/*# sourceMappingURL=styles.css.map */

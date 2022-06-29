@@ -1,4 +1,5 @@
 export * from './constants';
+export * from './hooks';
 
 export function getMainComponent () {
     let spotlightMain: HTMLDivElement | null = null;
