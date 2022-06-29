@@ -30,7 +30,7 @@ export interface ItemOptions {
 
 export type CommandAction = (result?: string) => any | Promise<any | null | unknown | void>;
 
-export interface Answer { key: string; label: string; icon?: ItemIcon }
+export interface Answer { key: string; label: string; icon?: ItemIcon | string }
 
 export interface CommandOption extends ItemOptions {
     // The title which will be shown inside the spotlight results.
