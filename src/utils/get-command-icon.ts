@@ -9,6 +9,7 @@ import {
     ClockIcon,
     DiceIcon,
     DownloadIcon,
+    EyedropperIcon,
     GearIcon,
     GlobeIcon,
     HouseIcon,
@@ -40,6 +41,7 @@ export function getCommandIcon (icon: ItemIcon): ((props: IconProps) => JSX.Elem
         case 'clock': return ClockIcon;
         case 'dice': return DiceIcon;
         case 'download': return DownloadIcon;
+        case 'eyedropper': return EyedropperIcon;
         case 'gear': return GearIcon;
         case 'globe': return GlobeIcon;
         case 'house': return HouseIcon;

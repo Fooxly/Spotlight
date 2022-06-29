@@ -42,7 +42,6 @@ export const BASE_COMMANDS: Command[] = [
     {
         action: () => {
             try {
-                // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
                 const uuid = ([1e7].toString() + `${-1e3}` + `${-4e3}` + `${-8e3}` + `${-1e11}`)
                     .replace(/[018]/g, (c) =>
                         (

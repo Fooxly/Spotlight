@@ -9,6 +9,7 @@ export * from './chevron';
 export * from './clock';
 export * from './dice';
 export * from './download';
+export * from './eyedropper';
 export * from './gear';
 export * from './globe';
 export * from './house';

@@ -10,6 +10,7 @@ export const Icons: typeof IconsType = [
     'clock',
     'dice',
     'download',
+    'eyedropper',
     'gear',
     'globe',
     'house',

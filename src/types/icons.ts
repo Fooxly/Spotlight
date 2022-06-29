@@ -8,6 +8,7 @@ export const Icons = <const>[
     'clock',
     'dice',
     'download',
+    'eyedropper',
     'gear',
     'globe',
     'house',
