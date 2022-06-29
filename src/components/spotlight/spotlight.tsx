@@ -82,7 +82,6 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
         document.removeEventListener(UPDATE_SPOTLIGHT_EVENT_KEY, forceUpdateSpotlight as any, false);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         document.addEventListener(UPDATE_SPOTLIGHT_EVENT_KEY, forceUpdateSpotlight as any, false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -392,7 +391,7 @@ export function SpotlightComponent ({ showTips }: Props): JSX.Element | null {
 
     const fallbackTitle = (answers ?? subMenuItem) ? 'Choose an option...' : 'Search or jump to...';
 
-    // If we are not able to find the window element, we can not render
+    // If we are unable to find the window element, we can not render
     if (typeof window === 'undefined') return null;
 
     return ReactDOM.createPortal(!visible ? null : (

@@ -23,15 +23,47 @@ interface Props {
     isDarkMode?: boolean;
     showRecentlyUsed?: number;
     showTips?: boolean;
+    onBranchSwitchCmd?: string | null;
 }
 
-export function Spotlight ({ isDarkMode, showRecentlyUsed = 5, showTips = true }: Props): JSX.Element {
+export function Spotlight ({
+    isDarkMode,
+    onBranchSwitchCmd,
+    showTips = true,
+    showRecentlyUsed = 5,
+}: Props): JSX.Element {
     const [darkMode, setDarkMode] = useState<boolean>(isDarkMode ?? false);
 
     const listenerDarkMode = useCallback(() => {
         if (typeof isDarkMode === 'boolean') return;
         setDarkMode(isSystemInDarkMode());
     }, [isDarkMode]);
+
+    useEffect(() => {
+        const url = new URL(window.location.href);
+        const error = url.searchParams.get('spotlight-error');
+        if (error) {
+            toast(error);
+            url.searchParams.delete('spotlight-error');
+            window.history.pushState(
+                null,
+                '',
+                [window.location.pathname, url.searchParams.toString()].filter(Boolean).join('?'),
+            );
+        }
+        const branchSwitched = url.searchParams.get('spotlight-branch-switch') === 'true';
+        if (branchSwitched) {
+            toast(onBranchSwitchCmd ? 'Please wait ...' : 'Please wait for packages to update ...');
+            url.searchParams.delete('spotlight-branch-switch');
+            shell(onBranchSwitchCmd ?? 'yarn')
+                .then(() => {
+                    window.location.href = url.toString();
+                })
+                .catch(() => {
+                    toast('Failed to update packages.');
+                });
+        }
+    }, [onBranchSwitchCmd]);
 
     useEffect(() => {
         const matchDarkMode = window.matchMedia('(prefers-color-scheme: dark)');

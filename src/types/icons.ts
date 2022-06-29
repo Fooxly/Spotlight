@@ -1,10 +1,12 @@
 export const Icons = <const>[
     'bell-mute',
     'bell',
+    'branch',
     'brush',
     'camera',
     'checkmark',
     'clock',
+    'dice',
     'download',
     'gear',
     'globe',

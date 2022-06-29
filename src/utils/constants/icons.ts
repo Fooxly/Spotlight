@@ -3,10 +3,12 @@ import type { Icons as IconsType } from '@/types/icons';
 export const Icons: typeof IconsType = [
     'bell-mute',
     'bell',
+    'branch',
     'brush',
     'camera',
     'checkmark',
     'clock',
+    'dice',
     'download',
     'gear',
     'globe',

@@ -2,10 +2,12 @@ import type { ItemIcon } from '@/types';
 import {
     BellMuteIcon,
     BellIcon,
+    BranchIcon,
     BrushIcon,
     CameraIcon,
     CheckmarkIcon,
     ClockIcon,
+    DiceIcon,
     DownloadIcon,
     GearIcon,
     GlobeIcon,
@@ -31,10 +33,12 @@ export function getCommandIcon (icon: ItemIcon): ((props: IconProps) => JSX.Elem
     switch (icon) {
         case 'bell-mute': return BellMuteIcon;
         case 'bell': return BellIcon;
+        case 'branch': return BranchIcon;
         case 'brush': return BrushIcon;
         case 'camera': return CameraIcon;
         case 'checkmark': return CheckmarkIcon;
         case 'clock': return ClockIcon;
+        case 'dice': return DiceIcon;
         case 'download': return DownloadIcon;
         case 'gear': return GearIcon;
         case 'globe': return GlobeIcon;

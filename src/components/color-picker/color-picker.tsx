@@ -225,7 +225,7 @@ export function ColorPicker (): JSX.Element | null {
         hideColorPicker();
     }, HOTKEY_OPTIONS, [activeColor, showContinue]);
 
-    // If we are not able to find the window element, we can not render
+    // If we are unable to find the window element, we can not render
     if (typeof window === 'undefined') return null;
     return ReactDOM.createPortal(!visible ? null : (
         <Container ref={colorPickerRef} onMouseUp={() => setAreaFocus(false)}>
