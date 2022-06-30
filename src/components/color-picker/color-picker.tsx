@@ -7,7 +7,17 @@ import html2canvas from 'html2canvas';
 import { Tooltip } from '../tooltip';
 import type { ColorGrabberProps } from '../color-grabber';
 
-import { combineHexColors, getColorFromHex, getColorStringForMode, HSVAtoRGBA, RGBAToHex, HexToLuma } from '@/utils/colors';
+import {
+    combineHexColors,
+    getColorFromHex,
+    getColorStringForMode,
+    HSVAtoRGBA,
+    RGBAToHex,
+    HexToLuma,
+    HexToHSLA,
+    RGBAtoHSVA,
+    HexToRGBA,
+} from '@/utils/colors';
 import { ALL_COLOR_MODES, COLOR_PICKER_EVENT_KEY, COLOR_PICKER_RESULT_EVENT_KEY } from '@/utils';
 import { ColorMode, ColorPickerOptions } from '@/types';
 import { CheckmarkIcon, ChevronIcon, EyedropperIcon } from '@/icons/line';
@@ -202,6 +212,7 @@ export function ColorPicker ({ setColorGrabberProps }: Props): JSX.Element | nul
             await new Promise((resolve) => setTimeout(resolve, 200));
 
             const canvas = await html2canvas(document.body, {
+                logging: false,
                 ignoreElements: (element) => Boolean(console.log(element)),
             });
 
@@ -209,9 +220,21 @@ export function ColorPicker ({ setColorGrabberProps }: Props): JSX.Element | nul
                 visible: true,
                 frame: canvas.toDataURL('image/png'),
                 onGrab: (hex) => {
-                    setActiveColor(hex + 'FF'); // FIXME:
                     setColorGrabberProps({ visible: false });
                     setVisible(true);
+                    // wait for colorAreaDimsRef to be rendered
+                    setTimeout(() => {
+                        const hsva = RGBAtoHSVA(HexToRGBA(hex));
+                        setHue(hsva.h);
+                        setPosition({
+                            x: (hsva.s * getRectSize().width) / 100 - 1,
+                            y: (100 - hsva.v) * getRectSize().height / 100 + 1,
+                        });
+                        // wait for useEffect to correct hex
+                        setTimeout(() => {
+                            setActiveColor(hex);
+                        }, 100);
+                    }, 1);
                 },
             });
         } catch (error) {
