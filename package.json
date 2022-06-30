@@ -28,8 +28,8 @@
         "url": "https://github.com/Fooxly/Spotlight.git"
     },
     "bugs": {
-      "url": "https://github.com/Fooxly/Spotlight/issues",
-      "email": "bugs@fooxly.com"
+        "url": "https://github.com/Fooxly/Spotlight/issues",
+        "email": "bugs@fooxly.com"
     },
     "bin": {
         "spotlight": "./server/dist/index.js"
@@ -67,6 +67,7 @@
         "cors": "^2.8.5",
         "express": "^4.17.3",
         "fuse.js": "^6.5.3",
+        "html2canvas": "^1.4.1",
         "react-hotkeys-hook": "^3.4.4",
         "styled-components": "^5.3.5"
     },

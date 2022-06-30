@@ -1,12 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ThemeProvider } from 'styled-components';
 
-import {
-    HISTORY_LENGTH_KEY,
-} from './utils';
-import { ColorPicker, SpotlightComponent, Toast } from './components';
-import { getColorFunction, themes } from './theme';
+import { HISTORY_LENGTH_KEY } from './utils';
 import { isSystemInDarkMode } from './utils/appearance';
+import { ColorGrabber, ColorGrabberProps, ColorPicker, SpotlightComponent, Toast } from './components';
+import { getColorFunction, themes } from './theme';
 
 import type { Theme } from '@/types/theme';
 import {
@@ -33,6 +31,7 @@ export function Spotlight ({
     showRecentlyUsed = 5,
 }: Props): JSX.Element {
     const [darkMode, setDarkMode] = useState<boolean>(isDarkMode ?? false);
+    const [colorGrabberProps, setColorGrabberProps] = useState<ColorGrabberProps | null>(null);
 
     const listenerDarkMode = useCallback(() => {
         if (typeof isDarkMode === 'boolean') return;
@@ -95,7 +94,8 @@ export function Spotlight ({
     return (
         <ThemeProvider theme={calculatedTheme}>
             <SpotlightComponent showTips={showTips} />
-            <ColorPicker />
+            <ColorPicker setColorGrabberProps={setColorGrabberProps} />
+            <ColorGrabber {...colorGrabberProps} hide={() => setColorGrabberProps({})} />
             <Toast />
         </ThemeProvider>
     );

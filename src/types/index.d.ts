@@ -14,6 +14,7 @@ export interface ColorPickerOptions {
     title?: string;
     modes?: ColorMode[];
     alpha?: boolean;
+    startColor?: string;
 }
 
 export type ItemIcon = typeof Icons[number];

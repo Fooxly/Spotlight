@@ -108,7 +108,9 @@ export function HexToHSLA (str: string): HSLA {
     return HSVAtoHSLA(RGBAtoHSVA(HexToRGBA(str)));
 }
 
-export function RGBAToHex (rgba: RGBA, alpha = true): string {
+export function RGBAToHex (rgba: RGBA, alpha?: true): string;
+export function RGBAToHex (rgba: Omit<RGBA, 'a'>, alpha?: false): string;
+export function RGBAToHex (rgba: RGBA | Pick<RGBA, 'r' | 'g' | 'b'> & Partial<Pick<RGBA, 'a'>>, alpha = true): string {
     let R = rgba.r.toString(16);
     let G = rgba.g.toString(16);
     let B = rgba.b.toString(16);
@@ -126,7 +128,7 @@ export function RGBAToHex (rgba: RGBA, alpha = true): string {
         B = '0' + B;
     }
 
-    if (alpha) {
+    if (alpha && rgba.a) {
         const newAlpha = Math.trunc(rgba.a * 255);
         A = newAlpha.toString(16);
 

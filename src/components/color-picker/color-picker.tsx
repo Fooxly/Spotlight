@@ -2,13 +2,15 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ReactDOM from 'react-dom';
 import styled, { useTheme } from 'styled-components';
 import { Options, useHotkeys } from 'react-hotkeys-hook';
+import html2canvas from 'html2canvas';
 
 import { Tooltip } from '../tooltip';
+import type { ColorGrabberProps } from '../color-grabber';
 
 import { combineHexColors, getColorFromHex, getColorStringForMode, HSVAtoRGBA, RGBAToHex, HexToLuma } from '@/utils/colors';
 import { ALL_COLOR_MODES, COLOR_PICKER_EVENT_KEY, COLOR_PICKER_RESULT_EVENT_KEY } from '@/utils';
 import { ColorMode, ColorPickerOptions } from '@/types';
-import { CheckmarkIcon, ChevronIcon } from '@/icons/line';
+import { CheckmarkIcon, ChevronIcon, EyedropperIcon } from '@/icons/line';
 import { toast } from '@/commands';
 
 // create the spotlight color picker wrapper if this is not already created
@@ -27,7 +29,11 @@ const preventDefault = (e: KeyboardEvent) => {
     e.stopPropagation();
 };
 
-export function ColorPicker (): JSX.Element | null {
+interface Props {
+    setColorGrabberProps: React.Dispatch<React.SetStateAction<ColorGrabberProps | null>>;
+}
+
+export function ColorPicker ({ setColorGrabberProps }: Props): JSX.Element | null {
     const theme = useTheme();
 
     const colorPickerRef = useRef<HTMLDivElement>(null);
@@ -183,6 +189,36 @@ export function ColorPicker (): JSX.Element | null {
         }
     };
 
+    const handleGrab = async () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = window.screen.width;
+        canvas.height = window.screen.height;
+
+        const context = canvas.getContext('2d');
+        if (!context) return;
+
+        try {
+            setVisible(false);
+            await new Promise((resolve) => setTimeout(resolve, 200));
+
+            const canvas = await html2canvas(document.body, {
+                ignoreElements: (element) => Boolean(console.log(element)),
+            });
+
+            setColorGrabberProps({
+                visible: true,
+                frame: canvas.toDataURL('image/png'),
+                onGrab: (hex) => {
+                    setActiveColor(hex + 'FF'); // FIXME:
+                    setColorGrabberProps({ visible: false });
+                    setVisible(true);
+                },
+            });
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
     useHotkeys('esc', (e) => {
         preventDefault(e);
         hideColorPicker();
@@ -300,17 +336,22 @@ export function ColorPicker (): JSX.Element | null {
                             </ColorModeSelector>
                         )}
                     </ColorResult>
-                    {showContinue ? (
-                        <Continue onClick={handleContinue}>
-                            <span>Continue</span>
-                            <StyledCheckmarkIcon color='gray1' size={16} />
-                        </Continue>
-                    ) : navigator.clipboard ? (
-                        <Continue onClick={handleCopy}>
-                            <span>{copied ? 'Copied!' : 'Copy to clipboard'}</span>
-                            <StyledCheckmarkIcon color='gray1' size={16} />
-                        </Continue>
-                    ) : null}
+                    <Row>
+                        {showContinue ? (
+                            <Continue onClick={handleContinue}>
+                                <span>Continue</span>
+                                <StyledCheckmarkIcon color='gray1' size={16} />
+                            </Continue>
+                        ) : navigator.clipboard ? (
+                            <Continue onClick={handleCopy}>
+                                <span>{copied ? 'Copied!' : 'Copy to clipboard'}</span>
+                                <StyledCheckmarkIcon color='gray1' size={16} />
+                            </Continue>
+                        ) : null}
+                        <ColorGrabberButton onClick={handleGrab}>
+                            <EyedropperIcon size={20} color='gray1' />
+                        </ColorGrabberButton>
+                    </Row>
                 </Results>
             </Content>
         </Container>
@@ -592,7 +633,41 @@ const Continue = styled.button`
     background-color: transparent;
     overflow: hidden;
     cursor: pointer;
+
+    transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    will-change: border, color;
+
+    :hover, :focus {
+        background-color: ${(p) => p.theme.color.teal}40;
+        border: 2px solid ${(p) => p.theme.color.teal};
+    }
+
+    > span {
+        display: block;
+
+        @media (max-width: 200px) {
+            display: none;
+        }
+    }
+`;
+
+const Row = styled.div`
+    ${(p) => p.theme.flex.row({ align: 'center' })}
     margin-top: 15px;
+    column-gap: 10px;
+`;
+
+const ColorGrabberButton = styled.button`
+    ${(p) => p.theme.flex.row({ justify: 'center', align: 'center' })}
+    ${(p) => p.theme.text.System.regular(15, 'gray1')}
+    border: 2px solid ${(p) => p.theme.color.gray7};
+    outline: 0;
+    width: 55px;
+    height: 40px;
+    border-radius: 8px;
+    background-color: transparent;
+    overflow: hidden;
+    cursor: pointer;
 
     transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
     will-change: border, color;
