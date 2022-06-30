@@ -95,7 +95,7 @@ export function Spotlight ({
         <ThemeProvider theme={calculatedTheme}>
             <SpotlightComponent showTips={showTips} />
             <ColorPicker setColorGrabberProps={setColorGrabberProps} />
-            <ColorGrabber {...colorGrabberProps} hide={() => setColorGrabberProps({})} />
+            <ColorGrabber {...colorGrabberProps} />
             <Toast />
         </ThemeProvider>
     );
