@@ -16,7 +16,7 @@ export interface SpotlightOptions {
     // Ability to add your own tips to the tips menu besides the default ones.
     customTips?: string[];
     // Event which fires when the spotlight has loaded.
-    onLoaded?: () => void;
+    onLoaded?: () => void | Promise<void>;
     // Event which fires when the spotlight was not loaded successfully.
-    onLoadFailed?: (error: Error) => void;
+    onLoadFailed?: (error: Error) => void | Promise<void>;
 }

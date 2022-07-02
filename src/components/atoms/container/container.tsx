@@ -8,7 +8,7 @@ export function Container ({ children, className, ...restProps }: React.HTMLProp
     const { light } = useAppearance();
 
     return (
-        <div {...restProps} className={`${className ?? ''} spotlight-container spotlight-container-${light ? 'light' : 'dark'}`}>
+        <div {...restProps} className={`${className ?? ''} spotlight-container spotlight-container-${light ? 'light' : 'dark'}`.trim()}>
             <>
                 {children}
             </>

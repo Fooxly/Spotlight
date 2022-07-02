@@ -1,0 +1,22 @@
+.spotlight-search-box {
+    width: 60%;
+    max-width: 650px;
+
+    &.spotlight-search-box-no-icons {
+        .spotlight-search-result-icon {
+            display: none;
+        }
+    }
+
+    .spotlight-search-results {
+        border-top: 1px solid var(--color-gray8);
+        padding: 8px;
+        max-height: 400px;
+        height: auto;
+        overflow-y: auto;
+
+        @media(max-height: 600px) {
+            max-height: 100%;
+        }
+    }
+}

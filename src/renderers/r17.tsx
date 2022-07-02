@@ -9,7 +9,7 @@ export function setup (options: SpotlightOptions) {
     const mainComponent = getMainComponent();
     if (!mainComponent) {
         console.error('Spotlight was unable to create a root component.');
-        options?.onLoadFailed?.(new Error('SPOTLIGHT_NO_ROOT_COMPONENT'));
+        void options?.onLoadFailed?.(new Error('SPOTLIGHT_NO_ROOT_COMPONENT'));
         return;
     }
     ReactDOM.render(<Master {...options} />, mainComponent);

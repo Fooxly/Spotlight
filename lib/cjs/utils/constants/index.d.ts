@@ -1,5 +1,12 @@
+export * from './icons';
+export * from './spotlight-registry';
 export declare const HISTORY_KEY = "__fooxly_spotlight_history__";
 export declare const HISTORY_LENGTH_KEY = "__fooxly_spotlight_history_length__";
 export declare const SPOTLIGHT_THEME_KEY = "__fooxly_spotlight_theme__";
+export declare const REGISTRY_UPDATE_EVENT_KEY = "__fooxly_spotlight_registry_update__";
 export declare const THEME_UPDATE_EVENT_KEY = "__fooxly_spotlight_theme_update__";
 export declare const TOAST_EVENT_KEY = "__fooxly_spotlight_toast_message__";
+export declare const QUESTION_EVENT_KEY = "__fooxly_spotlight_question__";
+export declare const QUESTION_RESULT_EVENT_KEY = "__fooxly_spotlight_question_result__";
+export declare const PICKED_RESULT_EVENT_KEY = "__fooxly_spotlight_picked_result__";
+export declare const SEARCH_CLOSED_EVENT_KEY = "__fooxly_spotlight_search_closed__";

@@ -1,6 +1,8 @@
 .spotlight-container {
     background-color: var(--color-gray10);
     border-radius: 10px;
+    overflow: hidden;
+    pointer-events: all;
 
     &.spotlight-container-light {
         border: 2px solid var(--color-gray4);
@@ -8,5 +10,13 @@
 
     &.spotlight-container-dark {
         border: 2px solid var(--color-gray8);
+    }
+
+    @media(max-width: 900px) {
+        width: 70%;
+    }
+
+    @media(max-width: 700px) {
+        width: 85%;
     }
 }

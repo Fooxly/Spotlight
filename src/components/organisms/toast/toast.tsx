@@ -2,17 +2,17 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { TOAST_EVENT_KEY } from '@/utils';
 import { InfoIcon, WarningCircleIcon } from '@/icons/line';
-import { ToastMessageEvent } from '@/types';
+import { ToastEvent } from '@/types';
 
 import './styles.css';
 
 let timeout: NodeJS.Timeout | null = null;
 
 export function Toast (): JSX.Element | null {
-    const [message, setMessage] = useState<ToastMessageEvent | null>(null);
+    const [message, setMessage] = useState<ToastEvent | null>(null);
     const [show, setShow] = useState<boolean>(false);
 
-    const handleNewToastMessage = (ev: CustomEvent<ToastMessageEvent>) => {
+    const handleNewToastMessage = (ev: CustomEvent<ToastEvent>) => {
         if (timeout) clearTimeout(timeout);
         setShow(true);
         setMessage(ev.detail);

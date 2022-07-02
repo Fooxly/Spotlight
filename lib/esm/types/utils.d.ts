@@ -7,6 +7,6 @@ export interface SpotlightOptions {
     showRecentlyUsed?: number;
     showTips?: boolean;
     customTips?: string[];
-    onLoaded?: () => void;
-    onLoadFailed?: (error: Error) => void;
+    onLoaded?: () => void | Promise<void>;
+    onLoadFailed?: (error: Error) => void | Promise<void>;
 }

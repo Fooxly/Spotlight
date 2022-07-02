@@ -1,4 +1,4 @@
-import { ToastMessageEvent, ToastType } from '@/types';
+import { ToastEvent, ToastType } from '@/types';
 import { TOAST_EVENT_KEY } from '@/utils';
 
 export function toast (message: string | JSX.Element, type: ToastType = 'info'): void {
@@ -7,7 +7,7 @@ export function toast (message: string | JSX.Element, type: ToastType = 'info'):
         detail: {
             message,
             type,
-        } as ToastMessageEvent,
+        } as ToastEvent,
     });
     document.dispatchEvent(ev);
 }

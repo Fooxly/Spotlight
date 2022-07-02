@@ -1,0 +1,50 @@
+.spotlight-search-input {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  position: relative;
+  background-color: var(--color-gray10);
+  box-sizing: border-box;
+}
+.spotlight-search-input .spotlight-search-input-input {
+  font-size: 18px;
+  color: var(--color-gray1);
+  background-color: var(--color-gray10);
+  flex: 1;
+  height: 55px;
+  border: 0;
+  padding: 0 50px;
+}
+.spotlight-search-input .spotlight-search-input-input:focus {
+  outline: 0;
+}
+.spotlight-search-input .spotlight-search-input-input ::placeholder {
+  color: var(--color-gray6) !important;
+}
+.spotlight-search-input .spotlight-search-input-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 15px;
+  margin-bottom: 2px;
+}
+.spotlight-search-input .spotlight-search-input-clear {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 0;
+  outline: 0;
+  border-radius: 100px;
+  background-color: var(--color-gray2);
+  position: absolute;
+  right: 15px;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+}
+
+/*# sourceMappingURL=styles.css.map */

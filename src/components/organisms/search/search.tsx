@@ -1,19 +1,44 @@
 import React, { useState } from 'react';
 
-import { Container, Overlay } from '@/components/atoms';
+import { Question } from './question';
+import { Default } from './default';
+
+import { SearchBase } from '@/components/molecules';
+import { SearchContext, SearchType } from '@/utils';
+import { Result, SpotlightOptions } from '@/types';
 
 import './styles.css';
 
-export function Search (): JSX.Element {
+export function Search (props: SpotlightOptions): JSX.Element {
+    const [type, setType] = useState<SearchType>('search');
     const [visible, setVisible] = useState(false);
+    const [search, setSearch] = useState('');
+    const [placeholder, setPlaceholder] = useState<string | null>(null);
+    const [results, setResults] = useState<Result[]>([]);
+    const [showIcons, setShowIcons] = useState<boolean>(true);
+    const [selectedItem, setSelectedItem] = useState<string | null>(null);
 
     return (
-        <Overlay visible={visible} setVisible={setVisible}>
-            <div id='spotlight-search'>
-                <Container>
-                    spotlight
-                </Container>
-            </div>
-        </Overlay>
+        <SearchContext.Provider value={{
+            type,
+            setType,
+            visible,
+            setVisible,
+            search,
+            setSearch,
+            placeholder,
+            setPlaceholder,
+            results,
+            setResults,
+            showIcons,
+            setShowIcons,
+            selectedItem,
+            setSelectedItem,
+        }}
+        >
+            <SearchBase />
+            <Question />
+            <Default {...props} />
+        </SearchContext.Provider>
     );
 }

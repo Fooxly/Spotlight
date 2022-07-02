@@ -5,6 +5,8 @@ import { THEME_UPDATE_EVENT_KEY } from './utils';
 
 import { Appearance, SpotlightOptions } from '@/types';
 import {
+    registerCommand,
+    question,
     toast,
 } from '@/commands';
 
@@ -68,5 +70,7 @@ export * from '@/commands';
 export default {
     config,
     setAppearance,
+    registerCommand,
+    question,
     toast,
 };
