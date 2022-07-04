@@ -3,8 +3,8 @@ import './styles.css';
 import { SearchType } from '../../../utils';
 export interface SearchInputProps {
     type: SearchType;
-    loading?: boolean;
     forwardRef?: React.Ref<HTMLInputElement>;
-    onValueChange?: (value: string) => void;
+    value: string;
+    onValueChange: (value: string) => void;
 }
-export declare function SearchInput({ type, loading, forwardRef, onValueChange }: SearchInputProps): JSX.Element;
+export declare function SearchInput({ type, forwardRef, value, onValueChange }: SearchInputProps): JSX.Element;

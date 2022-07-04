@@ -10,16 +10,16 @@ export interface SearchContextProps {
     setType: (type: SearchType) => void;
     visible: boolean;
     setVisible: (visible: boolean) => void;
-    search: string;
-    setSearch: (search: string) => void;
-    placeholder: string | null;
-    setPlaceholder: (placeholder: string | null) => void;
-    results: Result[];
-    setResults: (results: Result[]) => void;
-    showIcons: boolean;
-    setShowIcons: (showIcons: boolean) => void;
-    selectedItem: string | null;
-    setSelectedItem: (selectedItem: string | null) => void;
+    parentId: string | undefined;
+    setParentId: (parentId: string | undefined) => void;
+    catalog: Result[];
+    setCatalog: (catalog: Result[]) => void;
+    placeholder: string | undefined;
+    setPlaceholder: (placeholder: string | undefined) => void;
+    loading: boolean;
+    setLoading: (loading: boolean) => void;
+    selectedItem: string | undefined;
+    setSelectedItem: (selectedItem: string | undefined) => void;
 }
 
 export const SearchContext = createContext<SearchContextProps>({
@@ -27,15 +27,15 @@ export const SearchContext = createContext<SearchContextProps>({
     setType: () => {},
     visible: false,
     setVisible: () => {},
-    search: '',
-    setSearch: () => {},
-    placeholder: null,
+    parentId: undefined,
+    setParentId: () => {},
+    catalog: [],
+    setCatalog: () => {},
+    placeholder: undefined,
     setPlaceholder: () => {},
-    results: [],
-    setResults: () => {},
-    showIcons: true,
-    setShowIcons: () => {},
-    selectedItem: null,
+    loading: false,
+    setLoading: () => {},
+    selectedItem: undefined,
     setSelectedItem: () => {},
 });
 

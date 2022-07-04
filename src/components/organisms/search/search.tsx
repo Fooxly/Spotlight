@@ -11,12 +11,12 @@ import './styles.css';
 
 export function Search (props: SpotlightOptions): JSX.Element {
     const [type, setType] = useState<SearchType>('search');
-    const [visible, setVisible] = useState(false);
-    const [search, setSearch] = useState('');
-    const [placeholder, setPlaceholder] = useState<string | null>(null);
-    const [results, setResults] = useState<Result[]>([]);
-    const [showIcons, setShowIcons] = useState<boolean>(true);
-    const [selectedItem, setSelectedItem] = useState<string | null>(null);
+    const [visible, setVisible] = useState<boolean>(false);
+    const [catalog, setCatalog] = useState<Result[]>([]);
+    const [parentId, setParentId] = useState<string | undefined>();
+    const [placeholder, setPlaceholder] = useState<string | undefined>();
+    const [loading, setLoading] = useState<boolean>(false);
+    const [selectedItem, setSelectedItem] = useState<string | undefined>();
 
     return (
         <SearchContext.Provider value={{
@@ -24,14 +24,14 @@ export function Search (props: SpotlightOptions): JSX.Element {
             setType,
             visible,
             setVisible,
-            search,
-            setSearch,
+            catalog,
+            setCatalog,
+            parentId,
+            setParentId,
             placeholder,
             setPlaceholder,
-            results,
-            setResults,
-            showIcons,
-            setShowIcons,
+            loading,
+            setLoading,
             selectedItem,
             setSelectedItem,
         }}

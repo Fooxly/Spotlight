@@ -2,6 +2,7 @@ import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { SEARCH_CLOSED_EVENT_KEY } from '@/utils';
+import { SearchCloseEvent } from '@/types';
 
 import './styles.css';
 
@@ -28,6 +29,9 @@ export function Overlay ({ visible, setVisible, children, className, ...restProp
         setVisible(false);
         const ev = new CustomEvent(SEARCH_CLOSED_EVENT_KEY, {
             bubbles: false,
+            detail: {
+                value: undefined,
+            } as SearchCloseEvent,
         });
         document.dispatchEvent(ev);
     };

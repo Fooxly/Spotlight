@@ -15,20 +15,17 @@ interface IconProps {
 
 export interface RegisterOptions extends IconProps {
     category?: string;
-    options?: RegisterChildItem[] | string[];
-}
-
-export interface RegisterChildItem extends IconProps {
-    label: string;
+    options?: Answer[] | string[];
 }
 
 export interface RegistryItem extends IconProps {
     id: string;
     type: 'command' | 'page';
+    key: string;
     label: string;
     category: string;
     action: (result?: string) => any | Promise<any | unknown | void>;
-    options?: RegisterOptions[] | string[];
+    options?: Answer[] | string[];
 }
 
 export interface Result {
@@ -38,8 +35,9 @@ export interface Result {
     icon?: string;
     iconColor?: string;
     category: string;
-    action?: (result?: string) => any | Promise<any | unknown | void>;
+    action: (result: Result) => any | Promise<any | unknown | void>;
     type: 'option' | 'command' | 'page';
+    parent?: string;
     children?: Result[];
 }
 

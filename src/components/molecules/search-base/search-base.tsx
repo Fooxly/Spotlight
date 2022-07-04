@@ -1,12 +1,13 @@
-import React, { createRef, useCallback, useEffect, useMemo } from 'react';
+import React, { createRef, useEffect, useMemo, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { SearchInput } from '../search-input';
 import { SearchSection } from '../search-section';
 
+import { getResultById, getResultsByParentId } from '@/utils/search';
 import { Container, Overlay } from '@/components/atoms';
-import { getUUID, useSearchContext, fuzzySearch, PICKED_RESULT_EVENT_KEY } from '@/utils';
-import { Category, ResultPickedEvent } from '@/types';
+import { getUUID, useSearchContext, fuzzySearch, SEARCH_CLOSED_EVENT_KEY } from '@/utils';
+import { Category, SearchCloseEvent } from '@/types';
 
 import './styles.css';
 
@@ -16,8 +17,24 @@ const preventDefault = (ev: KeyboardEvent) => {
 };
 
 export function SearchBase (): JSX.Element {
-    const { search, showIcons, results, type, visible, setVisible, selectedItem, setSelectedItem } = useSearchContext();
+    const {
+        type,
+        catalog,
+        visible,
+        parentId,
+        selectedItem,
+        setVisible,
+        setLoading,
+        setParentId,
+        setSelectedItem,
+    } = useSearchContext();
+    const searchRef = createRef<HTMLInputElement>();
     const resultsRef = createRef<HTMLDivElement>();
+    const [search, setSearch] = useState('');
+
+    const results = useMemo(() => {
+        return getResultsByParentId(catalog, parentId);
+    }, [catalog, parentId]);
 
     const categories: Category[] = useMemo(() => {
         const filteredResults = fuzzySearch(search, results);
@@ -49,55 +66,69 @@ export function SearchBase (): JSX.Element {
         return Object.values(categoriesObject);
     }, [search, results]);
 
-    const doesSelectedItemExist = useCallback(() => {
-        return categories.some((cat) => cat.results.find((result) => result.id === selectedItem));
-    }, [categories, selectedItem]);
-
-    const updateSelectedItemHighlight = useCallback(() => {
-        if (!resultsRef?.current || !selectedItem || !categories) return;
-        const firstItem = categories[0].results[0].id;
-        const lastItem =
-            categories[categories.length - 1]
-                .results[categories[categories.length - 1].results.length - 1].id;
-        const el = resultsRef?.current?.querySelector(`#option-${selectedItem}`);
-        if (!el) return;
-        el.scrollIntoView({
-            behavior: 'smooth',
-            block: selectedItem === firstItem ? 'end' : selectedItem === lastItem ? 'start' : 'nearest',
-        });
-    }, [categories, resultsRef, selectedItem]);
-
-    const forceResetToFirst = useCallback(() => {
-        setSelectedItem(categories[0]?.results[0].id);
-        updateSelectedItemHighlight();
-    }, [categories, setSelectedItem, updateSelectedItemHighlight]);
+    const showIcons = useMemo(() => {
+        return results.some((result) => result.icon);
+    }, [results]);
 
     useEffect(() => {
-        if (selectedItem && doesSelectedItemExist()) return;
-        // Reset the selected item
-        setSelectedItem(categories[0]?.results[0].id);
-    }, [categories, doesSelectedItemExist, results, selectedItem, setSelectedItem]);
-
-    // When search is updated, the first result should always be selected as this will be the top result
-    useEffect(() => {
-        forceResetToFirst();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search]);
-
-    const checkForReset = useCallback(() => {
-        if (!selectedItem || !doesSelectedItemExist()) {
-            if (categories) setSelectedItem(categories[0].results[0].id);
-            else setSelectedItem(null);
-        }
-    }, [categories, doesSelectedItemExist, selectedItem, setSelectedItem]);
+        setSelectedItem(categories?.[0]?.results?.[0]?.id);
+    }, [categories, search, setSelectedItem]);
 
     useEffect(() => {
-        updateSelectedItemHighlight();
-    }, [categories, resultsRef, updateSelectedItemHighlight]);
+        // eslint-disable-next-line unicorn/no-useless-undefined
+        setSelectedItem(undefined);
+        // eslint-disable-next-line unicorn/no-useless-undefined
+        setParentId(undefined);
+        setSearch('');
+        setLoading(false);
+    }, [setLoading, setSearch, setParentId, setSelectedItem, type]);
 
-    useHotkeys('up', (ev) => {
+    useEffect(() => {
+        setSearch('');
+        setLoading(false);
+    }, [setLoading, setSearch, parentId]);
+
+    useEffect(() => {
+        searchRef.current?.focus?.();
+    }, [searchRef]);
+
+    useHotkeys('backspace', (ev) => {
+        if (search.length > 0 || !parentId) return;
         preventDefault(ev);
-        checkForReset();
+        const parent = getResultById(catalog, parentId);
+        setParentId(parent?.parent);
+    }, {
+        enabled: visible && !!parentId,
+        enableOnTags: ['INPUT', 'TEXTAREA'],
+    }, [search, catalog, parentId]);
+
+    useHotkeys('enter', (e) => {
+        preventDefault(e);
+        if (type === 'input') {
+            const ev = new CustomEvent(SEARCH_CLOSED_EVENT_KEY, {
+                bubbles: false,
+                detail: {
+                    value: search,
+                } as SearchCloseEvent,
+            });
+            document.dispatchEvent(ev);
+        } else {
+            if (!selectedItem) return;
+            const item = getResultById(catalog, selectedItem);
+            if (!item) return;
+            if (!item.children?.length) {
+                item.action(item);
+                return;
+            }
+            setParentId(item.id);
+        }
+    }, {
+        enabled: visible,
+        enableOnTags: ['INPUT', 'TEXTAREA'],
+    }, [search, selectedItem, type]);
+
+    useHotkeys('up', (e) => {
+        preventDefault(e);
         for (const category of categories) {
             const indexInCategory = category.results.findIndex((result) => result.id === selectedItem);
             if (indexInCategory === -1) continue;
@@ -114,13 +145,12 @@ export function SearchBase (): JSX.Element {
             setSelectedItem(category.results[indexInCategory - 1].id);
         }
     }, {
-        enabled: visible,
+        enabled: visible && !!categories?.length,
         enableOnTags: ['INPUT', 'TEXTAREA'],
     }, [categories, selectedItem, setSelectedItem]);
 
-    useHotkeys('down', (ev) => {
-        preventDefault(ev);
-        checkForReset();
+    useHotkeys('down', (e) => {
+        preventDefault(e);
         for (const category of categories) {
             const indexInCategory = category.results.findIndex((result) => result.id === selectedItem);
             if (indexInCategory === -1) continue;
@@ -137,42 +167,14 @@ export function SearchBase (): JSX.Element {
             setSelectedItem(category.results[indexInCategory + 1].id);
         }
     }, {
-        enabled: visible,
+        enabled: visible && !!categories?.length,
         enableOnTags: ['INPUT', 'TEXTAREA'],
     }, [categories, selectedItem, setSelectedItem]);
-
-    useHotkeys('enter', (e) => {
-        preventDefault(e);
-        let result: string | undefined;
-        if (type === 'input') {
-            result = search;
-        } else {
-            if (!selectedItem) return;
-            // get the result from the selected item
-            for (const category of categories) {
-                const r = category.results.find((result) => result.id === selectedItem);
-                if (r) {
-                    result = r.id;
-                    break;
-                }
-            }
-        }
-        const ev = new CustomEvent(PICKED_RESULT_EVENT_KEY, {
-            bubbles: false,
-            detail: {
-                value: result,
-            } as ResultPickedEvent,
-        });
-        document.dispatchEvent(ev);
-    }, {
-        enabled: visible,
-        enableOnTags: ['INPUT', 'TEXTAREA'],
-    }, [search, selectedItem, type]);
 
     return (
         <Overlay visible={visible} setVisible={setVisible}>
             <Container className={`spotlight-search-box ${!showIcons ? ' spotlight-search-box-no-icons' : ''}`.trim()}>
-                <SearchInput type={type} />
+                <SearchInput type={type} forwardRef={searchRef} value={search} onValueChange={(v) => setSearch(v)} />
                 {categories.length > 0 && (
                     <div className='spotlight-search-results' ref={resultsRef}>
                         {categories.map((category: Category) => (

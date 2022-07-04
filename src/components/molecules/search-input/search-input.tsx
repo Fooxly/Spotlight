@@ -7,17 +7,16 @@ import { SearchType, useSearchContext } from '@/utils';
 
 export interface SearchInputProps {
     type: SearchType;
-    loading?: boolean;
     forwardRef?: React.Ref<HTMLInputElement>;
-    onValueChange?: (value: string) => void;
+    value: string;
+    onValueChange: (value: string) => void;
 }
 
-export function SearchInput ({ type, loading, forwardRef, onValueChange }: SearchInputProps): JSX.Element {
-    const { placeholder, search, setSearch } = useSearchContext();
+export function SearchInput ({ type, forwardRef, value, onValueChange }: SearchInputProps): JSX.Element {
+    const { placeholder, loading } = useSearchContext();
 
     const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-        onValueChange?.(e.target.value);
-        setSearch(e.target.value);
+        onValueChange(e.target.value);
     };
 
     const formattedPlaceholder = useMemo(() => {
@@ -35,8 +34,9 @@ export function SearchInput ({ type, loading, forwardRef, onValueChange }: Searc
                 placeholder={formattedPlaceholder}
                 className='spotlight-search-input-input'
                 type='text'
-                value={search ?? ''}
+                value={value ?? ''}
                 onChange={handleValueChange}
+                disabled={loading}
             />
             <div className='spotlight-search-input-icon'>
                 {type === 'select' || type === 'input' ? (
@@ -47,8 +47,8 @@ export function SearchInput ({ type, loading, forwardRef, onValueChange }: Searc
                     <SearchIcon size={24} color='gray4' />
                 )}
             </div>
-            {(search?.length ?? 0) > 0 && (
-                <button className='spotlight-search-input-clear' onClick={() => setSearch('')}>
+            {(value?.length ?? 0) > 0 && (
+                <button className='spotlight-search-input-clear' onClick={() => onValueChange('')}>
                     <TimesIcon size={8} color='gray10' />
                 </button>
             )}

@@ -16,6 +16,6 @@ export interface QuestionEvent {
 export interface QuestionResponseEvent {
     value?: string;
 }
-export interface ResultPickedEvent {
+export interface SearchCloseEvent {
     value?: string;
 }

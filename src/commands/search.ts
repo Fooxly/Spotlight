@@ -41,6 +41,7 @@ export function registerCommand (
     Registry.push({
         id: getUUID(),
         type: 'command',
+        key: title,
         label: title,
         action,
         category: options?.category ?? 'Commands',

@@ -11,5 +11,5 @@ export const TOAST_EVENT_KEY = '__fooxly_spotlight_toast_message__';
 
 export const QUESTION_EVENT_KEY = '__fooxly_spotlight_question__';
 export const QUESTION_RESULT_EVENT_KEY = '__fooxly_spotlight_question_result__';
-export const PICKED_RESULT_EVENT_KEY = '__fooxly_spotlight_picked_result__';
+export const SEARCH_INPUT_RESULT_EVENT_KEY = '__fooxly_spotlight_search_result__';
 export const SEARCH_CLOSED_EVENT_KEY = '__fooxly_spotlight_search_closed__';

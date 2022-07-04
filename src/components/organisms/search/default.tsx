@@ -2,12 +2,13 @@ import { useCallback, useEffect } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import {
-    PICKED_RESULT_EVENT_KEY,
+    getUUID,
     Registry,
     REGISTRY_UPDATE_EVENT_KEY,
     useSearchContext,
 } from '@/utils';
-import { RegistryItem, Result, ResultPickedEvent, SpotlightOptions } from '@/types';
+import { Answer, RegistryItem, Result, SpotlightOptions } from '@/types';
+import { getResultById } from '@/utils/search';
 
 import './styles.css';
 
@@ -20,85 +21,96 @@ export function Default (props: SpotlightOptions): null {
     const {
         type,
         visible,
-        search,
-        results,
+        catalog,
         selectedItem,
         setType,
         setVisible,
-        setResults,
-        setShowIcons,
+        setCatalog,
         setPlaceholder,
         setSelectedItem,
+        setLoading,
     } = useSearchContext();
 
-    const handleSpotlightUpdate = useCallback(() => {
-        const formatResult = (item: RegistryItem): Result => {
-            return {
-                id: item.id,
-                key: item.label,
-                label: item.label,
-                type: item.type,
-                icon: item.icon,
-                iconColor: item.iconColor,
-                category: item.category,
-                // children: item.options?.map((option) => formatResult(option)),
-                // action: item.action,
-            };
+    const handleSpotlightEnd = useCallback(() => {
+        setVisible(false);
+        setLoading(false);
+        // eslint-disable-next-line unicorn/no-useless-undefined
+        setSelectedItem(undefined);
+    }, [setLoading, setSelectedItem, setVisible]);
+
+    const handleAction = useCallback(async (result: Result, value?: string) => {
+        console.log(result.id);
+        if (result.parent) {
+            await handleAction(getResultById(catalog, result.parent)!, value);
+            return;
+        }
+        // get the registry item based on the result
+        const item = Registry.find((item) => item.id === result.id);
+        console.log(result.key, value);
+        // TODO: handle the action from the registry item
+        // TODO: update loading if there is a promise
+        const actionResult = await item?.action(value);
+        // TODO: handle errors with error widget
+        handleSpotlightEnd();
+    }, [catalog, handleSpotlightEnd]);
+
+    const formatAnswers = useCallback((item: Answer | string, parentId: string, parentObject?: Answer | RegistryItem): Result => {
+        // const id = `${parentId}-${typeof item === 'string' ? item : item.key}`;
+        const id = getUUID();
+        return {
+            type: 'option',
+            id,
+            key: typeof item === 'string' ? item : item.key,
+            label: typeof item === 'string' ? item : item.label ?? item.key,
+            icon: typeof item === 'string' ? undefined : item.icon,
+            iconColor: typeof item === 'string' ? undefined : item.iconColor,
+            category: parentObject?.label ?? '',
+            action: (result) => handleAction(result, result.key),
+            parent: parentId,
+            children:
+                typeof item === 'string' ? undefined : item.options?.map((option) => formatAnswers(option, id, parentObject)),
         };
+    }, [handleAction]);
 
-        // const selectedItemKey = results.find((result) => result.id === selectedItem)?.key;
-        // TODO: handle action and child options
+    const formatResult = useCallback((item: RegistryItem): Result => {
+        return {
+            id: item.id,
+            key: item.label,
+            label: item.label,
+            type: item.type,
+            icon: item.icon,
+            iconColor: item.iconColor,
+            category: item.category,
+            action: (result) => handleAction(result, result.key),
+            children: item.options?.map((option) => formatAnswers(option, item.id, item)),
+        };
+    }, [formatAnswers, handleAction]);
+
+    const handleSpotlightUpdate = useCallback(() => {
         const newResults: Result[] = Registry.map((item) => formatResult(item));
-
-        setShowIcons(newResults.some((result) => result.icon));
-        setResults(newResults);
-    }, [setResults, setShowIcons]);
+        setCatalog(newResults);
+    }, [formatResult, setCatalog]);
 
     const handleSpotlightStart = useCallback(() => {
         handleSpotlightUpdate();
-        setPlaceholder(null);
+        // eslint-disable-next-line unicorn/no-useless-undefined
+        setPlaceholder(undefined);
         setType('search');
         setVisible(true);
     }, [handleSpotlightUpdate, setPlaceholder, setType, setVisible]);
 
-    const handleSpotlightEnd = useCallback(() => {
-        setVisible(false);
-        setResults([]);
-        setSelectedItem(null);
-    }, [setResults, setSelectedItem, setVisible]);
-
-    const handlePickedResult = useCallback((ev: CustomEvent<ResultPickedEvent>) => {
-        if (type !== 'search') return;
-        console.log(results.find((result) => result.id === ev.detail.value)?.key);
-    }, [type, results]);
-
     useEffect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        document.removeEventListener(REGISTRY_UPDATE_EVENT_KEY, handleSpotlightUpdate as any);
         if (type === 'search') {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             document.addEventListener(REGISTRY_UPDATE_EVENT_KEY, handleSpotlightUpdate as any);
-        } else {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            document.removeEventListener(REGISTRY_UPDATE_EVENT_KEY, handleSpotlightUpdate as any);
         }
         return () => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             document.removeEventListener(REGISTRY_UPDATE_EVENT_KEY, handleSpotlightUpdate as any);
         };
     }, [handleSpotlightUpdate, type]);
-
-    useEffect(() => {
-        if (type === 'search') {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            document.addEventListener(PICKED_RESULT_EVENT_KEY, handlePickedResult as any);
-        } else {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            document.removeEventListener(PICKED_RESULT_EVENT_KEY, handlePickedResult as any);
-        }
-        return () => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            document.removeEventListener(PICKED_RESULT_EVENT_KEY, handlePickedResult as any);
-        };
-    }, [handlePickedResult, type]);
 
     useHotkeys(props.spotlightShortcut!, (ev) => {
         preventDefault(ev);
@@ -107,7 +119,7 @@ export function Default (props: SpotlightOptions): null {
     }, {
         enabled: type === 'search',
         enableOnTags: ['INPUT', 'TEXTAREA'],
-    }, [visible, search, selectedItem, type]);
+    }, [visible, selectedItem, type]);
 
     return null;
 }

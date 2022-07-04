@@ -1,7 +1,7 @@
 import React, { MouseEvent, useMemo } from 'react';
 
-import { Result, ResultPickedEvent } from '@/types';
-import { getLocalIcon, PICKED_RESULT_EVENT_KEY, useSearchContext } from '@/utils';
+import { Result } from '@/types';
+import { getLocalIcon, useSearchContext } from '@/utils';
 import { Icons } from '@/utils/constants/icons';
 
 import './styles.css';
@@ -14,7 +14,7 @@ let lastMouseX = -1;
 let lastMouseY = -1;
 
 export function SearchResult ({ result }: Props): JSX.Element {
-    const { selectedItem, setSelectedItem } = useSearchContext();
+    const { selectedItem, setSelectedItem, setParentId } = useSearchContext();
 
     const TypeText = useMemo(() => {
         if (result.type === 'option') return 'Select option';
@@ -52,13 +52,11 @@ export function SearchResult ({ result }: Props): JSX.Element {
     };
 
     const handlePickResult = () => {
-        const ev = new CustomEvent(PICKED_RESULT_EVENT_KEY, {
-            bubbles: false,
-            detail: {
-                value: result.id,
-            } as ResultPickedEvent,
-        });
-        document.dispatchEvent(ev);
+        if (!result.children?.length) {
+            result.action(result);
+            return;
+        }
+        setParentId(result.id);
     };
 
     return (
