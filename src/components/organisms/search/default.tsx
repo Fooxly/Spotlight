@@ -25,7 +25,6 @@ export function Default (props: SpotlightOptions): null {
         selectedItem,
         setType,
         setVisible,
-        getCatalog,
         setCatalog,
         setPlaceholder,
         setSelectedItem,
@@ -43,7 +42,6 @@ export function Default (props: SpotlightOptions): null {
 
     const handleAction = useCallback(async (result: Result, value?: string) => {
         console.log(catalog?.[0]?.children?.[0]?.id, result.id);
-        console.log(getCatalog()?.[0]?.children?.[0]?.id, result.id);
         if (result.parent) {
             // await handleAction(getResultById(catalog, result.parent)!, value);
             return;
@@ -61,7 +59,7 @@ export function Default (props: SpotlightOptions): null {
         setLoading(false);
         // TODO: handle errors with error widget
         handleSpotlightEnd();
-    }, [catalog, getCatalog, handleSpotlightEnd, setLoading]);
+    }, [catalog, handleSpotlightEnd, setLoading]);
 
     const formatAnswers = useCallback((item: Answer | string, parentId: string, parentObject?: Answer | RegistryItem): Result => {
         // const id = `${parentId}-${typeof item === 'string' ? item : item.key}`;
