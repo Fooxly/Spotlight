@@ -10,6 +10,8 @@ export interface SearchContextProps {
     setType: (type: SearchType) => void;
     visible: boolean;
     setVisible: (visible: boolean) => void;
+    error: string | undefined;
+    setError: (error: string | undefined) => void;
     parentId: string | undefined;
     setParentId: (parentId: string | undefined) => void;
     catalog: Result[];
@@ -27,6 +29,8 @@ export const SearchContext = createContext<SearchContextProps>({
     setType: () => {},
     visible: false,
     setVisible: () => {},
+    error: undefined,
+    setError: () => {},
     parentId: undefined,
     setParentId: () => {},
     catalog: [],

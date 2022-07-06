@@ -1,4 +1,5 @@
 export * from './catelog';
+export * from './errors';
 export * from './icons';
 export * from './spotlight-registry';
 

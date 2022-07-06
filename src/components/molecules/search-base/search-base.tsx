@@ -3,6 +3,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 
 import { SearchInput } from '../search-input';
 import { SearchSection } from '../search-section';
+import { SearchError } from '../search-error';
 
 import { getResultById, getResultsByParentId } from '@/utils/search';
 import { Container, Overlay } from '@/components/atoms';
@@ -32,7 +33,8 @@ export function SearchBase (): JSX.Element {
     const [search, setSearch] = useState('');
 
     const results = useMemo(() => {
-        return getResultsByParentId(catalog.items, parentId);
+        return getResultsByParentId(parentId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [catalog.items, parentId]);
 
     const categories: Category[] = useMemo(() => {
@@ -94,7 +96,7 @@ export function SearchBase (): JSX.Element {
     useHotkeys('backspace', (ev) => {
         if (search.length > 0 || !parentId) return;
         preventDefault(ev);
-        const parent = getResultById(catalog.items, parentId);
+        const parent = getResultById(parentId);
         setParentId(parent?.parent);
     }, {
         enabled: visible && !!parentId,
@@ -113,7 +115,7 @@ export function SearchBase (): JSX.Element {
             document.dispatchEvent(ev);
         } else {
             if (!selectedItem) return;
-            const item = getResultById(catalog.items, selectedItem);
+            const item = getResultById(selectedItem);
             if (!item) return;
             if (!item.children?.length) {
                 item.action(item);
@@ -174,6 +176,7 @@ export function SearchBase (): JSX.Element {
         <Overlay visible={visible} setVisible={setVisible}>
             <Container className={`spotlight-search-box ${!showIcons ? ' spotlight-search-box-no-icons' : ''}`.trim()}>
                 <SearchInput type={type} forwardRef={searchRef} value={search} onValueChange={(v) => setSearch(v)} />
+                <SearchError />
                 {categories.length > 0 && (
                     <div className='spotlight-search-results' ref={resultsRef}>
                         {categories.map((category: Category) => (

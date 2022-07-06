@@ -16,11 +16,14 @@ export function Question (): null {
     const {
         type,
         setType,
+        setError,
         setVisible,
         setPlaceholder,
     } = useSearchContext();
 
     const handleQuestionEnd = useCallback((result?: string) => {
+        // eslint-disable-next-line unicorn/no-useless-undefined
+        setError(undefined);
         // Reset the type
         setType('search');
         // Submit the result to the command handler
@@ -33,7 +36,7 @@ export function Question (): null {
         document.dispatchEvent(ev);
         // Hide the search view
         setVisible(false);
-    }, [setType, setVisible]);
+    }, [setError, setType, setVisible]);
 
     const handleCloseEvent = useCallback((ev: CustomEvent<SearchCloseEvent>) => {
         handleQuestionEnd(type !== 'input' ? undefined : ev.detail.value);
@@ -72,8 +75,10 @@ export function Question (): null {
             // If there is no answer, set the placeholder
             setPlaceholder(ev.detail.question);
         }
+        // eslint-disable-next-line unicorn/no-useless-undefined
+        setError(undefined);
         setVisible(true);
-    }, [setType, setVisible, handleResultPicked, setPlaceholder]);
+    }, [setType, setError, setVisible, handleResultPicked, setPlaceholder]);
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

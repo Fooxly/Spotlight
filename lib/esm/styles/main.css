@@ -55,6 +55,7 @@
   --color-gray3: #636366;
   --color-gray2: #3A3A3C;
   --color-gray1: #000000;
+  --color-error-background: rgba(255, 59, 48, 0.3764705882);
 }
 #spotlight.spotlight-dark {
   --light: false;
@@ -77,6 +78,7 @@
   --color-gray3: #C7C7CC;
   --color-gray2: #E5E5EA;
   --color-gray1: #FFFFFF;
+  --color-error-background: rgba(255, 69, 58, 0.3764705882);
 }
 #spotlight * {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;

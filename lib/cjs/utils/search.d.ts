@@ -1,3 +1,3 @@
 import { Result } from '../types';
-export declare function getResultById(catalog: Result[], id?: string): Result | undefined;
-export declare function getResultsByParentId(catalog: Result[], parentId?: string): Result[];
+export declare function getResultById(id?: string, results?: Result[]): Result | undefined;
+export declare function getResultsByParentId(parentId?: string, results?: Result[]): Result[];

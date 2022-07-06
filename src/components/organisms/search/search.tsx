@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 
 import { Question } from './question';
 import { Default } from './default';
@@ -12,6 +12,7 @@ import './styles.css';
 export function Search (props: SpotlightOptions): JSX.Element {
     const [type, setType] = useState<SearchType>('search');
     const [visible, setVisible] = useState<boolean>(false);
+    const [error, setError] = useState<string | undefined>();
     const [catalog, setCatalog] = useState<Result[]>([]);
     const [parentId, setParentId] = useState<string | undefined>();
     const [placeholder, setPlaceholder] = useState<string | undefined>();
@@ -24,6 +25,8 @@ export function Search (props: SpotlightOptions): JSX.Element {
             setType,
             visible,
             setVisible,
+            error,
+            setError,
             catalog,
             setCatalog,
             parentId,

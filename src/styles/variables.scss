@@ -82,6 +82,11 @@ $themes: (
         light: #000000,
         dark: #FFFFFF,
     ),
+    // Custom colors
+    color-error-background: (
+        light: #FF3B3060,
+        dark: #FF453A60,
+    )
 );
 
 @mixin styles($mode) {

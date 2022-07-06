@@ -6,6 +6,8 @@ export interface SearchContextProps {
     setType: (type: SearchType) => void;
     visible: boolean;
     setVisible: (visible: boolean) => void;
+    error: string | undefined;
+    setError: (error: string | undefined) => void;
     parentId: string | undefined;
     setParentId: (parentId: string | undefined) => void;
     catalog: Result[];
