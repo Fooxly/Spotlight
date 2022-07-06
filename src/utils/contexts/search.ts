@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { createContext, useContext } from 'react';
 
-import { Result } from '@/types';
+import type { Result } from '@/types';
 
 export type SearchType = 'select' | 'input' | 'search';
 

@@ -6,7 +6,7 @@ import { SearchSection } from '../search-section';
 
 import { getResultById, getResultsByParentId } from '@/utils/search';
 import { Container, Overlay } from '@/components/atoms';
-import { getUUID, useSearchContext, fuzzySearch, SEARCH_CLOSED_EVENT_KEY } from '@/utils';
+import { getUUID, useSearchContext, fuzzySearch, SEARCH_CLOSED_EVENT_KEY, catalog } from '@/utils';
 import { Category, SearchCloseEvent } from '@/types';
 
 import './styles.css';
@@ -19,7 +19,6 @@ const preventDefault = (ev: KeyboardEvent) => {
 export function SearchBase (): JSX.Element {
     const {
         type,
-        catalog,
         visible,
         parentId,
         selectedItem,
@@ -33,8 +32,8 @@ export function SearchBase (): JSX.Element {
     const [search, setSearch] = useState('');
 
     const results = useMemo(() => {
-        return getResultsByParentId(catalog, parentId);
-    }, [catalog, parentId]);
+        return getResultsByParentId(catalog.items, parentId);
+    }, [catalog.items, parentId]);
 
     const categories: Category[] = useMemo(() => {
         const filteredResults = fuzzySearch(search, results);
@@ -95,7 +94,7 @@ export function SearchBase (): JSX.Element {
     useHotkeys('backspace', (ev) => {
         if (search.length > 0 || !parentId) return;
         preventDefault(ev);
-        const parent = getResultById(catalog, parentId);
+        const parent = getResultById(catalog.items, parentId);
         setParentId(parent?.parent);
     }, {
         enabled: visible && !!parentId,
@@ -114,7 +113,7 @@ export function SearchBase (): JSX.Element {
             document.dispatchEvent(ev);
         } else {
             if (!selectedItem) return;
-            const item = getResultById(catalog, selectedItem);
+            const item = getResultById(catalog.items, selectedItem);
             if (!item) return;
             if (!item.children?.length) {
                 item.action(item);

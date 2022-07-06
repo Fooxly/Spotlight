@@ -1,3 +1,4 @@
+export * from './catelog';
 export * from './icons';
 export * from './spotlight-registry';
 

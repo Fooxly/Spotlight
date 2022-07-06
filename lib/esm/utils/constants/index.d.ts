@@ -1,3 +1,4 @@
+export * from './catelog';
 export * from './icons';
 export * from './spotlight-registry';
 export declare const HISTORY_KEY = "__fooxly_spotlight_history__";

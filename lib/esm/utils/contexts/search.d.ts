@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { Result } from '../../types';
+import type { Result } from '../../types';
 export declare type SearchType = 'select' | 'input' | 'search';
 export interface SearchContextProps {
     type: SearchType;

@@ -5,6 +5,7 @@ import {
     QUESTION_EVENT_KEY,
     QUESTION_RESULT_EVENT_KEY,
     SEARCH_CLOSED_EVENT_KEY,
+    updateCatalog,
     useSearchContext,
 } from '@/utils';
 import { Answer, QuestionEvent, QuestionResponseEvent, Result, SearchCloseEvent } from '@/types';
@@ -16,7 +17,6 @@ export function Question (): null {
         type,
         setType,
         setVisible,
-        setCatalog,
         setPlaceholder,
     } = useSearchContext();
 
@@ -67,13 +67,13 @@ export function Question (): null {
         setType(ev.detail.options?.length ? 'select' : 'input');
         if (ev.detail.options?.length) {
             // Create the catalog
-            setCatalog(ev.detail.options.map((option) => formatResult(option)));
+            updateCatalog(ev.detail.options.map((option) => formatResult(option)));
         } else {
             // If there is no answer, set the placeholder
             setPlaceholder(ev.detail.question);
         }
         setVisible(true);
-    }, [setType, setVisible, handleResultPicked, setCatalog, setPlaceholder]);
+    }, [setType, setVisible, handleResultPicked, setPlaceholder]);
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

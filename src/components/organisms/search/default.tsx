@@ -3,6 +3,8 @@ import { useHotkeys } from 'react-hotkeys-hook';
 
 import {
     getUUID,
+    catalog,
+    updateCatalog,
     Registry,
     REGISTRY_UPDATE_EVENT_KEY,
     useSearchContext,
@@ -21,11 +23,9 @@ export function Default (props: SpotlightOptions): null {
     const {
         type,
         visible,
-        catalog,
         selectedItem,
         setType,
         setVisible,
-        setCatalog,
         setPlaceholder,
         setSelectedItem,
         setLoading,
@@ -38,10 +38,10 @@ export function Default (props: SpotlightOptions): null {
         setSelectedItem(undefined);
     }, [setLoading, setSelectedItem, setVisible]);
 
-    console.log('up to date catalog', catalog?.[0]?.children?.[0]?.id);
+    console.log('up to date catalog', catalog.items?.[0]?.children?.[0]?.id);
 
     const handleAction = useCallback(async (result: Result, value?: string) => {
-        console.log(catalog?.[0]?.children?.[0]?.id, result.id);
+        console.log(catalog.items?.[0]?.children?.[0]?.id, result.id);
         if (result.parent) {
             // await handleAction(getResultById(catalog, result.parent)!, value);
             return;
@@ -59,7 +59,7 @@ export function Default (props: SpotlightOptions): null {
         setLoading(false);
         // TODO: handle errors with error widget
         handleSpotlightEnd();
-    }, [catalog, handleSpotlightEnd, setLoading]);
+    }, [handleSpotlightEnd, setLoading]);
 
     const formatAnswers = useCallback((item: Answer | string, parentId: string, parentObject?: Answer | RegistryItem): Result => {
         // const id = `${parentId}-${typeof item === 'string' ? item : item.key}`;
@@ -96,8 +96,8 @@ export function Default (props: SpotlightOptions): null {
     const handleSpotlightUpdate = useCallback(() => {
         console.log('updating catalog');
         const newResults: Result[] = Registry.map((item) => formatResult(item));
-        setCatalog(newResults);
-    }, [formatResult, setCatalog]);
+        updateCatalog(newResults);
+    }, [formatResult]);
 
     const handleSpotlightStart = useCallback(() => {
         handleSpotlightUpdate();
