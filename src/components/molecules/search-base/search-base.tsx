@@ -4,6 +4,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { SearchInput } from '../search-input';
 import { SearchSection } from '../search-section';
 import { SearchError } from '../search-error';
+import { SearchTips } from '../search-tips';
 
 import { getResultById, getResultsByParentId } from '@/utils/search';
 import { Container, Overlay } from '@/components/atoms';
@@ -179,6 +180,7 @@ export function SearchBase (): JSX.Element {
                 <SearchError />
                 {categories.length > 0 && (
                     <div className='spotlight-search-results' ref={resultsRef}>
+                        <SearchTips visible={search.length === 0} />
                         {categories.map((category: Category) => (
                             <SearchSection category={category} key={category.id} />
                         ))}

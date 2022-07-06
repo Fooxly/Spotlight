@@ -24,10 +24,16 @@
   border: 0;
   outline: 0;
   background-color: transparent;
+  border-radius: 8px;
   cursor: pointer;
   width: 30px;
   height: 30px;
   margin-left: 15px;
+  transition: background-color 0.2s ease-in-out;
+  will-change: background-color;
+}
+.spotlight-search-error > button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 /*# sourceMappingURL=styles.css.map */

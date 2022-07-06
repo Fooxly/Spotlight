@@ -2,6 +2,8 @@
 import type { Result } from '../../types';
 export declare type SearchType = 'select' | 'input' | 'search';
 export interface SearchContextProps {
+    devMode: boolean;
+    showTips: boolean;
     type: SearchType;
     setType: (type: SearchType) => void;
     visible: boolean;

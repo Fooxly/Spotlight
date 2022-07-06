@@ -50,6 +50,8 @@ export function Default (props: SpotlightOptions): null {
     }, [handleSpotlightEnd, setLoading, setParentId]);
 
     const handleAction = useCallback(async (result: Result, value?: string) => {
+        // eslint-disable-next-line unicorn/no-useless-undefined
+        setError(undefined);
         if (result.parent) {
             await handleAction(getResultById(result.parent)!, value);
             return;

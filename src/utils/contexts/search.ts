@@ -6,6 +6,10 @@ import type { Result } from '@/types';
 export type SearchType = 'select' | 'input' | 'search';
 
 export interface SearchContextProps {
+    // Spotlight props
+    devMode: boolean;
+    showTips: boolean;
+    // Handling of spotlight
     type: SearchType;
     setType: (type: SearchType) => void;
     visible: boolean;
@@ -25,6 +29,8 @@ export interface SearchContextProps {
 }
 
 export const SearchContext = createContext<SearchContextProps>({
+    devMode: false,
+    showTips: false,
     type: 'search',
     setType: () => {},
     visible: false,
