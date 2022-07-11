@@ -20,8 +20,12 @@
     height: 35px;
   }
 }
+.spotlight-search-result:disabled {
+  cursor: default;
+}
 .spotlight-search-result.spotlight-search-result-selected {
   background-color: var(--color-gray9);
+  cursor: pointer !important;
 }
 .spotlight-search-result.spotlight-search-result-selected .spotlight-search-result-type {
   opacity: 1;

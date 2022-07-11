@@ -17,6 +17,7 @@ export function Question (): null {
         type,
         setType,
         setError,
+        setLoading,
         setVisible,
         setPlaceholder,
     } = useSearchContext();
@@ -64,21 +65,22 @@ export function Question (): null {
                     typeof item === 'string' ? undefined : item.options?.map((option) => formatResult(option, id, parentObject)),
             };
         };
-
         // Set default values for the question input
-        // eslint-disable-next-line unicorn/no-useless-undefined
-        setType(ev.detail.options?.length ? 'select' : 'input');
         if (ev.detail.options?.length) {
             // Create the catalog
             updateCatalog(ev.detail.options.map((option) => formatResult(option)));
         } else {
             // If there is no answer, set the placeholder
             setPlaceholder(ev.detail.question);
+            updateCatalog([]);
         }
+        setLoading(false);
         // eslint-disable-next-line unicorn/no-useless-undefined
         setError(undefined);
+        // eslint-disable-next-line unicorn/no-useless-undefined
+        setType(ev.detail.options?.length ? 'select' : 'input');
         setVisible(true);
-    }, [setType, setError, setVisible, handleResultPicked, setPlaceholder]);
+    }, [setType, setLoading, setError, setVisible, handleResultPicked, setPlaceholder]);
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

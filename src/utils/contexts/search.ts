@@ -1,9 +1,14 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { createContext, useContext } from 'react';
 
+import { ERRORS } from '../constants';
+
 import type { Result } from '@/types';
 
 export type SearchType = 'select' | 'input' | 'search';
+
+export interface ErrorObject { error: ERRORS; props?: { [key: string]: any }}
+export type Error = ERRORS | ErrorObject;
 
 export interface SearchContextProps {
     // Spotlight props
@@ -14,8 +19,8 @@ export interface SearchContextProps {
     setType: (type: SearchType) => void;
     visible: boolean;
     setVisible: (visible: boolean) => void;
-    error: string | undefined;
-    setError: (error: string | undefined) => void;
+    error: Error | undefined;
+    setError: (error: Error | undefined) => void;
     parentId: string | undefined;
     setParentId: (parentId: string | undefined) => void;
     catalog: Result[];

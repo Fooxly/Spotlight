@@ -5,9 +5,9 @@
     ],
     "overrides": [
         {
-            "files": ["./server/src/**/*.ts"],
+            "files": ["./src/server/**/*.ts"],
             "parserOptions": {
-                "project": "./server/tsconfig.json"
+                "project": "./tsconfig.cjs.json"
             }
         }
     ],

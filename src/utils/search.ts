@@ -3,7 +3,7 @@ import { catalog } from './constants';
 import { Result } from '@/types';
 
 export function getResultById (id?: string, results?: Result[]): Result | undefined {
-    const resultsArr = results ?? catalog.items;
+    const resultsArr = results ?? catalog.store;
     if (!id) return undefined;
     for (const item of resultsArr) {
         if (item.id === id) {
@@ -21,8 +21,9 @@ export function getResultById (id?: string, results?: Result[]): Result | undefi
 
 export function getResultsByParentId (parentId?: string, results?: Result[]): Result[] {
     const resultsArr = results ?? catalog.items;
+    if (!resultsArr?.length) return [];
     if (!parentId) {
-        return resultsArr;
+        return [...resultsArr];
     }
     // Deep search trough all the results and children props to find an object with the parent id
     for (const item of resultsArr) {
@@ -32,7 +33,7 @@ export function getResultsByParentId (parentId?: string, results?: Result[]): Re
         if (item.children?.length) {
             const results = getResultsByParentId(parentId, item.children);
             if (results.length > 0) {
-                return results;
+                return [...results];
             }
         }
     }

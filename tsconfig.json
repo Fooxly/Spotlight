@@ -6,7 +6,7 @@
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "esnext",
     ],
     "declaration": true,
     "allowJs": true,

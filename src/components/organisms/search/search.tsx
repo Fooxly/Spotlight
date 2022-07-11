@@ -4,7 +4,7 @@ import { Question } from './question';
 import { Default } from './default';
 
 import { SearchBase } from '@/components/molecules';
-import { SearchContext, SearchType } from '@/utils';
+import { Error, SearchContext, SearchType } from '@/utils';
 import { Result, SpotlightOptions } from '@/types';
 
 import './styles.css';
@@ -12,7 +12,7 @@ import './styles.css';
 export function Search (props: SpotlightOptions): JSX.Element {
     const [type, setType] = useState<SearchType>('search');
     const [visible, setVisible] = useState<boolean>(false);
-    const [error, setError] = useState<string | undefined>();
+    const [error, setError] = useState<Error | undefined>();
     const [catalog, setCatalog] = useState<Result[]>([]);
     const [parentId, setParentId] = useState<string | undefined>();
     const [placeholder, setPlaceholder] = useState<string | undefined>();

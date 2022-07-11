@@ -1,8 +1,15 @@
-import { Answer, QuestionEvent, QuestionResponseEvent, RegisterOptions } from '@/types';
-import { Registry, QUESTION_EVENT_KEY, QUESTION_RESULT_EVENT_KEY, REGISTRY_UPDATE_EVENT_KEY, getUUID } from '@/utils';
+import { Answer, QuestionEvent, QuestionResponseEvent, RegisterCommandOptions, RegisterOptions } from '@/types';
+import {
+    QUESTION_EVENT_KEY,
+    QUESTION_RESULT_EVENT_KEY,
+    generateId,
+    addRegistry,
+    registry,
+    FORCE_UPDATE_EVENT,
+} from '@/utils';
 
-function updateSpotlightRegistry (): void {
-    const ev = new CustomEvent(REGISTRY_UPDATE_EVENT_KEY, {
+function updateSpotlight (): void {
+    const ev = new CustomEvent(FORCE_UPDATE_EVENT, {
         bubbles: false,
     });
     document.dispatchEvent(ev);
@@ -36,18 +43,52 @@ export function question (
 export function registerCommand (
     title: string,
     action: (result?: string) => any | Promise<any | unknown | void>,
-    options?: RegisterOptions,
+    options?: RegisterCommandOptions,
 ): void {
-    Registry.push({
-        id: getUUID(),
+    addRegistry({
+        id: generateId(title),
         type: 'command',
         key: title,
         label: title,
         action,
         category: options?.category ?? 'Commands',
+        confirm: options?.confirm,
         icon: options?.icon,
         iconColor: options?.iconColor,
         options: options?.options,
     });
-    updateSpotlightRegistry();
+    setTimeout(() => {
+        updateSpotlight();
+    }, 100);
+}
+
+export function registerPage (
+    title: string,
+    page: string,
+    options?: RegisterOptions,
+): void {
+    addRegistry({
+        id: generateId(title),
+        type: 'page',
+        key: title,
+        label: title,
+        action: () => {
+            window.location.href = page;
+        },
+        category: options?.category ?? 'Pages',
+        icon: options?.icon ?? 'redirect',
+        iconColor: options?.iconColor,
+    });
+    setTimeout(() => {
+        updateSpotlight();
+    }, 100);
+}
+
+export function unregister (title: string) {
+    const index = registry.items.findIndex((item) => item.key === title);
+    if (index === -1) return;
+    registry.items.splice(index, 1);
+    setTimeout(() => {
+        updateSpotlight();
+    }, 100);
 }

@@ -48,6 +48,10 @@
             &:hover {
                 color: var(--color-teal);
             }
+
+            &:disabled {
+                opacity: 0 !important;
+            }
         }
     }
 }

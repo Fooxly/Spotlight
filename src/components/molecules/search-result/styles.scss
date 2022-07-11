@@ -20,8 +20,13 @@
         height: 35px;
     }
 
+    &:disabled {
+        cursor: default;
+    }
+
     &.spotlight-search-result-selected {
         background-color: var(--color-gray9);
+        cursor: pointer !important;
 
         .spotlight-search-result-type {
             opacity: 1;

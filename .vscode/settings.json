@@ -1,22 +1,22 @@
 {
   "files.exclude": {
-    "node_modules": true,
-    "build": true,
-    ".editorconfig": true,
-    ".gitattributes": true,
-    "craco.config.js": true,
-    "tsconfig.paths.json": true,
-    "tsconfig.json": true,
-    "yarn.lock": true,
-    ".eslintrc": true,
-    ".vscode": true,
-    "lib": true,
-    "server/dist": true,
-    "yarn-error.log": true,
-    "tsconfig.cjs.json": true,
-    ".npmignore": true,
-    ".gitignore": true,
-    ".github": true
+    "node_modules": false,
+    "build": false,
+    ".editorconfig": false,
+    ".gitattributes": false,
+    "craco.config.js": false,
+    "tsconfig.paths.json": false,
+    "tsconfig.json": false,
+    "yarn.lock": false,
+    ".eslintrc": false,
+    ".vscode": false,
+    "lib": false,
+    "server/dist": false,
+    "yarn-error.log": false,
+    "tsconfig.cjs.json": false,
+    ".npmignore": false,
+    ".gitignore": false,
+    ".github": false
   },
-  "workspace.isHidden": true
+  "workspace.isHidden": false
 }

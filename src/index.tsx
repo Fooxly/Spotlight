@@ -1,13 +1,16 @@
 /* eslint-disable @typescript-eslint/brace-style */
 import React from 'react';
 
-import { THEME_UPDATE_EVENT_KEY } from './utils';
+import { HISTORY_LENGTH_KEY, THEME_UPDATE_EVENT_KEY } from './utils';
 
 import { Appearance, SpotlightOptions } from '@/types';
 import {
     registerCommand,
+    registerPage,
+    unregister,
     question,
     toast,
+    shell,
 } from '@/commands';
 
 const DefaultConfig: SpotlightOptions = {
@@ -25,6 +28,9 @@ let lastConfigSettings = DefaultConfig;
 function config (options: SpotlightOptions) {
     // Merge the default options (or last chosen options) with the new user chosen ones
     lastConfigSettings = { ...lastConfigSettings, ...options };
+
+    localStorage.setItem(HISTORY_LENGTH_KEY, lastConfigSettings.showRecentlyUsed!.toString());
+
     // Get the major react version the project is running on
     const majorReactVersion = Number(React.version.split('.')[0]);
 
@@ -71,6 +77,9 @@ export default {
     config,
     setAppearance,
     registerCommand,
+    registerPage,
+    unregister,
     question,
     toast,
+    shell,
 };

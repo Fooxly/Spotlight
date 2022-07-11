@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useMemo, useState } from 'react';
+import React, { createRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { SearchInput } from '../search-input';
@@ -8,8 +8,17 @@ import { SearchTips } from '../search-tips';
 
 import { getResultById, getResultsByParentId } from '@/utils/search';
 import { Container, Overlay } from '@/components/atoms';
-import { getUUID, useSearchContext, fuzzySearch, SEARCH_CLOSED_EVENT_KEY, catalog } from '@/utils';
-import { Category, SearchCloseEvent } from '@/types';
+import {
+    getUUID,
+    useSearchContext,
+    fuzzySearch,
+    SEARCH_CLOSED_EVENT_KEY,
+    catalog,
+    clearHistory,
+    getHistory,
+    CATALOG_UPDATE_EVENT,
+} from '@/utils';
+import { Category, Result, SearchCloseEvent } from '@/types';
 
 import './styles.css';
 
@@ -23,6 +32,7 @@ export function SearchBase (): JSX.Element {
         type,
         visible,
         parentId,
+        loading,
         selectedItem,
         setVisible,
         setLoading,
@@ -32,14 +42,29 @@ export function SearchBase (): JSX.Element {
     const searchRef = createRef<HTMLInputElement>();
     const resultsRef = createRef<HTMLDivElement>();
     const [search, setSearch] = useState('');
+    const [forceUpdate, setForceUpdate] = useState(Date.now());
+
+    const forceUpdateEvent = useCallback(() => {
+        setForceUpdate(Date.now());
+    }, []);
+
+    useEffect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        document.addEventListener(CATALOG_UPDATE_EVENT, forceUpdateEvent as any);
+        return () => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            document.removeEventListener(CATALOG_UPDATE_EVENT, forceUpdateEvent as any);
+        };
+    }, [forceUpdateEvent]);
 
     const results = useMemo(() => {
         return getResultsByParentId(parentId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [catalog.items, parentId]);
+    }, [type, catalog.items, parentId, forceUpdate]);
 
     const categories: Category[] = useMemo(() => {
-        const filteredResults = fuzzySearch(search, results);
+        const newResults = [...(results.map((item) => ({ ...item })) ?? [])];
+        const filteredResults = fuzzySearch(search, newResults, type === 'search');
 
         // Categorise all the results
         const categoriesObject: Record<string, Category> = {};
@@ -60,21 +85,109 @@ export function SearchBase (): JSX.Element {
                     label: result.category,
                     results: [result],
                 };
+                if (result.category === 'Pages') {
+                    categoriesObject.Pages.action = {
+                        label: 'All pages',
+                        action: () => {
+                            setSearch('/');
+                        },
+                    };
+                }
+                if (result.category === 'Commands') {
+                    categoriesObject.Commands.action = {
+                        label: 'All commands',
+                        action: () => {
+                            setSearch('>');
+                        },
+                    };
+                }
+                if (result.category === 'Recently used') {
+                    categoriesObject['Recently used'].action = {
+                        label: 'Clear',
+                        action: () => {
+                            clearHistory();
+                            setForceUpdate(Date.now());
+                        },
+                    };
+                }
             } else {
                 categoriesObject[result.category].results.push(result);
             }
         }
+        const history = getHistory();
+        const categoriesArr = Object.values(categoriesObject);
+        if (categoriesObject['Recently used']?.results?.length) {
+            // Order the recently used results by most recent
+            categoriesObject['Recently used'].results.sort((a, b) => {
+                return history.indexOf(a.id) - history.indexOf(b.id);
+            });
+            // Add the recently used results to the top of the list
+            const historyIndex = categoriesArr.findIndex((category) => category.label === 'Recently used');
+            categoriesArr.splice(historyIndex, 1);
+            categoriesArr.splice(0, 0, categoriesObject['Recently used']);
+        }
         // Return an array of categories
-        return Object.values(categoriesObject);
-    }, [search, results]);
+        return categoriesArr;
+    }, [setForceUpdate, search, results, type]);
 
     const showIcons = useMemo(() => {
         return results.some((result) => result.icon);
     }, [results]);
 
+    const scrollResultIntoView = useCallback((id?: string) => {
+        const selectedId = id ?? selectedItem;
+        if (!selectedId || !resultsRef) return;
+        if (!categories?.length) return;
+        const firstItem = categories[0].results[0].id;
+        const lastItem =
+            categories[categories.length - 1]
+                .results[categories[categories.length - 1].results.length - 1].id;
+        const el = document.querySelector(`#option-${selectedId}`);
+        if (!el) return;
+        el.scrollIntoView({
+            behavior: 'smooth',
+            block: selectedId === firstItem ? 'end' : selectedId === lastItem ? 'start' : 'nearest',
+        });
+    }, [selectedItem, categories, resultsRef]);
+
     useEffect(() => {
-        setSelectedItem(categories?.[0]?.results?.[0]?.id);
-    }, [categories, search, setSelectedItem]);
+        if (!selectedItem) {
+            setSelectedItem(categories?.[0]?.results?.[0]?.id);
+            return;
+        }
+        let exists = false;
+        for (const cat of categories) {
+            for (const result of cat.results) {
+                if (result.id === selectedItem) {
+                    exists = true;
+                    break;
+                }
+            }
+        }
+        if (!exists) {
+            setSelectedItem(categories?.[0]?.results?.[0]?.id);
+        }
+    }, [categories, search, selectedItem, setSelectedItem]);
+
+    const parentIdExists = useCallback((catalog: Result[], id: string): boolean => {
+        for (const item of catalog) {
+            if (item.id === id) {
+                return true;
+            }
+            if (item.children?.length) {
+                return parentIdExists(item.children, id);
+            }
+        }
+        return false;
+    }, []);
+
+    useEffect(() => {
+        if (!parentId) return;
+        if (!parentIdExists(catalog.items, parentId)) {
+            // eslint-disable-next-line unicorn/no-useless-undefined
+            setParentId(undefined);
+        }
+    }, [categories, parentId, setParentId, parentIdExists]);
 
     useEffect(() => {
         // eslint-disable-next-line unicorn/no-useless-undefined
@@ -100,7 +213,7 @@ export function SearchBase (): JSX.Element {
         const parent = getResultById(parentId);
         setParentId(parent?.parent);
     }, {
-        enabled: visible && !!parentId,
+        enabled: visible && !!parentId && !loading,
         enableOnTags: ['INPUT', 'TEXTAREA'],
     }, [search, catalog, parentId]);
 
@@ -125,12 +238,13 @@ export function SearchBase (): JSX.Element {
             setParentId(item.id);
         }
     }, {
-        enabled: visible,
+        enabled: visible && !loading,
         enableOnTags: ['INPUT', 'TEXTAREA'],
     }, [search, selectedItem, type]);
 
     useHotkeys('up', (e) => {
         preventDefault(e);
+        if (loading) return;
         for (const category of categories) {
             const indexInCategory = category.results.findIndex((result) => result.id === selectedItem);
             if (indexInCategory === -1) continue;
@@ -141,18 +255,23 @@ export function SearchBase (): JSX.Element {
                     newCategoryIndex = categories.length - 1;
                 }
                 const newCategory = categories[newCategoryIndex];
-                setSelectedItem(newCategory.results[newCategory.results.length - 1].id);
+                const newId = newCategory.results[newCategory.results.length - 1].id;
+                setSelectedItem(newId);
+                scrollResultIntoView(newId);
                 return;
             }
-            setSelectedItem(category.results[indexInCategory - 1].id);
+            const newId = category.results[indexInCategory - 1].id;
+            setSelectedItem(newId);
+            scrollResultIntoView(newId);
         }
     }, {
         enabled: visible && !!categories?.length,
         enableOnTags: ['INPUT', 'TEXTAREA'],
-    }, [categories, selectedItem, setSelectedItem]);
+    }, [categories, selectedItem, setSelectedItem, loading, scrollResultIntoView]);
 
     useHotkeys('down', (e) => {
         preventDefault(e);
+        if (loading) return;
         for (const category of categories) {
             const indexInCategory = category.results.findIndex((result) => result.id === selectedItem);
             if (indexInCategory === -1) continue;
@@ -163,15 +282,19 @@ export function SearchBase (): JSX.Element {
                     newCategoryIndex = 0;
                 }
                 const newCategory = categories[newCategoryIndex];
-                setSelectedItem(newCategory.results[0].id);
+                const newId = newCategory.results[0].id;
+                setSelectedItem(newId);
+                scrollResultIntoView(newId);
                 return;
             }
-            setSelectedItem(category.results[indexInCategory + 1].id);
+            const newId = category.results[indexInCategory + 1].id;
+            setSelectedItem(newId);
+            scrollResultIntoView(newId);
         }
     }, {
         enabled: visible && !!categories?.length,
         enableOnTags: ['INPUT', 'TEXTAREA'],
-    }, [categories, selectedItem, setSelectedItem]);
+    }, [categories, selectedItem, setSelectedItem, loading]);
 
     return (
         <Overlay visible={visible} setVisible={setVisible}>

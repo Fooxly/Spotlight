@@ -42,5 +42,8 @@
 .spotlight-search-section .spotlight-search-section-title > button:hover {
   color: var(--color-teal);
 }
+.spotlight-search-section .spotlight-search-section-title > button:disabled {
+  opacity: 0 !important;
+}
 
 /*# sourceMappingURL=styles.css.map */

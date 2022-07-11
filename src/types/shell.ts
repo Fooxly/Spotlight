@@ -1,3 +1,8 @@
+export interface ShellOptions {
+    port?: number;
+    inExternalTerminal: boolean;
+}
+
 export interface ShellCommand {
     command: string;
     inExternalTerminal: boolean;

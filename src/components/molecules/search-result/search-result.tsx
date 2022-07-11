@@ -14,7 +14,7 @@ let lastMouseX = -1;
 let lastMouseY = -1;
 
 export function SearchResult ({ result }: Props): JSX.Element {
-    const { selectedItem, setSelectedItem, setParentId } = useSearchContext();
+    const { loading, selectedItem, setSelectedItem, setParentId } = useSearchContext();
 
     const TypeText = useMemo(() => {
         if (result.type === 'option') return 'Select option';
@@ -52,6 +52,7 @@ export function SearchResult ({ result }: Props): JSX.Element {
     };
 
     const handlePickResult = () => {
+        if (loading) return;
         if (!result.children?.length) {
             result.action(result);
             return;
@@ -67,6 +68,7 @@ export function SearchResult ({ result }: Props): JSX.Element {
             onClick={handlePickResult}
             // eslint-disable-next-line react/jsx-handler-names
             onFocus={enableFocus}
+            disabled={loading}
         >
             <div className='spotlight-search-result-left'>
                 <div className='spotlight-search-result-icon'>

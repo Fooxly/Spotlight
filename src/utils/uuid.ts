@@ -6,3 +6,13 @@ export function getUUID () {
             ).toString(16),
         );
 }
+
+export function generateId (title: string): string {
+    let hash = 0;
+    const len = title.length;
+    for (let i = 0; i < len; i++) {
+        hash = ((hash << 5) - hash) + (title.codePointAt(i) ?? 0);
+        hash = Math.trunc(hash); // to 32bit integer
+    }
+    return `${Math.abs(hash)}`;
+}

@@ -1,13 +1,15 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import {
-    getUUID,
     updateCatalog,
-    Registry,
-    REGISTRY_UPDATE_EVENT_KEY,
     useSearchContext,
     ERRORS,
+    generateId,
+    updateHistory,
+    registry,
+    FORCE_UPDATE_EVENT,
+    CATALOG_UPDATE_EVENT,
 } from '@/utils';
 import { Answer, RegistryItem, Result, SpotlightOptions } from '@/types';
 import { getResultById } from '@/utils/search';
@@ -33,6 +35,21 @@ export function Default (props: SpotlightOptions): null {
         setLoading,
     } = useSearchContext();
 
+    const [forceUpdate, setForceUpdate] = useState(Date.now());
+
+    const forceUpdateEvent = useCallback(() => {
+        setForceUpdate(Date.now());
+    }, []);
+
+    useEffect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        document.addEventListener(FORCE_UPDATE_EVENT, forceUpdateEvent as any);
+        return () => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            document.removeEventListener(FORCE_UPDATE_EVENT, forceUpdateEvent as any);
+        };
+    }, [forceUpdateEvent]);
+
     const handleSpotlightEnd = useCallback(() => {
         setVisible(false);
         setLoading(false);
@@ -53,12 +70,27 @@ export function Default (props: SpotlightOptions): null {
         // eslint-disable-next-line unicorn/no-useless-undefined
         setError(undefined);
         if (result.parent) {
-            await handleAction(getResultById(result.parent)!, value);
+            const parent = getResultById(result.parent);
+            if (!parent) {
+                // eslint-disable-next-line unicorn/no-useless-undefined
+                setParentId(undefined);
+                setError(ERRORS.PARENT_NOT_FOUND);
+                return;
+            }
+            await handleAction(parent, value);
             return;
         }
         // get the registry item based on the result
-        const item = Registry.find((item) => item.id === result.id);
+        const item = registry.items.find((item) => item.id === result.id);
         if (!item) return;
+        if (item.confirm && !confirm(
+            typeof item.confirm === 'string'
+                ? item.confirm
+                : 'Are you sure you want to continue? This could have major consequences.',
+        )) {
+            return;
+        }
+        updateHistory(result);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const actionResult = item.action(value);
         // update loading if there is a promise
@@ -67,21 +99,25 @@ export function Default (props: SpotlightOptions): null {
             void actionResult.then(() => {
                 handleSpotlightResultClicked();
             }).catch((error: { message: string; port: number; reason?: string | Error }) => {
-                let errorMessage = ERRORS[error.message] || ERRORS.UNKNOWN;
-                if (typeof error.port === 'number') errorMessage = errorMessage.replace('{{port}}', String(error.port));
-                errorMessage = errorMessage.replace('{{error.message}}', String(error.message));
-
-                setError(errorMessage);
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                const err = ERRORS[error.message as any];
+                setError({
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                    error: (err ?? ERRORS.UNKNOWN) as unknown as ERRORS,
+                    props: {
+                        port: error.port,
+                        message: error.message,
+                    },
+                });
                 setLoading(false);
             });
         } else {
             handleSpotlightResultClicked();
         }
-    }, [handleSpotlightResultClicked, setError, setLoading]);
+    }, [handleSpotlightResultClicked, setError, setLoading, setParentId]);
 
     const formatAnswers = useCallback((item: Answer | string, parentId: string, parentObject?: Answer | RegistryItem): Result => {
-        // const id = `${parentId}-${typeof item === 'string' ? item : item.key}`;
-        const id = getUUID();
+        const id = generateId(typeof item === 'string' ? item : item.label ?? item.key);
         return {
             type: 'option',
             id,
@@ -112,9 +148,15 @@ export function Default (props: SpotlightOptions): null {
     }, [formatAnswers, handleAction]);
 
     const handleSpotlightUpdate = useCallback(() => {
-        const newResults: Result[] = Registry.map((item) => formatResult(item));
+        if (type !== 'search') return;
+        const newResults: Result[] = registry.items.map((item) => formatResult(item));
         updateCatalog(newResults);
-    }, [formatResult]);
+        const ev = new CustomEvent(CATALOG_UPDATE_EVENT, {
+            bubbles: false,
+        });
+        document.dispatchEvent(ev);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [formatResult, type, registry.items, forceUpdate]);
 
     const handleSpotlightStart = useCallback(() => {
         handleSpotlightUpdate();
@@ -127,17 +169,9 @@ export function Default (props: SpotlightOptions): null {
     }, [handleSpotlightUpdate, setError, setPlaceholder, setType, setVisible]);
 
     useEffect(() => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        document.removeEventListener(REGISTRY_UPDATE_EVENT_KEY, (() => handleSpotlightUpdate()) as any);
-        if (type === 'search') {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            document.addEventListener(REGISTRY_UPDATE_EVENT_KEY, (() => handleSpotlightUpdate()) as any);
-        }
-        return () => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            document.removeEventListener(REGISTRY_UPDATE_EVENT_KEY, (() => handleSpotlightUpdate()) as any);
-        };
-    }, [handleSpotlightUpdate, type]);
+        handleSpotlightUpdate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [handleSpotlightUpdate, registry.items, forceUpdate]);
 
     useHotkeys(props.spotlightShortcut!, (ev) => {
         preventDefault(ev);

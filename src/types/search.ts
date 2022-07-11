@@ -14,7 +14,14 @@ interface IconProps {
 }
 
 export interface RegisterOptions extends IconProps {
+    // To which category the items should be added.
     category?: string;
+    // Should the user be warned when they try to execute the item? (A custom warning message can be written here if needed)
+    confirm?: boolean | string;
+}
+
+export interface RegisterCommandOptions extends RegisterOptions {
+    // Possibility to add sub categories to the command.
     options?: Answer[] | string[];
 }
 
@@ -25,6 +32,8 @@ export interface RegistryItem extends IconProps {
     label: string;
     category: string;
     action: (result?: string) => any | Promise<any | unknown | void>;
+    // Should the user be warned when they try to execute the item? (A custom warning message can be written here if needed)
+    confirm?: boolean | string;
     options?: Answer[] | string[];
 }
 

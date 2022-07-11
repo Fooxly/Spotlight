@@ -12,6 +12,9 @@ interface IconProps {
 }
 export interface RegisterOptions extends IconProps {
     category?: string;
+    confirm?: boolean | string;
+}
+export interface RegisterCommandOptions extends RegisterOptions {
     options?: Answer[] | string[];
 }
 export interface RegistryItem extends IconProps {
@@ -21,6 +24,7 @@ export interface RegistryItem extends IconProps {
     label: string;
     category: string;
     action: (result?: string) => any | Promise<any | unknown | void>;
+    confirm?: boolean | string;
     options?: Answer[] | string[];
 }
 export interface Result {

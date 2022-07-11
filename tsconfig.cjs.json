@@ -3,6 +3,12 @@
   "compilerOptions": {
     "outDir": "lib/cjs",
     "module": "commonjs",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext",
+    ],
   },
+  "include": ["src", "src/server"],
   "exclude": ["node_modules", "lib"],
 }

@@ -1,7 +1,7 @@
 import { exec, ExecException } from 'node:child_process';
 import { WebSocketServer } from 'ws';
 
-import { ShellCommand, ShellCommandResponse } from '@/types';
+import { ShellCommand, ShellCommandResponse } from '../types';
 
 const port = (process.argv?.[2] === '--port' || process.argv?.[2] === '-p' ? Number(process.argv?.[3]) : 1898) ?? 1898;
 
@@ -10,6 +10,7 @@ const currentDir = process.cwd();
 
 console.log(`Running Spotlight server on port \u001B[32m${port}\u001B[0m`);
 wss.on('connection', (ws) => {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     ws.on('message', async (data) => {
         try {
             // eslint-disable-next-line @typescript-eslint/no-base-to-string
@@ -25,7 +26,7 @@ wss.on('connection', (ws) => {
                     exec(`
     osascript -e 'tell application "Terminal"
         activate
-        do script "clear && cd \\"${currentDir}\\" && ${json.command.replaceAll('"', '\\"')} && echo Press any key to exit \\\\.\\\\.\\\\.; read -k1 -s && exit"
+        do script "clear && cd \\"${currentDir}\\" && ${json.command.replace(/"/gm, '\\"')} && echo Press any key to exit \\\\.\\\\.\\\\.; read -k1 -s && exit"
     end tell'
                     `, (error: ExecException | null, stdout) => {
                         if (error) return reject(new Error('TERMINAL_FAILED'));
@@ -43,7 +44,6 @@ wss.on('connection', (ws) => {
                 result,
             } as ShellCommandResponse));
         } catch (error) {
-            console.log(error);
             ws.send(JSON.stringify({
                 success: false,
                 error,
