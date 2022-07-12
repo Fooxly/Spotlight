@@ -4,7 +4,7 @@
 
     &.spotlight-search-box-no-icons {
         .spotlight-search-result-icon {
-            display: none;
+            display: none !important;
         }
     }
 

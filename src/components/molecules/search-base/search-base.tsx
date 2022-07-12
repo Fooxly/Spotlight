@@ -129,7 +129,7 @@ export function SearchBase (): JSX.Element {
     }, [setForceUpdate, search, results, type]);
 
     const showIcons = useMemo(() => {
-        return results.some((result) => result.icon);
+        return results.some((result) => !!result.icon?.length);
     }, [results]);
 
     const scrollResultIntoView = useCallback((id?: string) => {
@@ -296,7 +296,7 @@ export function SearchBase (): JSX.Element {
 
     return (
         <Overlay visible={visible} setVisible={setVisible}>
-            <Container className={`spotlight-search-box ${!showIcons ? ' spotlight-search-box-no-icons' : ''}`.trim()}>
+            <Container className={`spotlight-search-box ${!showIcons ? 'spotlight-search-box-no-icons' : ''}`.trim()}>
                 <SearchInput type={type} forwardRef={searchRef} value={search} onValueChange={(v) => setSearch(v)} />
                 <SearchError />
                 {categories.length > 0 && (

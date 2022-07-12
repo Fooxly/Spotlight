@@ -3,7 +3,7 @@
   max-width: 650px;
 }
 .spotlight-search-box.spotlight-search-box-no-icons .spotlight-search-result-icon {
-  display: none;
+  display: none !important;
 }
 .spotlight-search-box .spotlight-search-results {
   border-top: 1px solid var(--color-gray8);
