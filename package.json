@@ -48,13 +48,15 @@
         ]
     },
     "scripts": {
-        "debug": "concurrently --kill-others \"yarn debug:cjs\" \"yarn debug:esm\"",
+        "debug": "concurrently --kill-others \"yarn debug:cjs\" \"yarn debug:esm\" \"yarn debug:cpy\"",
         "debug:cjs": "concurrently --kill-others \"tsc -w --project tsconfig.cjs.json\" \"sass --watch src:lib/cjs\" \"tsc-alias -w -p tsconfig.cjs.json\"",
         "debug:esm": "concurrently --kill-others \"tsc -w --project tsconfig.json\" \"sass --watch src:lib/esm\" \"tsc-alias -w -p tsconfig.json\"",
+        "debug:cpy": "nodemon --watch src --ext ts,tsx,json,scss --exec 'sleep 1 && yarn build:cpy'",
         "clean": "rm -rf lib",
-        "build": "yarn clean && yarn build:esm && yarn build:cjs",
+        "build": "yarn clean && yarn build:esm && yarn build:cjs && yarn build:cpy",
         "build:esm": "tsc --project tsconfig.json && sass src:lib/esm && tsc-alias -p tsconfig.json",
         "build:cjs": "tsc --project tsconfig.cjs.json && sass src:lib/cjs && tsc-alias -p tsconfig.cjs.json",
+        "build:cpy": "cp lib/cjs/styles/main.css main.css && cp src/module.d.ts lib/cjs/declarations.d.ts && cp src/module.d.ts lib/esm/declarations.d.ts",
         "typecheck": "tsc --noEmit",
         "lint": "eslint --ext ts,tsx src",
         "lint-fix": "yarn lint --fix"
@@ -79,7 +81,7 @@
         "@types/ws": "^8.5.3",
         "concurrently": "^7.1.0",
         "jest": "^27.5.1",
-        "nodemon": "^2.0.15",
+        "nodemon": "^2.0.19",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "sass": "^1.53.0",
