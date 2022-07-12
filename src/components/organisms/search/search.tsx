@@ -7,8 +7,6 @@ import { SearchBase } from '@/components/molecules';
 import { Error, SearchContext, SearchType } from '@/utils';
 import { Result, SpotlightOptions } from '@/types';
 
-import './styles.css';
-
 export function Search (props: SpotlightOptions): JSX.Element {
     const [type, setType] = useState<SearchType>('search');
     const [visible, setVisible] = useState<boolean>(false);

@@ -15,5 +15,9 @@ export function updateRegistry (newRegistry: RegistryItem[]) {
 }
 
 export function addRegistry (item: RegistryItem) {
+    const index = registry.items.findIndex((i) => i.key === item.key);
+    if (index !== -1) {
+        registry.items.splice(index, 1);
+    }
     registry.items = [...registry.items, item];
 }

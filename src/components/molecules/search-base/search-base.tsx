@@ -20,8 +20,6 @@ import {
 } from '@/utils';
 import { Category, Result, SearchCloseEvent } from '@/types';
 
-import './styles.css';
-
 const preventDefault = (ev: KeyboardEvent) => {
     ev.preventDefault();
     ev.stopPropagation();

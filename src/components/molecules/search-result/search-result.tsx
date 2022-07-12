@@ -4,8 +4,6 @@ import { Result } from '@/types';
 import { getLocalIcon, useSearchContext } from '@/utils';
 import { Icons } from '@/utils/constants/icons';
 
-import './styles.css';
-
 interface Props {
     result: Result;
 }

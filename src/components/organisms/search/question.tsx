@@ -10,8 +10,6 @@ import {
 } from '@/utils';
 import { Answer, QuestionEvent, QuestionResponseEvent, Result, SearchCloseEvent } from '@/types';
 
-import './styles.css';
-
 export function Question (): null {
     const {
         type,

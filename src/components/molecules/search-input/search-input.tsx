@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 
-import './styles.css';
 import { ArrowIcon, SearchIcon, TimesIcon } from '@/icons/line';
 import { Loading } from '@/components/atoms';
 import { SearchType, useSearchContext } from '@/utils';

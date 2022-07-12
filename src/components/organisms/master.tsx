@@ -9,8 +9,6 @@ import { Search } from './search';
 
 import type { SpotlightOptions } from '@/types';
 
-import '@/styles/main.css';
-
 export function Master (props: SpotlightOptions): JSX.Element {
     const { light, appearance } = useAppearance(props.appearance ?? 'auto');
 
