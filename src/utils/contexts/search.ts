@@ -14,6 +14,7 @@ export interface SearchContextProps {
     // Spotlight props
     devMode: boolean;
     showTips: boolean;
+    customTips: string[];
     // Handling of spotlight
     type: SearchType;
     setType: (type: SearchType) => void;
@@ -36,6 +37,7 @@ export interface SearchContextProps {
 export const SearchContext = createContext<SearchContextProps>({
     devMode: false,
     showTips: false,
+    customTips: [],
     type: 'search',
     setType: () => {},
     visible: false,

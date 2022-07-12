@@ -15,10 +15,14 @@ interface Props {
 }
 
 export function SearchTips ({ visible: visibleProp = true }: Props): JSX.Element | null {
-    const { visible, devMode, showTips } = useSearchContext();
+    const { visible, devMode, showTips, customTips } = useSearchContext();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    const finalTips = useMemo(() => [...TIPS, ...(devMode ? DEV_TIPS : [])], [TIPS, DEV_TIPS, devMode]);
+    const finalTips = useMemo(() => [
+        ...customTips,
+        ...TIPS,
+        ...(devMode ? DEV_TIPS : []),
+    ], [customTips, devMode]);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const activeTip = useMemo(() => finalTips[Math.floor(Math.random() * finalTips.length)], [finalTips, visible]);

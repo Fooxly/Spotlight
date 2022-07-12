@@ -12,6 +12,7 @@ export declare type Error = ERRORS | ErrorObject;
 export interface SearchContextProps {
     devMode: boolean;
     showTips: boolean;
+    customTips: string[];
     type: SearchType;
     setType: (type: SearchType) => void;
     visible: boolean;

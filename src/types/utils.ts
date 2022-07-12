@@ -7,8 +7,6 @@ export interface SpotlightOptions {
     appearance?: Appearance;
     // A shortcut for the spotlight view. (Default vaue is cmd+shift+k, ctrl+shift+k)
     spotlightShortcut?: string;
-    // A shortcut for the color picker. (Default value is null)
-    colorPickerShortcut?: string;
     // The amount of items which will be shown in the recently used section in spotlight. (Default value is 5)
     showRecentlyUsed?: number;
     // This can disable the tips view all together. (Default value is true)

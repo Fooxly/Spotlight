@@ -14,10 +14,9 @@ import {
 } from '@/commands';
 
 const DefaultConfig: SpotlightOptions = {
-    devMode: false,
+    devMode: true,
     appearance: 'auto',
     spotlightShortcut: 'cmd+shift+k, ctrl+shift+k',
-    colorPickerShortcut: undefined,
     showRecentlyUsed: 5,
     showTips: true,
 };
@@ -25,7 +24,7 @@ const DefaultConfig: SpotlightOptions = {
 let lastConfigSettings = DefaultConfig;
 
 // Update / set the config for spotlight
-function config (options: SpotlightOptions) {
+export function config (options: SpotlightOptions) {
     // Merge the default options (or last chosen options) with the new user chosen ones
     lastConfigSettings = { ...lastConfigSettings, ...options };
 
@@ -58,7 +57,7 @@ function config (options: SpotlightOptions) {
 }
 
 // Update the appearance of spotlight
-function setAppearance (appearance: Appearance) {
+export function setAppearance (appearance: Appearance) {
     if (typeof window === 'undefined') {
         console.error('Unable to set appearance. Window is not defined.');
         return;
