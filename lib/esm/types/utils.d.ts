@@ -1,6 +1,6 @@
 import { Appearance } from './colors';
 export interface SpotlightOptions {
-    devMode: boolean;
+    devMode?: boolean;
     appearance?: Appearance;
     spotlightShortcut?: string;
     showRecentlyUsed?: number;

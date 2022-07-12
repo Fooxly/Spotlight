@@ -2,7 +2,7 @@ import { Appearance } from './colors';
 
 export interface SpotlightOptions {
     // If the spotlight is in dev mode or not. Dev mode will give more features but is not suitable for production.
-    devMode: boolean;
+    devMode?: boolean;
     // The appearance spotlight should start with. (Default value is auto)
     appearance?: Appearance;
     // A shortcut for the spotlight view. (Default vaue is cmd+shift+k, ctrl+shift+k)
