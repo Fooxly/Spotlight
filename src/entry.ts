@@ -14,7 +14,7 @@ let lastConfigSettings = DefaultConfig;
 
 // Update / set the config for spotlight
 export function generateConfig (setup: (options: SpotlightOptions) => void) {
-    return function (options: SpotlightOptions) {
+    return function (options?: SpotlightOptions) {
         // Merge the default options (or last chosen options) with the new user chosen ones
         lastConfigSettings = { ...lastConfigSettings, ...options };
 
