@@ -1,5 +1,4 @@
 import React from 'react';
-import './styles.css';
 import { SearchType } from '../../../utils';
 export interface SearchInputProps {
     type: SearchType;

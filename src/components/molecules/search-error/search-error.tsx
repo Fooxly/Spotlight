@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 
-import './styles.css';
 import { TimesIcon } from '@/icons/line';
 import { DEV_ERRORS, ErrorObject, NORMAL_ERRORS, useSearchContext } from '@/utils';
 

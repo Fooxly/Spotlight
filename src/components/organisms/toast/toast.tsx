@@ -4,8 +4,6 @@ import { TOAST_EVENT_KEY } from '@/utils';
 import { InfoIcon, WarningCircleIcon } from '@/icons/line';
 import { ToastEvent } from '@/types';
 
-import './styles.css';
-
 let timeout: NodeJS.Timeout | null = null;
 
 export function Toast (): JSX.Element | null {

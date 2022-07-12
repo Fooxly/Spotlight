@@ -4,8 +4,6 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { SEARCH_CLOSED_EVENT_KEY } from '@/utils';
 import { SearchCloseEvent } from '@/types';
 
-import './styles.css';
-
 interface Props extends React.HTMLProps<HTMLDivElement> {
     visible: boolean;
     setVisible: (visible: boolean) => void;

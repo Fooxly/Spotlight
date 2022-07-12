@@ -1,6 +1,5 @@
 /// <reference types="react" />
 import { Result } from '../../../types';
-import './styles.css';
 interface Props {
     result: Result;
 }

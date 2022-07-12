@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 
-import './styles.css';
 import { useSearchContext } from '@/utils';
 import { DEV_TIPS, TIPS } from '@/utils/constants/tips';
 

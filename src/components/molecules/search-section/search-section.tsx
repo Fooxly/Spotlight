@@ -5,8 +5,6 @@ import { SearchResult } from '../search-result';
 import { Category } from '@/types';
 import { useSearchContext } from '@/utils';
 
-import './styles.css';
-
 interface Props {
     category: Category;
 }

@@ -2,8 +2,6 @@ import React from 'react';
 
 import { getColor } from '@/utils/appearance';
 
-import './styles.css';
-
 interface Props {
     size?: number;
     color?: string;

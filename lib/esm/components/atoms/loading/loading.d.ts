@@ -1,5 +1,4 @@
 /// <reference types="react" />
-import './styles.css';
 interface Props {
     size?: number;
     color?: string;

@@ -14,8 +14,6 @@ import {
 import { Answer, RegistryItem, Result, SpotlightOptions } from '@/types';
 import { getResultById } from '@/utils/search';
 
-import './styles.css';
-
 const preventDefault = (ev: KeyboardEvent) => {
     ev.preventDefault();
     ev.stopPropagation();
