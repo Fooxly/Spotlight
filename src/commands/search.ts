@@ -40,17 +40,19 @@ export function question (
     });
 }
 
-export function registerCommand (
+export function registerCommand <Options extends RegisterCommandOptions> (
     title: string,
-    action: (result?: string) => any | Promise<any | unknown | void>,
-    options?: RegisterCommandOptions,
+    action: Options extends { options: any[] }
+        ? ((result: string) => any | Promise<any | unknown | void>)
+        : ((result: undefined) => any | Promise<any | unknown | void>),
+    options?: Options,
 ): void {
     addRegistry({
         id: generateId(title),
         type: 'command',
         key: title,
         label: title,
-        action,
+        action: action as never,
         category: options?.category ?? 'Commands',
         confirm: options?.confirm,
         icon: options?.icon,
