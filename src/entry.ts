@@ -8,6 +8,7 @@ export const DefaultConfig: SpotlightOptions = {
     spotlightShortcut: 'cmd+shift+k, ctrl+shift+k',
     showRecentlyUsed: 5,
     showTips: true,
+    customTips: [],
 };
 
 let lastConfigSettings = DefaultConfig;

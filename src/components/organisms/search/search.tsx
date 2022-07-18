@@ -21,7 +21,7 @@ export function Search (props: SpotlightOptions): JSX.Element {
         <SearchContext.Provider value={{
             devMode: props.devMode ?? false,
             showTips: props.showTips ?? true,
-            customTips: props.customTips ?? [],
+            customTips: props.customTips!,
             type,
             setType,
             visible,
